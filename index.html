@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --accent: #00e5a0;
+    --accent2: #ff6b35;
+    --accent3: #4d9fff;
+    --text: #e8e8f0;
+    --muted: #6a6a88;
+    --gain: #00e5a0;
+    --loss: #ff4d6d;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+min-height: 100vh;
+padding: 0;
+overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.04’/%3E%3C/svg%3E”);
+pointer-events: none;
+z-index: 0;
+opacity: 0.4;
+}
+
+.header {
+padding: 32px 40px 24px;
+border-bottom: 1px solid var(–border);
+display: flex;
+align-items: baseline;
+gap: 16px;
+position: relative;
+z-index: 1;
+}
+
+.header h1 {
+font-family: ‘Syne’, sans-serif;
+font-size: 28px;
+font-weight: 800;
+letter-spacing: -0.5px;
+color: var(–text);
+}
+
+.header .dot {
+width: 8px; height: 8px;
+border-radius: 50%;
+background: var(–accent);
+box-shadow: 0 0 12px var(–accent);
+animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+0%, 100% { opacity: 1; box-shadow: 0 0 12px var(–accent); }
+50% { opacity: 0.5; box-shadow: 0 0 4px var(–accent); }
+}
+
+.header .subtitle {
+color: var(–muted);
+font-size: 11px;
+letter-spacing: 2px;
+text-transform: uppercase;
+margin-left: auto;
+}
+
+.main {
+padding: 32px 40px;
+position: relative;
+z-index: 1;
+max-width: 1400px;
+}
+
+/* ── DROP ZONE ── */
+#dropZone {
+border: 1.5px dashed var(–border);
+border-radius: 12px;
+padding: 48px;
+text-align: center;
+cursor: pointer;
+transition: all 0.2s;
+background: var(–surface);
+position: relative;
+overflow: hidden;
+}
+
+#dropZone::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: radial-gradient(ellipse at 50% 0%, rgba(0,229,160,0.05) 0%, transparent 70%);
+pointer-events: none;
+}
+
+#dropZone:hover, #dropZone.drag-over {
+border-color: var(–accent);
+background: rgba(0,229,160,0.04);
+}
+
+#dropZone .icon {
+font-size: 36px;
+margin-bottom: 16px;
+}
+
+#dropZone h2 {
+font-family: ‘Syne’, sans-serif;
+font-size: 18px;
+font-weight: 600;
+margin-bottom: 8px;
+}
+
+#dropZone p {
+color: var(–muted);
+font-size: 12px;
+line-height: 1.6;
+}
+
+#dropZone .browse-btn {
+display: inline-block;
+margin-top: 20px;
+padding: 10px 24px;
+background: transparent;
+border: 1px solid var(–accent);
+color: var(–accent);
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+border-radius: 6px;
+cursor: pointer;
+letter-spacing: 1px;
+text-transform: uppercase;
+transition: all 0.2s;
+}
+
+#dropZone .browse-btn:hover {
+background: var(–accent);
+color: var(–bg);
+}
+
+#fileInput { display: none; }
+
+/* ── STATUS / LOADING ── */
+#status {
+margin-top: 20px;
+padding: 14px 18px;
+border-radius: 8px;
+font-size: 12px;
+display: none;
+}
+
+#status.info { background: rgba(77,159,255,0.1); border: 1px solid rgba(77,159,255,0.3); color: var(–accent3); }
+#status.success { background: rgba(0,229,160,0.1); border: 1px solid rgba(0,229,160,0.3); color: var(–accent); }
+#status.error { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3); color: var(–loss); }
+
+/* ── STATS ROW ── */
+#statsRow {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+gap: 16px;
+margin-top: 28px;
+display: none;
+}
+
+.stat-card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 20px;
+position: relative;
+overflow: hidden;
+animation: fadeUp 0.4s ease forwards;
+opacity: 0;
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+.stat-card .label {
+font-size: 10px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 10px;
+}
+
+.stat-card .value {
+font-family: ‘Syne’, sans-serif;
+font-size: 24px;
+font-weight: 700;
+color: var(–text);
+}
+
+.stat-card .change {
+font-size: 11px;
+margin-top: 6px;
+}
+
+.stat-card .change.gain { color: var(–gain); }
+.stat-card .change.loss { color: var(–loss); }
+
+.stat-card::after {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 2px;
+}
+
+.stat-card:nth-child(1)::after { background: var(–accent); }
+.stat-card:nth-child(2)::after { background: var(–accent2); }
+.stat-card:nth-child(3)::after { background: var(–accent3); }
+.stat-card:nth-child(4)::after { background: #c77dff; }
+
+/* ── CHART ── */
+#chartSection {
+margin-top: 28px;
+display: none;
+}
+
+.chart-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 16px;
+flex-wrap: wrap;
+gap: 12px;
+}
+
+.chart-header h3 {
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+font-weight: 600;
+letter-spacing: 1px;
+text-transform: uppercase;
+}
+
+.range-btns {
+display: flex;
+gap: 6px;
+}
+
+.range-btn {
+padding: 6px 14px;
+border-radius: 6px;
+border: 1px solid var(–border);
+background: transparent;
+color: var(–muted);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+cursor: pointer;
+transition: all 0.15s;
+letter-spacing: 0.5px;
+}
+
+.range-btn:hover { border-color: var(–accent); color: var(–accent); }
+.range-btn.active { background: var(–accent); border-color: var(–accent); color: var(–bg); }
+
+.chart-wrap {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 24px;
+position: relative;
+}
+
+#portfolioChart { width: 100% !important; height: 340px !important; }
+
+/* ── HOLDINGS TABLE ── */
+#holdingsSection {
+margin-top: 28px;
+display: none;
+}
+
+.holdings-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 16px;
+}
+
+.holdings-header h3 {
+font-family: ‘Syne’, sans-serif;
+font-size: 14px;
+font-weight: 600;
+letter-spacing: 1px;
+text-transform: uppercase;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+background: var(–surface);
+border-radius: 12px;
+overflow: hidden;
+border: 1px solid var(–border);
+}
+
+th {
+text-align: left;
+padding: 14px 16px;
+font-size: 10px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+border-bottom: 1px solid var(–border);
+background: var(–surface2);
+font-weight: 400;
+}
+
+td {
+padding: 14px 16px;
+font-size: 12px;
+border-bottom: 1px solid rgba(42,42,58,0.5);
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+.ticker-badge {
+display: inline-block;
+padding: 3px 8px;
+border-radius: 4px;
+background: var(–surface2);
+border: 1px solid var(–border);
+font-size: 11px;
+font-weight: 500;
+letter-spacing: 0.5px;
+}
+
+.gain-cell { color: var(–gain); }
+.loss-cell { color: var(–loss); }
+
+/* ── INSTRUCTIONS ── */
+#instructions {
+margin-top: 24px;
+padding: 20px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+font-size: 11px;
+line-height: 1.8;
+color: var(–muted);
+}
+
+#instructions strong { color: var(–accent); }
+#instructions h4 {
+font-family: ‘Syne’, sans-serif;
+font-size: 12px;
+font-weight: 600;
+letter-spacing: 1px;
+text-transform: uppercase;
+color: var(–text);
+margin-bottom: 10px;
+}
+
+#instructions ol { padding-left: 16px; }
+#instructions li { margin-bottom: 4px; }
+
+/* ── RESET ── */
+#resetBtn {
+display: none;
+margin-top: 16px;
+padding: 8px 18px;
+background: transparent;
+border: 1px solid var(–border);
+color: var(–muted);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+border-radius: 6px;
+cursor: pointer;
+letter-spacing: 1px;
+text-transform: uppercase;
+transition: all 0.2s;
+}
+#resetBtn:hover { border-color: var(–loss); color: var(–loss); }
+
+/* ── PROGRESS BAR ── */
+#progressBar {
+display: none;
+margin-top: 12px;
+height: 3px;
+background: var(–border);
+border-radius: 2px;
+overflow: hidden;
+}
+#progressFill {
+height: 100%;
+background: var(–accent);
+width: 0%;
+transition: width 0.3s ease;
+border-radius: 2px;
+}
+
+.note {
+margin-top: 12px;
+padding: 12px 16px;
+background: rgba(255,107,53,0.08);
+border: 1px solid rgba(255,107,53,0.25);
+border-radius: 8px;
+font-size: 11px;
+color: #ffaa80;
+line-height: 1.6;
+display: none;
+}
+
+@media (max-width: 600px) {
+.main, .header { padding: 20px; }
+.stat-card .value { font-size: 20px; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="header">
+  <div class="dot"></div>
+  <h1>Portfolio Tracker</h1>
+  <span class="subtitle">CMC Invest · Self-hosted</span>
+</div>
+
+<div class="main">
+
+  <div id="dropZone">
+    <div class="icon">📂</div>
+    <h2>Drop your CMC CSV here</h2>
+    <p>Export from CMC Invest → Activity → Download CSV<br>
+    Handles ASX (.AX) and US tickers automatically</p>
+    <button class="browse-btn" onclick="document.getElementById('fileInput').click()">Browse File</button>
+    <input type="file" id="fileInput" accept=".csv">
+  </div>
+
+  <div id="status"></div>
+  <div id="progressBar"><div id="progressFill"></div></div>
+
+  <div id="statsRow">
+    <div class="stat-card">
+      <div class="label">Current Value</div>
+      <div class="value" id="statValue">—</div>
+      <div class="change" id="statValueChange"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Cost</div>
+      <div class="value" id="statCost">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Gain / Loss</div>
+      <div class="value" id="statGain">—</div>
+      <div class="change" id="statGainPct"></div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Holdings</div>
+      <div class="value" id="statHoldings">—</div>
+      <div class="change" id="statLastUpdated"></div>
+    </div>
+  </div>
+
+  <div id="chartSection">
+    <div class="chart-header">
+      <h3>Portfolio Value</h3>
+      <div class="range-btns">
+        <button class="range-btn" onclick="setRange(30)">1M</button>
+        <button class="range-btn" onclick="setRange(90)">3M</button>
+        <button class="range-btn" onclick="setRange(180)">6M</button>
+        <button class="range-btn active" onclick="setRange(365)">1Y</button>
+        <button class="range-btn" onclick="setRange(0)">All</button>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="portfolioChart"></canvas>
+    </div>
+  </div>
+
+  <div id="holdingsSection">
+    <div class="holdings-header">
+      <h3>Current Holdings</h3>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Shares</th>
+          <th>Avg Cost</th>
+          <th>Current Price</th>
+          <th>Market Value</th>
+          <th>Gain / Loss</th>
+          <th>Return</th>
+        </tr>
+      </thead>
+      <tbody id="holdingsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="note" id="corsNote">
+    ⚠️ <strong>Price fetching blocked by browser CORS policy.</strong> Yahoo Finance's API can't be called directly from a local file in all browsers. 
+    Try opening this file in Firefox, or drag the file onto a simple local server. 
+    Alternatively, use the <strong>manual price mode</strong> below — prices will be shown as "N/A" and you can enter them yourself.
+  </div>
+
+<button id="resetBtn" onclick="resetApp()">↩ Load different file</button>
+
+  <div id="instructions">
+    <h4>How to export from CMC Invest</h4>
+    <ol>
+      <li>Log in to <strong>CMC Invest</strong> → go to <strong>Activity</strong> or <strong>Transaction History</strong></li>
+      <li>Click <strong>Export / Download CSV</strong> (usually top-right)</li>
+      <li>Save the file, then drag it onto this page</li>
+    </ol>
+    <br>
+    <strong>Supported columns:</strong> Date, Ticker/Symbol, Type (Buy/Sell), Quantity, Price, Brokerage — exact column names may vary, the app will auto-detect.
+  </div>
+
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────
+let allChartData = [];
+let chartInstance = null;
+let holdingsData = [];
+
+// ─── Drop Zone ───────────────────────────────────────
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) processFile(fileInput.files[0]);
+});
+
+// ─── Status helpers ───────────────────────────────────
+function showStatus(msg, type='info') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = type;
+  el.style.display = 'block';
+}
+
+function setProgress(pct) {
+  document.getElementById('progressBar').style.display = 'block';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ─── Parse CMC CSV ────────────────────────────────────
+function processFile(file) {
+  showStatus('📄 Reading CSV...', 'info');
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: async (results) => {
+      try {
+        const trades = parseTrades(results.data);
+        if (!trades.length) throw new Error('No trades found — check CSV format');
+        showStatus(`✓ Found ${trades.length} transactions. Fetching prices...`, 'info');
+        await buildPortfolio(trades);
+      } catch(e) {
+        showStatus('✗ Error: ' + e.message, 'error');
+      }
+    },
+    error: (e) => showStatus('✗ CSV parse error: ' + e.message, 'error')
+  });
+}
+
+function findCol(row, candidates) {
+  const keys = Object.keys(row);
+  for (const c of candidates) {
+    const match = keys.find(k => k.toLowerCase().trim().includes(c.toLowerCase()));
+    if (match) return match;
+  }
+  return null;
+}
+
+function parseTrades(rows) {
+  if (!rows.length) throw new Error('CSV is empty');
+  const sample = rows[0];
+
+  const dateCol    = findCol(sample, ['date','trade date','transaction date']);
+  const typeCol    = findCol(sample, ['type','transaction type','side','action','order type']);
+  const tickerCol  = findCol(sample, ['ticker','symbol','code','instrument','stock','security']);
+  const qtyCol     = findCol(sample, ['quantity','qty','units','shares','volume']);
+  const priceCol   = findCol(sample, ['price','unit price','trade price','exec price']);
+  const brokerCol  = findCol(sample, ['brokerage','commission','fee','broker fee']);
+
+  if (!dateCol || !tickerCol || !qtyCol) {
+    throw new Error(`Could not detect columns. Found: ${Object.keys(sample).join(', ')}`);
+  }
+
+  const trades = [];
+  for (const row of rows) {
+    const type = (row[typeCol] || '').toUpperCase();
+    const isBuy  = type.includes('BUY') || type.includes('PURCHASE');
+    const isSell = type.includes('SELL');
+    if (!isBuy && !isSell) continue;
+
+    const rawTicker = (row[tickerCol] || '').trim().toUpperCase().replace(/[^A-Z0-9.]/g,'');
+    if (!rawTicker) continue;
+
+    const qty    = parseFloat((row[qtyCol] || '0').replace(/[^0-9.-]/g,''));
+    const price  = parseFloat((row[priceCol] || '0').replace(/[^0-9.-]/g,''));
+    const broker = parseFloat((row[brokerCol] || '0').replace(/[^0-9.-]/g,'')) || 0;
+
+    if (!qty || !price) continue;
+
+    trades.push({
+      date: parseDate(row[dateCol]),
+      ticker: rawTicker,
+      qty: isSell ? -qty : qty,
+      price,
+      brokerage: broker,
+      cost: (isSell ? -qty : qty) * price + broker
+    });
+  }
+
+  trades.sort((a,b) => a.date - b.date);
+  return trades;
+}
+
+function parseDate(str) {
+  if (!str) return new Date();
+  str = str.trim();
+  // Try DD/MM/YYYY first (AU format)
+  const dm = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dm) return new Date(+dm[3], +dm[2]-1, +dm[1]);
+  return new Date(str);
+}
+
+// ─── Build portfolio timeline ─────────────────────────
+async function buildPortfolio(trades) {
+  // Get unique tickers
+  const tickers = [...new Set(trades.map(t => t.ticker))];
+
+  // Determine Yahoo Finance symbols (.AX suffix for ASX stocks)
+  // Heuristic: if ticker is 2-3 chars with no dot it's probably ASX; if it has a . already leave it
+  // User can have mix so we'll try both and see what works
+  const yahooMap = {};
+  for (const t of tickers) {
+    // If already has exchange suffix, use as-is
+    if (t.includes('.')) { yahooMap[t] = t; continue; }
+    // Common US index ETFs / stocks (not exhaustive but catches the big ones)
+    const usOnly = ['SPY','QQQ','VTI','SCHB','IVV','VXUS','VEA','BND','ARKK','TSLA','AAPL','MSFT','NVDA','GOOGL','AMZN','META','AMD','INTC'];
+    if (usOnly.includes(t)) { yahooMap[t] = t; }
+    else { yahooMap[t] = t + '.AX'; } // assume ASX by default
+  }
+
+  // Get earliest and latest date
+  const startDate = trades[0].date;
+  const endDate = new Date();
+
+  // Fetch historical prices for each ticker
+  setProgress(10);
+  const prices = {}; // ticker -> { date_str -> close }
+  let fetched = 0;
+  let corsError = false;
+
+  for (const ticker of tickers) {
+    const symbol = yahooMap[ticker];
+    try {
+      const data = await fetchYahooHistory(symbol, startDate, endDate);
+      if (data && Object.keys(data).length > 0) {
+        prices[ticker] = data;
+      } else {
+        // Try the other exchange
+        const altSymbol = symbol.endsWith('.AX') ? ticker : ticker + '.AX';
+        const data2 = await fetchYahooHistory(altSymbol, startDate, endDate);
+        prices[ticker] = data2 || {};
+        if (data2 && Object.keys(data2).length > 0) yahooMap[ticker] = altSymbol;
+      }
+    } catch(e) {
+      if (e.message && e.message.includes('CORS')) corsError = true;
+      prices[ticker] = {};
+    }
+    fetched++;
+    setProgress(10 + 60 * (fetched / tickers.length));
+  }
+
+  if (corsError) {
+    document.getElementById('corsNote').style.display = 'block';
+  }
+
+  setProgress(75);
+
+  // Build daily holdings snapshots
+  // Walk day by day from start to today
+  const dayMs = 86400000;
+  const days = [];
+  let cursor = new Date(startDate);
+  cursor.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // holdings state: ticker -> { qty, totalCost }
+  let holdings = {};
+  let tradeIdx = 0;
+
+  while (cursor <= today) {
+    const dStr = cursor.toISOString().split('T')[0];
+
+    // Apply trades up to this day
+    while (tradeIdx < trades.length) {
+      const t = trades[tradeIdx];
+      const tDate = new Date(t.date); tDate.setHours(0,0,0,0);
+      if (tDate > cursor) break;
+      if (!holdings[t.ticker]) holdings[t.ticker] = { qty: 0, totalCost: 0 };
+      holdings[t.ticker].qty += t.qty;
+      holdings[t.ticker].totalCost += t.cost;
+      if (holdings[t.ticker].qty <= 0.0001) delete holdings[t.ticker];
+      tradeIdx++;
+    }
+
+    // Skip weekends for display clarity
+    const dow = cursor.getDay();
+    if (dow !== 0 && dow !== 6) {
+      let totalValue = 0;
+      let hasPrice = false;
+      for (const [ticker, h] of Object.entries(holdings)) {
+        const tickerPrices = prices[ticker] || {};
+        // Find nearest prior price
+        const p = nearestPrice(tickerPrices, dStr);
+        if (p !== null) { totalValue += h.qty * p; hasPrice = true; }
+      }
+      if (hasPrice || Object.keys(holdings).length === 0) {
+        days.push({ date: dStr, value: totalValue });
+      }
+    }
+
+    cursor = new Date(cursor.getTime() + dayMs);
+  }
+
+  setProgress(90);
+
+  // Compute holdings with current prices
+  holdingsData = [];
+  for (const [ticker, h] of Object.entries(holdings)) {
+    const tickerPrices = prices[ticker] || {};
+    const todayStr = today.toISOString().split('T')[0];
+    const currentPrice = nearestPrice(tickerPrices, todayStr);
+    const marketValue = currentPrice !== null ? h.qty * currentPrice : null;
+    const costBasis = h.totalCost;
+    const avgCost = h.qty > 0 ? costBasis / h.qty : 0;
+    holdingsData.push({ ticker, qty: h.qty, avgCost, currentPrice, marketValue, costBasis });
+  }
+
+  allChartData = days;
+  setProgress(100);
+
+  renderChart(days);
+  renderStats();
+  renderHoldings();
+
+  document.getElementById('statsRow').style.display = 'grid';
+  document.getElementById('chartSection').style.display = 'block';
+  document.getElementById('holdingsSection').style.display = 'block';
+  document.getElementById('resetBtn').style.display = 'inline-block';
+  document.getElementById('progressBar').style.display = 'none';
+  document.getElementById('instructions').style.display = 'none';
+  showStatus(`✓ Loaded ${trades.length} transactions across ${tickers.length} holdings`, 'success');
+}
+
+function nearestPrice(priceMap, dateStr) {
+  if (!priceMap || !Object.keys(priceMap).length) return null;
+  if (priceMap[dateStr] !== undefined) return priceMap[dateStr];
+  // Walk back up to 5 days
+  const d = new Date(dateStr);
+  for (let i = 1; i <= 5; i++) {
+    d.setDate(d.getDate() - 1);
+    const s = d.toISOString().split('T')[0];
+    if (priceMap[s] !== undefined) return priceMap[s];
+  }
+  return null;
+}
+
+// ─── Yahoo Finance fetch ──────────────────────────────
+async function fetchYahooHistory(symbol, from, to) {
+  const p1 = Math.floor(from.getTime() / 1000) - 86400;
+  const p2 = Math.floor(to.getTime() / 1000) + 86400;
+
+  // Use a CORS proxy (allorigins) to bypass browser CORS restriction
+  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${p1}&period2=${p2}&interval=1d&events=history`;
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(yahooUrl)}`;
+
+  const resp = await fetch(proxyUrl);
+  if (!resp.ok) throw new Error('Network error');
+  const wrapper = await resp.json();
+  const data = JSON.parse(wrapper.contents);
+
+  const result = data?.chart?.result?.[0];
+  if (!result) return null;
+
+  const timestamps = result.timestamp || [];
+  const closes = result.indicators?.quote?.[0]?.close || [];
+
+  const out = {};
+  for (let i = 0; i < timestamps.length; i++) {
+    if (closes[i] == null) continue;
+    const d = new Date(timestamps[i] * 1000);
+    const dStr = d.toISOString().split('T')[0];
+    out[dStr] = closes[i];
+  }
+  return out;
+}
+
+// ─── Chart ───────────────────────────────────────────
+let currentRange = 365;
+
+function setRange(days) {
+  currentRange = days;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const filtered = filterByRange(allChartData, days);
+  updateChart(filtered);
+}
+
+function filterByRange(data, days) {
+  if (!days) return data;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  return data.filter(d => new Date(d.date) >= cutoff);
+}
+
+function renderChart(data) {
+  const filtered = filterByRange(data, currentRange);
+  const ctx = document.getElementById('portfolioChart').getContext('2d');
+
+  if (chartInstance) chartInstance.destroy();
+
+  const labels = filtered.map(d => d.date);
+  const values = filtered.map(d => d.value);
+  const isGain = values[values.length-1] >= values[0];
+  const lineColor = isGain ? '#00e5a0' : '#ff4d6d';
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Portfolio Value (AUD)',
+        data: values,
+        borderColor: lineColor,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: lineColor,
+        fill: true,
+        backgroundColor: (ctx) => {
+          const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, isGain ? 'rgba(0,229,160,0.18)' : 'rgba(255,77,109,0.18)');
+          gradient.addColorStop(1, 'rgba(0,0,0,0)');
+          return gradient;
+        },
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a26',
+          borderColor: '#2a2a3a',
+          borderWidth: 1,
+          titleColor: '#6a6a88',
+          bodyColor: '#e8e8f0',
+          padding: 12,
+          callbacks: {
+            label: ctx => ' $' + ctx.raw.toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2})
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(42,42,58,0.5)', drawBorder: false },
+          ticks: {
+            color: '#6a6a88', font: { family: 'DM Mono', size: 10 },
+            maxTicksLimit: 8,
+            callback: (val, idx) => {
+              const d = new Date(labels[idx]);
+              return d.toLocaleDateString('en-AU', {day:'numeric', month:'short'});
+            }
+          }
+        },
+        y: {
+          grid: { color: 'rgba(42,42,58,0.5)', drawBorder: false },
+          ticks: {
+            color: '#6a6a88', font: { family: 'DM Mono', size: 10 },
+            callback: val => '$' + (val >= 1000 ? (val/1000).toFixed(1)+'k' : val.toFixed(0))
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateChart(data) {
+  if (!chartInstance) return;
+  const values = data.map(d => d.value);
+  const isGain = values[values.length-1] >= values[0];
+  const lineColor = isGain ? '#00e5a0' : '#ff4d6d';
+  chartInstance.data.labels = data.map(d => d.date);
+  chartInstance.data.datasets[0].data = values;
+  chartInstance.data.datasets[0].borderColor = lineColor;
+  chartInstance.update('active');
+}
+
+// ─── Stats ────────────────────────────────────────────
+function renderStats() {
+  const currentData = filterByRange(allChartData, currentRange);
+  const currentVal = currentData.length ? currentData[currentData.length-1].value : 0;
+  const startVal = currentData.length ? currentData[0].value : 0;
+
+  // Total cost basis from holdings
+  let totalCost = holdingsData.reduce((sum, h) => sum + (h.costBasis || 0), 0);
+  let totalValue = holdingsData.reduce((sum, h) => sum + (h.marketValue || 0), 0);
+  const gain = totalValue - totalCost;
+  const gainPct = totalCost ? (gain / totalCost * 100) : 0;
+
+  const periodGain = currentVal - startVal;
+  const periodPct = startVal ? (periodGain / startVal * 100) : 0;
+
+  document.getElementById('statValue').textContent = fmt(totalValue);
+  document.getElementById('statValueChange').textContent = (periodGain >= 0 ? '▲ +' : '▼ ') + fmt(Math.abs(periodGain)) + ' this period';
+  document.getElementById('statValueChange').className = 'change ' + (periodGain >= 0 ? 'gain' : 'loss');
+
+  document.getElementById('statCost').textContent = fmt(totalCost);
+
+  document.getElementById('statGain').textContent = (gain >= 0 ? '+' : '') + fmt(gain);
+  document.getElementById('statGain').style.color = gain >= 0 ? 'var(--gain)' : 'var(--loss)';
+  document.getElementById('statGainPct').textContent = (gainPct >= 0 ? '+' : '') + gainPct.toFixed(2) + '%';
+  document.getElementById('statGainPct').className = 'change ' + (gain >= 0 ? 'gain' : 'loss');
+
+  document.getElementById('statHoldings').textContent = holdingsData.length;
+  document.getElementById('statLastUpdated').textContent = 'as of today';
+  document.getElementById('statLastUpdated').className = 'change';
+}
+
+function fmt(n) {
+  if (n == null || isNaN(n)) return 'N/A';
+  return '$' + n.toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ─── Holdings table ───────────────────────────────────
+function renderHoldings() {
+  const tbody = document.getElementById('holdingsBody');
+  tbody.innerHTML = '';
+
+  const sorted = [...holdingsData].sort((a,b) => (b.marketValue||0) - (a.marketValue||0));
+
+  for (const h of sorted) {
+    const gain = h.marketValue != null ? (h.marketValue - h.costBasis) : null;
+    const gainPct = gain != null && h.costBasis ? (gain / h.costBasis * 100) : null;
+    const gainClass = gain != null ? (gain >= 0 ? 'gain-cell' : 'loss-cell') : '';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="ticker-badge">${h.ticker}</span></td>
+      <td>${h.qty.toFixed(4)}</td>
+      <td>${fmt(h.avgCost)}</td>
+      <td>${h.currentPrice != null ? fmt(h.currentPrice) : '<span style="color:var(--muted)">N/A</span>'}</td>
+      <td>${h.marketValue != null ? fmt(h.marketValue) : '<span style="color:var(--muted)">N/A</span>'}</td>
+      <td class="${gainClass}">${gain != null ? (gain >= 0 ? '+' : '') + fmt(gain) : '<span style="color:var(--muted)">N/A</span>'}</td>
+      <td class="${gainClass}">${gainPct != null ? (gainPct >= 0 ? '+' : '') + gainPct.toFixed(2) + '%' : '<span style="color:var(--muted)">N/A</span>'}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ─── Reset ────────────────────────────────────────────
+function resetApp() {
+  allChartData = []; holdingsData = [];
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  document.getElementById('statsRow').style.display = 'none';
+  document.getElementById('chartSection').style.display = 'none';
+  document.getElementById('holdingsSection').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('status').style.display = 'none';
+  document.getElementById('progressBar').style.display = 'none';
+  document.getElementById('corsNote').style.display = 'none';
+  document.getElementById('instructions').style.display = 'block';
+  document.getElementById('holdingsBody').innerHTML = '';
+  fileInput.value = '';
+}
+</script>
+
+</body>
+</html>
