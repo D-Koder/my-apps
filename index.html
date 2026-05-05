@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CMC Portfolio Tracker · Confirmation Reconcile v13</title>
+<title>CMC Portfolio Tracker · Confirmation Reconcile v14</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,9 +13,9 @@
 </style>
 </head>
 <body>
-<div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Confirm v12</span></div>
+<div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Confirm v14</span></div>
 <div class="main">
-  <div class="info-banner"><strong>Confirmation Reconcile v13</strong> · cost basis rebuilt from Confirmation History only. EODHD uses the smart symbol resolver from your working test app: market candidates first, then EODHD search, then confirmed quote. The Cloudflare Worker proxy keeps it CORS-safe.</div>
+  <div class="info-banner"><strong>Confirmation Reconcile v14</strong> · cost basis rebuilt from Confirmation History only. EODHD uses the smart symbol resolver from your working test app: market candidates first, then EODHD search, then confirmed quote. It now defaults to your Cloudflare Worker proxy so foreign quotes do not hit EODHD directly and avoid CORS.</div>
   <div id="dropZone"><div class="icon">📂</div><h2>Drop your CMC CSV here</h2><p>CMC Invest → Activity → Confirmation History → Download CSV<br>Cost basis in AUD · optional live prices · GitHub Pages friendly</p><button class="btn" onclick="document.getElementById('fileInput').click()">Browse File</button><input type="file" id="fileInput" accept=".csv"></div>
   <div id="status"></div>
   <div id="livePanel">
@@ -68,7 +68,7 @@ dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.a
 window.addEventListener('load',()=>{
   document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'';
   document.getElementById('eodKey').value=localStorage.getItem('cmc_eodhd_key')||'';
-  document.getElementById('eodProxyUrl').value=localStorage.getItem('cmc_eodhd_proxy_url')||'';
+  document.getElementById('eodProxyUrl').value=localStorage.getItem('cmc_eodhd_proxy_url')||DEFAULT_EODHD_PROXY_URL;
   document.getElementById('tdKey').value=localStorage.getItem('cmc_twelvedata_key')||'';
   document.getElementById('fxKey').value=localStorage.getItem('cmc_fx_key')||'';
   document.getElementById('fxUSD').value=localStorage.getItem('cmc_fx_usd')||'0.722';
@@ -288,7 +288,8 @@ function getEodhdSearchArray(searchResult){
 }
 function getEodhdProxyUrl(){
   const el=document.getElementById('eodProxyUrl');
-  return (el&&el.value?el.value.trim().replace(/\/+$/,''):'');
+  const value=(el&&el.value?el.value.trim():'') || DEFAULT_EODHD_PROXY_URL;
+  return value.replace(/\/+$/,'');
 }
 function eodhdAvailable(key){return Boolean(getEodhdProxyUrl()||key)}
 async function fetchEodhdWorker(path){
