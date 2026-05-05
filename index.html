@@ -193,7 +193,7 @@
           <th>Price</th>
           <th>Market Value</th>
           <th>Cost Value</th>
-          <th>P&L</th>
+          <th>P&amp;L</th>
           <th>Return</th>
           <th>Currency</th>
           <th>Source</th>
@@ -239,6 +239,7 @@
     function log(message, data = null) {
       const box = document.getElementById("debugLog");
       const time = new Date().toLocaleTimeString();
+
       box.textContent += `[${time}] ${message}\n`;
 
       if (data !== null) {
@@ -271,48 +272,58 @@
       return n.toFixed(2) + "%";
     }
 
-   function getPriceFromQuote(response) {
-  if (!response || typeof response !== "object") return null;
+    function unwrapQuoteResponse(response) {
+      if (!response || typeof response !== "object") return null;
 
-  const data = response.data && typeof response.data === "object"
-    ? response.data
-    : response;
+      if (response.data && typeof response.data === "object") {
+        return response.data;
+      }
 
-  const raw =
-    data.close ??
-    data.price ??
-    data.last ??
-    data.previousClose ??
-    data.adjusted_close ??
-    data.adjustedClose ??
-    null;
+      return response;
+    }
 
-  const n = Number(raw);
+    function getPriceFromQuote(response) {
+      const data = unwrapQuoteResponse(response);
+      if (!data) return null;
 
-  if (!Number.isFinite(n) || n <= 0) {
-    return null;
-  }
+      const raw =
+        data.close ??
+        data.price ??
+        data.last ??
+        data.previousClose ??
+        data.adjusted_close ??
+        data.adjustedClose ??
+        null;
 
-  return n;
-}
-   function getCurrencyFromQuote(response) {
-  if (!response || typeof response !== "object") return "—";
+      const n = Number(raw);
 
-  const data = response.data && typeof response.data === "object"
-    ? response.data
-    : response;
+      if (!Number.isFinite(n) || n <= 0) {
+        return null;
+      }
 
-  return (
-    data?.currency ??
-    data?.Currency ??
-    response?.currency ??
-    response?.Currency ??
-    "—"
-  );
-}
+      return n;
+    }
 
-    function isValidQuote(data) {
-      return getPriceFromQuote(data) !== null;
+    function getCurrencyFromQuote(response) {
+      if (!response || typeof response !== "object") return "—";
+
+      const data = unwrapQuoteResponse(response);
+
+      return (
+        data?.currency ??
+        data?.Currency ??
+        data?.currencyCode ??
+        data?.CurrencyCode ??
+        response?.currency ??
+        response?.Currency ??
+        response?.currencyCode ??
+        response?.CurrencyCode ??
+        "—"
+      );
+    }
+
+    function isValidQuote(response) {
+      return getPriceFromQuote(response) !== null;
     }
 
     /************************************************************
@@ -404,14 +415,34 @@
       localStorage.setItem("symbolMapCache", JSON.stringify(cache));
     }
 
-    function getCachedSymbol(original) {
+    function getCachedSymbolInfo(original) {
       const cache = loadSymbolCache();
-      return cache[normaliseSymbol(original)] || null;
+      const value = cache[normaliseSymbol(original)];
+
+      if (!value) return null;
+
+      // Backwards compatibility if old cache was just a string
+      if (typeof value === "string") {
+        return {
+          resolved: normaliseSymbol(value),
+          currency: "—"
+        };
+      }
+
+      return {
+        resolved: normaliseSymbol(value.resolved),
+        currency: value.currency || "—"
+      };
     }
 
-    function setCachedSymbol(original, resolved) {
+    function setCachedSymbolInfo(original, resolved, currency = "—") {
       const cache = loadSymbolCache();
-      cache[normaliseSymbol(original)] = normaliseSymbol(resolved);
+
+      cache[normaliseSymbol(original)] = {
+        resolved: normaliseSymbol(resolved),
+        currency: currency || "—"
+      };
+
       saveSymbolCache(cache);
     }
 
@@ -519,6 +550,17 @@
         ""
       ).toUpperCase();
 
+      const currency = String(
+        item.Currency ??
+        item.currency ??
+        ""
+      ).toUpperCase();
+
+      const isPrimary =
+        item.isPrimary === true ||
+        item.IsPrimary === true ||
+        item.primary === true;
+
       const eodhdSymbol = code && exchange ? `${code}.${exchange}` : code;
 
       return {
@@ -527,6 +569,8 @@
         name,
         type,
         country,
+        currency,
+        isPrimary,
         eodhdSymbol,
         raw: item
       };
@@ -547,23 +591,30 @@
 
       // 1. Exact match
       let best = candidates.find(x => x.eodhdSymbol === original);
-      if (best) return best.eodhdSymbol;
+      if (best) return best;
 
-      // 2. Same root + expected exchange
+      // 2. Same root + expected exchange from original suffix
       best = candidates.find(x =>
         x.code === root &&
         hints.some(h => x.exchange === h)
       );
-      if (best) return best.eodhdSymbol;
+      if (best) return best;
 
       // 3. Same root + exchange contains hint
       best = candidates.find(x =>
         x.code === root &&
         hints.some(h => x.exchange.includes(h))
       );
-      if (best) return best.eodhdSymbol;
+      if (best) return best;
 
-      // 4. Same root + common good exchanges
+      // 4. Same root + primary listing
+      best = candidates.find(x =>
+        x.code === root &&
+        x.isPrimary === true
+      );
+      if (best) return best;
+
+      // 5. Same root + common preferred exchanges
       const preferred = [
         "XETRA",
         "LSE",
@@ -582,14 +633,14 @@
         x.code === root &&
         preferred.includes(x.exchange)
       );
-      if (best) return best.eodhdSymbol;
+      if (best) return best;
 
-      // 5. Same root, any exchange
+      // 6. Same root, any exchange
       best = candidates.find(x => x.code === root);
-      if (best) return best.eodhdSymbol;
+      if (best) return best;
 
-      // 6. Final fallback
-      return candidates[0].eodhdSymbol;
+      // 7. Final fallback
+      return candidates[0];
     }
 
     /************************************************************
@@ -604,14 +655,15 @@
       }
 
       // 1. Cache first
-      const cached = getCachedSymbol(original);
+      const cached = getCachedSymbolInfo(original);
 
-      if (cached) {
-        log(`Using cache: ${original} → ${cached}`);
+      if (cached && cached.resolved) {
+        log(`Using cache: ${original} → ${cached.resolved}`);
 
         return {
           original,
-          resolved: cached,
+          resolved: cached.resolved,
+          currency: cached.currency || "—",
           source: "cache"
         };
       }
@@ -621,12 +673,16 @@
         const direct = await fetchQuote(original);
 
         if (isValidQuote(direct)) {
-          setCachedSymbol(original, original);
+          const directCurrency = getCurrencyFromQuote(direct);
+
+          setCachedSymbolInfo(original, original, directCurrency);
+
           log(`Direct worked: ${original}`, direct);
 
           return {
             original,
             resolved: original,
+            currency: directCurrency,
             source: "direct"
           };
         }
@@ -639,41 +695,51 @@
       // 3. Search by root
       const root = getTickerRoot(original);
       const search = await searchSymbol(root);
-      const mapped = pickBestSymbol(original, search);
+      const mappedInfo = pickBestSymbol(original, search);
 
-      if (!mapped) {
+      if (!mappedInfo) {
         log(`No mapping found. Using original: ${original}`);
 
         return {
           original,
           resolved: original,
+          currency: "—",
           source: "fallback"
         };
       }
 
       // 4. Confirm mapped quote works
       try {
-        const mappedQuote = await fetchQuote(mapped);
+        const mappedQuote = await fetchQuote(mappedInfo.eodhdSymbol);
 
         if (isValidQuote(mappedQuote)) {
-          setCachedSymbol(original, mapped);
-          log(`Mapped confirmed: ${original} → ${mapped}`, mappedQuote);
+          const quoteCurrency = getCurrencyFromQuote(mappedQuote);
+          const finalCurrency =
+            quoteCurrency !== "—"
+              ? quoteCurrency
+              : mappedInfo.currency || "—";
+
+          setCachedSymbolInfo(original, mappedInfo.eodhdSymbol, finalCurrency);
+
+          log(`Mapped confirmed: ${original} → ${mappedInfo.eodhdSymbol}`, mappedQuote);
 
           return {
             original,
-            resolved: mapped,
+            resolved: mappedInfo.eodhdSymbol,
+            currency: finalCurrency,
             source: "search"
           };
         }
 
-        log(`Mapped invalid: ${mapped}`, mappedQuote);
+        log(`Mapped invalid: ${mappedInfo.eodhdSymbol}`, mappedQuote);
       } catch (err) {
-        log(`Mapped failed: ${mapped}: ${err.message}`);
+        log(`Mapped failed: ${mappedInfo.eodhdSymbol}: ${err.message}`);
       }
 
       return {
         original,
         resolved: original,
+        currency: "—",
         source: "fallback"
       };
     }
@@ -682,13 +748,19 @@
       const resolvedInfo = await resolveSymbol(originalSymbol);
       const quote = await fetchQuote(resolvedInfo.resolved);
 
+      const quoteCurrency = getCurrencyFromQuote(quote);
+      const finalCurrency =
+        quoteCurrency !== "—"
+          ? quoteCurrency
+          : resolvedInfo.currency || "—";
+
       return {
         originalSymbol: resolvedInfo.original,
         resolvedSymbol: resolvedInfo.resolved,
         source: resolvedInfo.source,
         quote,
         price: getPriceFromQuote(quote),
-        currency: getCurrencyFromQuote(quote)
+        currency: finalCurrency
       };
     }
 
