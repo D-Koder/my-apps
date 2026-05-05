@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CMC Portfolio Tracker · Confirmation Reconcile v7</title>
+<title>CMC Portfolio Tracker · Confirmation Reconcile v9</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,20 +13,21 @@
 </style>
 </head>
 <body>
-<div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Confirm v7</span></div>
+<div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Confirm v9</span></div>
 <div class="main">
-  <div class="info-banner"><strong>Confirmation Reconcile v7</strong> · cost basis rebuilt from Confirmation History only — live prices are optional. If the live API fails or a ticker is delisted/unsupported, the app falls back to the last CMC trade price.</div>
+  <div class="info-banner"><strong>Confirmation Reconcile v9</strong> · cost basis rebuilt from Confirmation History only — live prices are optional. If the live API fails or a ticker is delisted/unsupported, the app falls back to the last CMC trade price.</div>
   <div id="dropZone"><div class="icon">📂</div><h2>Drop your CMC CSV here</h2><p>CMC Invest → Activity → Confirmation History → Download CSV<br>Cost basis in AUD · optional live prices · GitHub Pages friendly</p><button class="btn" onclick="document.getElementById('fileInput').click()">Browse File</button><input type="file" id="fileInput" accept=".csv"></div>
   <div id="status"></div>
   <div id="livePanel">
-    <div class="live-title"><h3>Live Price Mode</h3><div class="live-actions"><button class="btn" onclick="refreshLivePrices()">Refresh live prices</button><button class="btn secondary" onclick="saveKeys()">Save keys</button></div></div>
+    <div class="live-title"><h3>Live Price Mode</h3><div class="live-actions"><button class="btn" onclick="refreshLivePrices()">Refresh live prices</button><button class="btn secondary" onclick="saveKeys()">Save keys</button><button class="btn secondary" onclick="clearQuoteCache()">Clear cache</button></div></div>
     <div class="api-grid">
       <div class="api-row"><label>Finnhub API key — US stock quotes</label><input id="finnhubKey" placeholder="paste free Finnhub token here"></div>
-      <div class="api-row"><label>Twelve Data API key — fallback for DE / CA / SE</label><input id="tdKey" placeholder="optional: paste Twelve Data key here"></div>
+      <div class="api-row"><label>EODHD API key — cached daily fallback for foreign stocks</label><input id="eodKey" placeholder="optional: paste EODHD key here"></div>
+      <div class="api-row"><label>Twelve Data API key — optional backup fallback</label><input id="tdKey" placeholder="optional: paste Twelve Data key here"></div>
       <div class="api-row"><label>ExchangeRate-API key — optional FX backup</label><input id="fxKey" placeholder="optional; manual CMC FX overrides are used first"></div>
       <div class="api-row"><label>CMC FX overrides — local currency per 1 AUD</label><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"><input id="fxUSD" placeholder="USD" value="0.722"><input id="fxCAD" placeholder="CAD" value="0.981"><input id="fxEUR" placeholder="EUR" value="0.616"><input id="fxSEK" placeholder="SEK" value="6.702"></div></div>
     </div>
-    <div class="api-note">FX priority: manual CMC FX override first, ExchangeRate-API second, Confirmation CSV trade-time FX last. CMC portfolio FX uses local currency per 1 AUD, so live AUD price = local price ÷ FX rate. Confirmation CSV also has Exch Rate, but that is the trade-time conversion and may be stale for live pricing.</div>
+    <div class="api-note">FX priority: manual CMC FX override first, ExchangeRate-API second, Confirmation CSV trade-time FX last. EODHD and Twelve Data fallback quotes are cached in this browser for 24 hours so refreshes do not waste limited API calls.</div>
     <div class="progress" id="liveProgress"></div>
   </div>
   <div id="statsRow">
@@ -65,6 +66,7 @@ const dropZone=document.getElementById('dropZone'),fileInput=document.getElement
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over')});dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0])});fileInput.addEventListener('change',()=>{if(fileInput.files[0])processFile(fileInput.files[0])});
 window.addEventListener('load',()=>{
   document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'';
+  document.getElementById('eodKey').value=localStorage.getItem('cmc_eodhd_key')||'';
   document.getElementById('tdKey').value=localStorage.getItem('cmc_twelvedata_key')||'';
   document.getElementById('fxKey').value=localStorage.getItem('cmc_fx_key')||'';
   document.getElementById('fxUSD').value=localStorage.getItem('cmc_fx_usd')||'0.722';
@@ -171,6 +173,65 @@ function convertLocalToAUD(local,currency,fxRates,confirmationFx){
   if(confirmationFx&&confirmationFx>0)return local*confirmationFx;
   return local;
 }
+
+const QUOTE_CACHE_KEY='cmc_daily_quote_cache_v1';
+const QUOTE_CACHE_TTL_MS=24*60*60*1000;
+function getQuoteCache(){try{return JSON.parse(localStorage.getItem(QUOTE_CACHE_KEY)||'{}')}catch(e){return {}}}
+function setQuoteCache(cache){try{localStorage.setItem(QUOTE_CACHE_KEY,JSON.stringify(cache))}catch(e){console.warn('Could not save quote cache',e)}}
+function quoteCacheKey(canonical){return 'quote:'+String(canonical||'').toUpperCase()}
+function getFreshCachedQuote(canonical){
+  const cache=getQuoteCache();
+  const q=cache[quoteCacheKey(canonical)];
+  if(!q||!q.fetchedAt)return null;
+  if(Date.now()-new Date(q.fetchedAt).getTime()>QUOTE_CACHE_TTL_MS)return null;
+  if(!Number(q.price))return null;
+  return {price:Number(q.price),source:(q.source||'Cached')+' cache',symbol:q.symbol||canonical,cached:true};
+}
+function saveCachedQuote(canonical,q){
+  if(!q||!Number(q.price))return;
+  const cache=getQuoteCache();
+  cache[quoteCacheKey(canonical)]={price:Number(q.price),source:q.source||'API',symbol:q.symbol||canonical,fetchedAt:new Date().toISOString()};
+  setQuoteCache(cache);
+}
+function eodhdCandidates(canonical){
+  const c=(CORP_ACTIONS[canonical]||canonical||'').toUpperCase();
+  const base=c.split(':')[0];
+  const out=[];const seen=new Set();
+  const add=(sym)=>{sym=String(sym||'').toUpperCase();if(sym&&!seen.has(sym)){seen.add(sym);out.push(sym)}};
+  if(c.endsWith(':US'))add(base+'.US');
+  else if(c.endsWith(':CA')){add(base+'.V');add(base+'.TO');add(base+'.NEO');add(base+'.CN')}
+  else if(c.endsWith(':DE')){add(base+'.XETRA');add(base+'.F');add(base+'.BE');add(base+'.MU')}
+  else if(c.endsWith(':SE')){add(base+'.ST')}
+  else if(c.endsWith(':AU')||!c.includes(':'))add(base+'.AU');
+  else add(base);
+  return out;
+}
+function extractEodhdPrice(j){
+  if(Array.isArray(j)){const row=j[0]||{};return Number(row.adjusted_close||row.close||row.price||0)}
+  if(j&&typeof j==='object')return Number(j.close||j.adjusted_close||j.price||j.previousClose||j.previous_close||0);
+  return 0;
+}
+async function fetchEodhdQuote(rawCode,key){
+  if(!key)return null;
+  const canonical=(CORP_ACTIONS[rawCode]||rawCode||'').toUpperCase();
+  for(const sym of eodhdCandidates(canonical)){
+    // Free plans often work best with EOD data. Try latest EOD first, then real-time if enabled on the account.
+    const urls=[
+      `https://eodhd.com/api/eod/${encodeURIComponent(sym)}?order=d&limit=1&api_token=${encodeURIComponent(key)}&fmt=json`,
+      `https://eodhd.com/api/real-time/${encodeURIComponent(sym)}?api_token=${encodeURIComponent(key)}&fmt=json`
+    ];
+    for(const url of urls){
+      try{
+        const j=await fetchJsonWithTimeout(url,10000);
+        const msg=JSON.stringify(j||{}).toLowerCase();
+        if(msg.includes('limit')||msg.includes('forbidden')||msg.includes('invalid'))continue;
+        const price=extractEodhdPrice(j);
+        if(price>0)return {price,source:'EODHD',symbol:sym};
+      }catch(e){console.warn('EODHD failed',sym,e)}
+    }
+  }
+  return null;
+}
 async function fetchFinnhubQuote(symbol,key){
   if(!key)return null;
   const url=`https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${encodeURIComponent(key)}`;
@@ -228,18 +289,31 @@ async function fetchTwelveQuote(rawCode,tdKey){
 }
 async function refreshLivePrices(){
   const finnhubKey=document.getElementById('finnhubKey').value.trim();
+  const eodKey=document.getElementById('eodKey').value.trim();
   const tdKey=document.getElementById('tdKey').value.trim();
-  if(!finnhubKey&&!tdKey){showStatus('Add a Finnhub or Twelve Data API key first, then refresh live prices.','error');return}
+  if(!finnhubKey&&!eodKey&&!tdKey){showStatus('Add a Finnhub, EODHD, or Twelve Data API key first, then refresh live prices.','error');return}
   saveKeys();
   const progress=document.getElementById('liveProgress');
   const fxRates=await getFxRates();
-  let ok=0,fail=0,tdOk=0,fhOk=0;
+  let ok=0,fail=0,tdOk=0,fhOk=0,eodOk=0,cacheOk=0;
   for(let i=0;i<holdingsData.length;i++){
     const h=holdingsData[i];
+    const needsFallback=/:(DE|CA|SE|AU)$/.test(h.code);
     progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} (${h.liveSymbol})`;
     try{
       let q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
-      if(!q && /:(DE|CA|SE)$/.test(h.code))q=await fetchTwelveQuote(h.code,tdKey);
+      if(!q && needsFallback){
+        q=getFreshCachedQuote(h.code);
+        if(q)cacheOk++;
+      }
+      if(!q && needsFallback){
+        q=await fetchEodhdQuote(h.code,eodKey);
+        if(q)saveCachedQuote(h.code,q);
+      }
+      if(!q && needsFallback){
+        q=await fetchTwelveQuote(h.code,tdKey);
+        if(q)saveCachedQuote(h.code,q);
+      }
       if(!q)throw new Error('No live quote');
       const local=Number(q.price);
       const aud=convertLocalToAUD(local,h.currency,fxRates,h.lastFx);
@@ -251,7 +325,7 @@ async function refreshLivePrices(){
       h.liveSymbolUsed=q.symbol;
       h.updatedAt=new Date();
       ok++;
-      if(q.source==='Finnhub')fhOk++; else if(q.source==='Twelve Data')tdOk++;
+      if(q.source==='Finnhub')fhOk++; else if(q.source==='EODHD')eodOk++; else if(q.source==='Twelve Data')tdOk++;
     }catch(e){
       h.liveError=e.message||'quote failed';
       h.liveSource=null;
@@ -265,11 +339,13 @@ async function refreshLivePrices(){
   holdingsData.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));
   renderHoldings();
   updateSummary();
-  progress.textContent=`Live refresh done: ${ok} updated (${fhOk} Finnhub, ${tdOk} Twelve Data dynamic), ${fail} fallback to last CMC trade price. FX used: manual CMC override first.`;
+  progress.textContent=`Live refresh done: ${ok} updated (${fhOk} Finnhub, ${eodOk} EODHD, ${tdOk} Twelve Data, ${cacheOk} cached), ${fail} fallback to last CMC trade price. FX used: manual CMC override first.`;
   document.getElementById('lastUpdated').textContent='Live refresh · '+new Date().toLocaleString('en-AU');
 }
+function clearQuoteCache(){localStorage.removeItem(QUOTE_CACHE_KEY);document.getElementById('liveProgress').textContent='Daily quote cache cleared.'}
 function saveKeys(){
   localStorage.setItem('cmc_finnhub_key',document.getElementById('finnhubKey').value.trim());
+  localStorage.setItem('cmc_eodhd_key',document.getElementById('eodKey').value.trim());
   localStorage.setItem('cmc_twelvedata_key',document.getElementById('tdKey').value.trim());
   localStorage.setItem('cmc_fx_key',document.getElementById('fxKey').value.trim());
   localStorage.setItem('cmc_fx_usd',document.getElementById('fxUSD').value.trim());
