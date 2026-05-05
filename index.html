@@ -1,959 +1,609 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Portfolio Tracker</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      margin: 0;
-      padding: 24px;
-    }
-
-    h1 {
-      margin-bottom: 6px;
-    }
-
-    h3 {
-      margin-top: 0;
-    }
-
-    .subtitle {
-      color: #94a3b8;
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 18px;
-    }
-
-    .controls {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    input {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: #020617;
-      color: #e5e7eb;
-      min-width: 150px;
-    }
-
-    button {
-      padding: 10px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #2563eb;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background: #1d4ed8;
-    }
-
-    button.secondary {
-      background: #475569;
-    }
-
-    button.secondary:hover {
-      background: #334155;
-    }
-
-    button.danger {
-      background: #dc2626;
-    }
-
-    button.danger:hover {
-      background: #b91c1c;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 12px;
-      border: 1px solid #1e293b;
-      margin-bottom: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #020617;
-      min-width: 1150px;
-    }
-
-    th,
-    td {
-      padding: 11px;
-      border-bottom: 1px solid #1e293b;
-      text-align: left;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-
-    th {
-      background: #1e293b;
-      color: #cbd5e1;
-    }
-
-    tr:hover {
-      background: #111827;
-    }
-
-    .ok {
-      color: #22c55e;
-      font-weight: bold;
-    }
-
-    .bad {
-      color: #ef4444;
-      font-weight: bold;
-    }
-
-    .warn {
-      color: #facc15;
-      font-weight: bold;
-    }
-
-    .small {
-      color: #94a3b8;
-      font-size: 12px;
-    }
-
-    pre {
-      white-space: pre-wrap;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 12px;
-      color: #cbd5e1;
-      overflow-x: auto;
-      max-height: 320px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CMC Portfolio Tracker · Confirmation Reconcile v13</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--border:#2a2a3a;--accent:#00e5a0;--accent2:#ff6b35;--accent3:#4d9fff;--text:#e8e8f0;--muted:#7a7a98;--gain:#00e5a0;--loss:#ff4d6d;--warn:#f5c542}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden}body:before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0}.header{padding:24px 20px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;position:relative;z-index:1}.header h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 2s ease-in-out infinite;flex-shrink:0}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.subtitle{color:var(--muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-left:auto}.main{padding:20px;position:relative;z-index:1}.info-banner{margin-bottom:16px;padding:12px 16px;background:rgba(77,159,255,.07);border:1px solid rgba(77,159,255,.3);border-radius:8px;font-size:11px;color:var(--accent3);line-height:1.7}.info-banner strong{color:var(--text)}#dropZone{border:1.5px dashed var(--border);border-radius:12px;padding:34px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;overflow:hidden}#dropZone:before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(0,229,160,.05) 0%,transparent 70%);pointer-events:none}#dropZone:hover,#dropZone.drag-over{border-color:var(--accent);background:rgba(0,229,160,.04)}#dropZone .icon{font-size:32px;margin-bottom:12px}#dropZone h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;margin-bottom:6px}#dropZone p{color:var(--muted);font-size:11px;line-height:1.6}.btn{display:inline-block;margin-top:12px;padding:10px 18px;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;border-radius:6px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .2s}.btn:hover,.btn:active{background:var(--accent);color:var(--bg)}.btn.secondary{border-color:var(--border);color:var(--muted)}.btn.secondary:hover{border-color:var(--accent3);color:var(--accent3);background:transparent}.btn.warn{border-color:var(--warn);color:var(--warn)}input[type=file]{display:none}#status{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:12px;display:none;line-height:1.5}#status.info{background:rgba(77,159,255,.1);border:1px solid rgba(77,159,255,.3);color:var(--accent3)}#status.success{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);color:var(--accent)}#status.error{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:var(--loss)}#statsRow{display:none;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px}.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden;animation:fadeUp .4s ease forwards;opacity:0}@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.stat-card .lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.stat-card .val{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}.stat-card .sub{font-size:10px;margin-top:3px;color:var(--muted)}.stat-card:after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent3)}.gain{color:var(--gain)}.loss{color:var(--loss)}.muted{color:var(--muted)}#livePanel{display:none;margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}.live-title{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.live-title h3{font-family:'Syne',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:1px}.api-grid{display:grid;grid-template-columns:1fr;gap:8px}.api-row{display:grid;gap:6px}.api-row label{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}.api-row input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:10px;font-family:'DM Mono',monospace;font-size:11px}.api-note{font-size:10px;color:var(--muted);line-height:1.6;margin-top:10px}.live-actions{display:flex;gap:8px;flex-wrap:wrap}.progress{font-size:10px;color:var(--muted);margin-top:8px}.chart-section{display:none;margin-top:20px}.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.chart-header h3{font-family:'Syne',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:1px}.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}#portfolioChart{width:100%!important;height:220px!important}.tabs{display:flex;gap:6px;margin:20px 0 14px;border-bottom:1px solid var(--border)}.tab{padding:8px 16px;font-size:11px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}#holdingsSection{display:none}.hcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}.hcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.hticker{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.tbadge{display:inline-block;padding:3px 8px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);font-size:11px;font-weight:500}.corp-tag{font-size:9px;background:rgba(77,159,255,.15);border:1px solid rgba(77,159,255,.3);color:var(--accent3);border-radius:3px;padding:1px 4px}.live-tag{font-size:9px;background:rgba(0,229,160,.12);border:1px solid rgba(0,229,160,.25);color:var(--accent);border-radius:3px;padding:1px 4px}.fail-tag{font-size:9px;background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.25);color:var(--loss);border-radius:3px;padding:1px 4px}.hval-wrap{text-align:right}.hval{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}.hval-sub{font-size:10px;color:var(--muted);margin-top:2px}.hgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.hstat .hl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}.hstat .hv{font-size:11px}#txSection{display:none}.tx-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.tx-filter{padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer}.tx-filter.active{background:var(--surface2);border-color:var(--accent3);color:var(--accent3)}.tx-list{display:flex;flex-direction:column;gap:6px}.tx-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.tx-dot{width:8px;height:8px;border-radius:50%}.tx-dot.buy{background:var(--gain)}.tx-dot.sell{background:var(--loss)}.tx-ticker{font-size:11px;font-weight:500}.tx-date,.tx-qty{font-size:10px;color:var(--muted)}.tx-right{text-align:right}.tx-amt{font-size:11px}.last-updated{font-size:10px;color:var(--muted);margin-top:8px;text-align:right}@media(min-width:760px){#statsRow{grid-template-columns:repeat(3,1fr)}.api-grid{grid-template-columns:1fr 1fr}.main{max-width:1000px;margin:0 auto}.hgrid{grid-template-columns:repeat(6,1fr)}}
+</style>
 </head>
-
 <body>
-  <h1>Portfolio Tracker</h1>
-
-  <div class="subtitle">
-    Dynamic holdings + Cloudflare Worker + EODHD symbol resolver.
-  </div>
-
-  <div class="card">
-    <h3>Add / Update Holding</h3>
-
-    <div class="controls">
-      <input id="holdingSymbol" placeholder="Symbol e.g. AIXA.DE" />
-      <input id="holdingShares" placeholder="Shares e.g. 33" type="number" step="0.0001" />
-      <input id="holdingAvgCost" placeholder="Avg cost e.g. 73.70" type="number" step="0.01" />
-
-      <button onclick="addHolding()">Add / Update</button>
-      <button class="secondary" onclick="refreshPortfolio()">Refresh Prices</button>
-      <button class="danger" onclick="clearHoldings()">Clear Holdings</button>
-      <button class="secondary" onclick="clearSymbolCache()">Clear Symbol Cache</button>
+<div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Confirm v12</span></div>
+<div class="main">
+  <div class="info-banner"><strong>Confirmation Reconcile v13</strong> · cost basis rebuilt from Confirmation History only. EODHD uses the smart symbol resolver from your working test app: market candidates first, then EODHD search, then confirmed quote. The Cloudflare Worker proxy keeps it CORS-safe.</div>
+  <div id="dropZone"><div class="icon">📂</div><h2>Drop your CMC CSV here</h2><p>CMC Invest → Activity → Confirmation History → Download CSV<br>Cost basis in AUD · optional live prices · GitHub Pages friendly</p><button class="btn" onclick="document.getElementById('fileInput').click()">Browse File</button><input type="file" id="fileInput" accept=".csv"></div>
+  <div id="status"></div>
+  <div id="livePanel">
+    <div class="live-title"><h3>Live Price Mode</h3><div class="live-actions"><button class="btn" onclick="refreshLivePrices()">Refresh live prices</button><button class="btn secondary" onclick="saveKeys()">Save keys</button><button class="btn secondary" onclick="clearQuoteCache()">Clear cache</button></div></div>
+    <div class="api-grid">
+      <div class="api-row"><label>Finnhub API key — US stock quotes</label><input id="finnhubKey" placeholder="paste free Finnhub token here"></div>
+      <div class="api-row"><label>EODHD API key — direct mode only; CORS may block this</label><input id="eodKey" placeholder="optional: direct browser mode"></div>
+      <div class="api-row"><label>EODHD proxy URL — recommended for GitHub Pages / CORS</label><input id="eodProxyUrl" placeholder="https://your-worker.yourname.workers.dev"></div>
+      <div class="api-row"><label>Twelve Data API key — optional backup fallback</label><input id="tdKey" placeholder="optional: paste Twelve Data key here"></div>
+      <div class="api-row"><label>ExchangeRate-API key — optional FX backup</label><input id="fxKey" placeholder="optional; manual CMC FX overrides are used first"></div>
+      <div class="api-row"><label>CMC FX overrides — local currency per 1 AUD</label><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"><input id="fxUSD" placeholder="USD" value="0.722"><input id="fxCAD" placeholder="CAD" value="0.981"><input id="fxEUR" placeholder="EUR" value="0.616"><input id="fxSEK" placeholder="SEK" value="6.702"></div></div>
     </div>
-
-    <p class="small">
-      Worker: <span id="workerUrl"></span>
-    </p>
+    <div class="api-note">FX priority: manual CMC FX override first, ExchangeRate-API second, Confirmation CSV trade-time FX last. EODHD direct browser calls may be blocked by CORS; use the optional Worker proxy to avoid that. EODHD and Twelve Data fallback quotes are cached in this browser for 24 hours so refreshes do not waste limited API calls.</div>
+    <div class="progress" id="liveProgress"></div>
   </div>
-
-  <div class="card">
-    <h3>Quick Symbol Test</h3>
-
-    <div class="controls">
-      <input id="testSymbol" placeholder="Example: AIXA.DE" value="AIXA.DE" />
-      <button onclick="testSymbol()">Test Symbol</button>
-    </div>
+  <div id="statsRow">
+    <div class="stat-card"><div class="lbl">Live Portfolio Value</div><div class="val" id="sLiveValue">—</div><div class="sub" id="sLiveSub">uses last trade price until refreshed</div></div>
+    <div class="stat-card"><div class="lbl">Cost of Holdings</div><div class="val" id="sHoldingCost">—</div><div class="sub">current positions cost basis</div></div>
+    <div class="stat-card"><div class="lbl">Unrealised P&L</div><div class="val" id="sUnrealised">—</div><div class="sub" id="sUnrealisedPct"></div></div>
+    <div class="stat-card"><div class="lbl">Realised P&L</div><div class="val" id="sRealised">—</div><div class="sub">closed trades</div></div>
+    <div class="stat-card"><div class="lbl">Total Invested</div><div class="val" id="sTotalIn">—</div><div class="sub">all buys incl. brokerage</div></div>
+    <div class="stat-card"><div class="lbl">Holdings</div><div class="val" id="sCount">—</div><div class="sub" id="sDate"></div></div>
   </div>
-
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Original</th>
-          <th>Resolved</th>
-          <th>Shares</th>
-          <th>Avg Cost</th>
-          <th>Price</th>
-          <th>Market Value</th>
-          <th>Cost Value</th>
-          <th>P&amp;L</th>
-          <th>Return</th>
-          <th>Currency</th>
-          <th>Source</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-
-      <tbody id="portfolioBody">
-        <tr>
-          <td colspan="13" class="small">No holdings added yet.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h3>Debug Log</h3>
-  <pre id="debugLog"></pre>
-
-  <script>
-    /************************************************************
-     * CONFIG
-     ************************************************************/
-
-    const WORKER_BASE = "https://lively-dew-5c3c.davidtrix7.workers.dev";
-
-    document.getElementById("workerUrl").textContent = WORKER_BASE;
-
-    let portfolioHoldings = loadHoldings();
-
-    /************************************************************
-     * GENERAL HELPERS
-     ************************************************************/
-
-    function normaliseSymbol(value) {
-      return String(value || "").trim().toUpperCase();
-    }
-
-    function getTickerRoot(symbol) {
-      return normaliseSymbol(symbol).split(".")[0];
-    }
-
-    function log(message, data = null) {
-      const box = document.getElementById("debugLog");
-      const time = new Date().toLocaleTimeString();
-
-      box.textContent += `[${time}] ${message}\n`;
-
-      if (data !== null) {
-        box.textContent += JSON.stringify(data, null, 2) + "\n";
+  <div class="chart-section" id="chartSection"><div class="chart-header"><h3>Cost Basis Over Time</h3></div><div class="chart-wrap"><canvas id="portfolioChart"></canvas></div></div>
+  <div id="holdingsSection"><div class="tabs"><div class="tab active" onclick="showTab('holdings',this)">Holdings</div><div class="tab" onclick="showTab('tx',this)">Transactions</div></div><div id="holdingsTab"><div id="holdingsList"></div></div><div id="txSection"><div class="tx-filters"><button class="tx-filter active" onclick="filterTx('all',this)">All</button><button class="tx-filter" onclick="filterTx('BUY',this)">Buys</button><button class="tx-filter" onclick="filterTx('SELL',this)">Sells</button></div><div class="tx-list" id="txList"></div></div></div>
+  <button id="resetBtn" class="btn secondary" style="display:none" onclick="resetApp()">↩ Load different file</button><div class="last-updated" id="lastUpdated"></div>
+</div>
+<script>
+const CORP_ACTIONS={
+  'BITF:US':'KEEL:US',
+  'IPA:US':'HYFT:US',
+  'CLBR:US':'PEW:US',
+  'MEIP:US':'LITS:US'
+};
+const SPLIT_ACTIONS={
+  'NVDA:US':{before:'2024-06-10',ratio:10}
+};
+// Confirmation History can leave tiny/old residues for delisted or unsupported holdings that no longer appear in the live CMC Portfolio screen.
+// These are ignored for the current-holdings view, while their trades still remain in the Transactions tab.
+const CURRENT_HOLDING_EXCLUSIONS=new Set([
+  // These do not appear in the live CMC portfolio screen, but Confirmation History alone leaves a residue.
+  // Trades still remain in Transactions.
+  'ASST:US',
+  'WINT:US'
+]);
+let allTrades=[],holdingsData=[],allChartData=[],chartInstance=null,currentTxFilter='all';
+const suffixCurrency={':US':'USD',':CA':'CAD',':DE':'EUR',':SE':'SEK',':AU':'AUD'};
+const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over')});dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0])});fileInput.addEventListener('change',()=>{if(fileInput.files[0])processFile(fileInput.files[0])});
+window.addEventListener('load',()=>{
+  document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'';
+  document.getElementById('eodKey').value=localStorage.getItem('cmc_eodhd_key')||'';
+  document.getElementById('eodProxyUrl').value=localStorage.getItem('cmc_eodhd_proxy_url')||'';
+  document.getElementById('tdKey').value=localStorage.getItem('cmc_twelvedata_key')||'';
+  document.getElementById('fxKey').value=localStorage.getItem('cmc_fx_key')||'';
+  document.getElementById('fxUSD').value=localStorage.getItem('cmc_fx_usd')||'0.722';
+  document.getElementById('fxCAD').value=localStorage.getItem('cmc_fx_cad')||'0.981';
+  document.getElementById('fxEUR').value=localStorage.getItem('cmc_fx_eur')||'0.616';
+  document.getElementById('fxSEK').value=localStorage.getItem('cmc_fx_sek')||'6.702';
+});
+function showStatus(msg,type='info'){const el=document.getElementById('status');el.textContent=msg;el.className=type;el.style.display='block'}
+function parseDate(str){if(!str)return null;str=String(str).trim();if(/^\d{4}-\d{2}-\d{2}/.test(str))return new Date(str+'T00:00:00');const m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);const d=new Date(str);return isNaN(d)?null:d}
+function num(v){return parseFloat(String(v||'0').replace(/[^0-9.-]/g,''))||0}
+function fmt(n){if(n==null||isNaN(n))return'N/A';return '$'+Number(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function processFile(file){showStatus('📄 Reading CSV...','info');Papa.parse(file,{header:true,skipEmptyLines:true,complete:r=>{try{build(r.data)}catch(e){showStatus('✗ Error: '+e.message,'error');console.error(e)}},error:e=>showStatus('✗ CSV error: '+e.message,'error')})}
+const TD_MARKET_RULES={
+  ':DE':{country:['Germany'],currency:'EUR',exchanges:['XETR','FSX','FSE','FWB','XFRA','Frankfurt','Xetra']},
+  ':CA':{country:['Canada'],currency:'CAD',exchanges:['TSXV','TSX','XTSX','XTSE','NEO','CSE','Toronto','Venture']},
+  ':SE':{country:['Sweden'],currency:'SEK',exchanges:['OMX','OMXS','STO','XSTO','Stockholm','Nasdaq Stockholm']},
+  ':AU':{country:['Australia'],currency:'AUD',exchanges:['ASX','XASX','Cboe Australia']}
+};
+const TWELVE_MIN_DELAY_MS=8000; // Twelve Data Basic plan is small; keep calls slow and old-school reliable.
+let lastTwelveCallAt=0;
+function mapLiveSymbol(rawCode){rawCode=(rawCode||'').toUpperCase();const c=CORP_ACTIONS[rawCode]||rawCode;const base=c.split(':')[0];if(c.endsWith(':US'))return base;if(c.endsWith(':CA'))return base+'.V';if(c.endsWith(':DE'))return base+'.DE';if(c.endsWith(':SE'))return base+'.ST';if(c.endsWith(':AU'))return base+'.AX';if(!c.includes(':'))return base+'.AX';return base}
+function getMarketRule(canonical){for(const [suffix,rule] of Object.entries(TD_MARKET_RULES)){if(canonical.endsWith(suffix))return {suffix,...rule}}return null}
+function getTdCache(){try{return JSON.parse(localStorage.getItem('cmc_td_symbol_cache')||'{}')}catch(e){return {}}}
+function setTdCache(cache){try{localStorage.setItem('cmc_td_symbol_cache',JSON.stringify(cache))}catch(e){console.warn('Could not save Twelve cache',e)}}
+function tdCacheKey(canonical){return 'td:'+canonical.toUpperCase()}
+function sleep(ms){return new Promise(res=>setTimeout(res,ms))}
+async function waitForTwelveSlot(){const wait=Math.max(0,TWELVE_MIN_DELAY_MS-(Date.now()-lastTwelveCallAt));if(wait>0)await sleep(wait);lastTwelveCallAt=Date.now()}
+function dynamicTdFallbackCandidates(canonical){
+  const base=canonical.split(':')[0];
+  const rule=getMarketRule(canonical);
+  const out=[];
+  const seen=new Set();
+  const add=(symbol,exchange,label)=>{const key=(symbol+'|'+(exchange||'')).toUpperCase();if(!seen.has(key)){seen.add(key);out.push({symbol,exchange:exchange||'',label:label||`${symbol}${exchange?':'+exchange:''}`})}};
+  if(!rule){add(base,'','base only');return out}
+  for(const ex of rule.exchanges)add(base,ex,`${base}:${ex}`);
+  if(rule.suffix===':CA'){add(base+'.V','','TSXV suffix');add(base+'.TO','','TSX suffix');add(base+'.NE','','NEO suffix');add(base+'.CN','','CSE suffix')}
+  if(rule.suffix===':DE'){add(base+'.DE','','German suffix');add(base+'.F','','Frankfurt suffix')}
+  if(rule.suffix===':SE'){add(base+'.ST','','Stockholm suffix')}
+  if(rule.suffix===':AU'){add(base+'.AX','','ASX suffix')}
+  add(base,'','base only');
+  return out;
+}
+function scoreTdSearchResult(item,base,rule){
+  let score=0;
+  const sym=String(item.symbol||'').toUpperCase();
+  const country=String(item.country||'');
+  const currency=String(item.currency||'').toUpperCase();
+  const exchangeText=(String(item.exchange||'')+' '+String(item.mic_code||'')).toUpperCase();
+  if(sym===base)score+=80; else if(sym.startsWith(base))score+=35;
+  if(rule?.country?.some(c=>country.toLowerCase().includes(c.toLowerCase())))score+=25;
+  if(rule?.currency&&currency===rule.currency)score+=20;
+  if(rule?.exchanges?.some(ex=>exchangeText.includes(String(ex).toUpperCase())))score+=15;
+  if(/COMMON|STOCK|ETF|EQUITY/i.test(String(item.type||'')))score+=5;
+  return score;
+}
+async function twelveFetchJson(url){await waitForTwelveSlot();const r=await fetch(url);return await r.json()}
+async function discoverTwelveCandidates(canonical,tdKey){
+  const base=canonical.split(':')[0];
+  const rule=getMarketRule(canonical);
+  const params=new URLSearchParams({symbol:base,apikey:tdKey});
+  const j=await twelveFetchJson(`https://api.twelvedata.com/symbol_search?${params.toString()}`);
+  const rows=Array.isArray(j?.data)?j.data:[];
+  const found=rows.map(item=>({item,score:scoreTdSearchResult(item,base,rule)}))
+    .filter(x=>x.score>=60)
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,6)
+    .map(x=>({symbol:String(x.item.symbol||base).toUpperCase(),exchange:x.item.exchange||x.item.mic_code||'',label:`search:${x.item.symbol}${x.item.exchange?':'+x.item.exchange:''}`}));
+  return found;
+}
+function inferCurrency(rawCode){rawCode=(rawCode||'').toUpperCase();for(const [s,cur] of Object.entries(suffixCurrency))if(rawCode.endsWith(s))return cur;if(!rawCode.includes(':'))return 'AUD';return 'USD'}
+function build(rows){const trades=[];for(const row of rows){const ot=String(row['Order Type']||'').trim().toUpperCase();if(ot!=='BUY'&&ot!=='SELL')continue;const rawCode=String(row['AsxCode']||'').trim().toUpperCase();if(!rawCode)continue;const code=CORP_ACTIONS[rawCode]||rawCode;const qty=num(row['Quantity']);const priceAUD=num(row['Price']);if(!qty||!priceAUD)continue;const brok=num(row['Brokerage'])+num(row['GST']);const date=parseDate(row['Trade Date']||row['As at Date']||row['Settlement Date']);if(!date)continue;let adjQty=qty,adjPriceAUD=priceAUD;const split=SPLIT_ACTIONS[rawCode];if(split&&date<new Date(split.before+'T00:00:00')){adjQty=qty*split.ratio;adjPriceAUD=priceAUD/split.ratio}const confNo=num(row['Confirmation Number']);const exch=num(row['Exch Rate']||row['Exchange Rate']||row['ExchangeRate']);trades.push({date,confNo,code,rawCode,type:ot,qty:adjQty,displayQty:qty,priceAUD:adjPriceAUD,consideration:qty*priceAUD,brokerage:brok,fx:exch||1,currency:inferCurrency(rawCode),liveSymbol:mapLiveSymbol(rawCode)})}if(!trades.length)throw new Error('No Buy/Sell trades found in CSV');trades.sort((a,b)=>(a.date-b.date)||((a.confNo||0)-(b.confNo||0)));allTrades=trades;const qtyMap={},costMap={},avgMap={},realisedMap={},lastFxMap={},netQtyMap={};for(const t of trades){qtyMap[t.code]??=0;costMap[t.code]??=0;avgMap[t.code]??=0;realisedMap[t.code]??=0;netQtyMap[t.code]??=0;lastFxMap[t.code]=t.fx||lastFxMap[t.code]||1;if(t.type==='BUY'){netQtyMap[t.code]+=t.qty;qtyMap[t.code]+=t.qty;costMap[t.code]+=t.consideration+t.brokerage;avgMap[t.code]=qtyMap[t.code]>0?costMap[t.code]/qtyMap[t.code]:0}else{netQtyMap[t.code]-=t.qty;const avg=avgMap[t.code]||0;const proceeds=t.consideration-t.brokerage;realisedMap[t.code]+=proceeds-(avg*t.qty);qtyMap[t.code]-=t.qty;costMap[t.code]=qtyMap[t.code]>0?avg*qtyMap[t.code]:0;if(Math.abs(qtyMap[t.code])<=0.0001){qtyMap[t.code]=0;costMap[t.code]=0;avgMap[t.code]=0}if(Math.abs(netQtyMap[t.code])<=0.0001)netQtyMap[t.code]=0}}const holdings=[];for(const [code,netQty] of Object.entries(netQtyMap)){if(netQty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(code)){const last=[...trades].reverse().find(t=>t.code===code);const totalCost=costMap[code]||0;const lastPrice=last?.priceAUD||0;holdings.push({code,rawCode:last?.rawCode||code,qty:netQty,totalCost,avgCost:netQty?totalCost/netQty:0,lastPrice,lastDate:last?.date,currency:last?.currency||'USD',liveSymbol:last?.liveSymbol||mapLiveSymbol(code),lastFx:lastFxMap[code]||1,liveLocal:null,liveAUD:null,liveValue:null,liveError:null,updatedAt:null,realisedPnL:realisedMap[code]||0})}}holdings.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));holdingsData=holdings;const totalBuy=trades.filter(t=>t.type==='BUY').reduce((s,t)=>s+t.consideration+t.brokerage,0);const totalRealised=Object.values(realisedMap).reduce((s,v)=>s+v,0);document.getElementById('sTotalIn').textContent=fmt(totalBuy);document.getElementById('sRealised').textContent=(totalRealised>=0?'+':'')+fmt(totalRealised);document.getElementById('sRealised').className='val '+(totalRealised>=0?'gain':'loss');document.getElementById('sCount').textContent=holdings.length;const lastDate=trades.at(-1)?.date;document.getElementById('sDate').textContent=lastDate?'as of '+lastDate.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'';makeChart();updateSummary();renderHoldings();renderTx();document.getElementById('statsRow').style.display='grid';document.getElementById('livePanel').style.display='block';document.getElementById('chartSection').style.display='block';document.getElementById('holdingsSection').style.display='block';document.getElementById('resetBtn').style.display='inline-block';showStatus(`✓ CONFIRMATION RECONCILE v13 SMART EODHD · ${trades.length} transactions · ${holdings.length} current holdings loaded. Foreign stocks use smart EODHD resolver before Finnhub.`,'success')}
+function updateSummary(){const displayedHoldings=holdingsData.filter(h=>h.qty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(h.code));holdingsData=displayedHoldings;const cost=displayedHoldings.reduce((s,h)=>s+h.totalCost,0);const val=displayedHoldings.reduce((s,h)=>s+(h.liveValue??h.qty*h.lastPrice),0);const pnl=val-cost;console.table(displayedHoldings.map(h=>({code:h.code,units:h.qty,cost:+h.totalCost.toFixed(2),value:+((h.liveValue??h.qty*h.lastPrice)).toFixed(2)})));document.getElementById('sHoldingCost').textContent=fmt(cost);document.getElementById('sLiveValue').textContent=fmt(val);document.getElementById('sLiveSub').textContent=holdingsData.some(h=>h.liveValue!=null)?'live/updated where available':'using last CMC trade price';document.getElementById('sUnrealised').textContent=(pnl>=0?'+':'')+fmt(pnl);document.getElementById('sUnrealised').className='val '+(pnl>=0?'gain':'loss');document.getElementById('sUnrealisedPct').textContent=cost?((pnl>=0?'+':'')+(pnl/cost*100).toFixed(2)+'%'):'—'}
+function getManualFxRates(){
+  const manual={AUD:1};
+  for(const cur of ['USD','CAD','EUR','SEK']){
+    const el=document.getElementById('fx'+cur);
+    const v=el?num(el.value):0;
+    if(v>0)manual[cur]=v;
+  }
+  return manual;
+}
+async function getFxRates(){
+  const rates={AUD:1,...getManualFxRates()};
+  const fxKey=document.getElementById('fxKey').value.trim();
+  if(fxKey){
+    try{
+      const r=await fetch(`https://v6.exchangerate-api.com/v6/${encodeURIComponent(fxKey)}/latest/AUD`);
+      const j=await r.json();
+      // Only fill gaps. Manual CMC overrides remain the source of truth when entered.
+      if(j.result==='success'&&j.conversion_rates){
+        for(const [cur,rate] of Object.entries(j.conversion_rates)){
+          if(!rates[cur])rates[cur]=rate;
+        }
       }
+    }catch(e){console.warn('FX API failed; using manual/confirmation FX only',e)}
+  }
+  return rates;
+}
+function convertLocalToAUD(local,currency,fxRates,confirmationFx){
+  if(currency==='AUD')return local;
+  // Manual CMC FX and ExchangeRate-API are local currency per 1 AUD, so divide.
+  if(fxRates[currency])return local/fxRates[currency];
+  // Confirmation CSV Exch Rate is trade-time AUD per 1 local currency, so multiply. This is only a last fallback.
+  if(confirmationFx&&confirmationFx>0)return local*confirmationFx;
+  return local;
+}
 
-      box.textContent += "\n";
-      box.scrollTop = box.scrollHeight;
+const QUOTE_CACHE_KEY='cmc_daily_quote_cache_v2';
+const QUOTE_CACHE_TTL_MS=24*60*60*1000;
+function getQuoteCache(){try{return JSON.parse(localStorage.getItem(QUOTE_CACHE_KEY)||'{}')}catch(e){return {}}}
+function setQuoteCache(cache){try{localStorage.setItem(QUOTE_CACHE_KEY,JSON.stringify(cache))}catch(e){console.warn('Could not save quote cache',e)}}
+function quoteCacheKey(canonical){return 'quote:'+String(canonical||'').toUpperCase()}
+function getFreshCachedQuote(canonical){
+  const cache=getQuoteCache();
+  const q=cache[quoteCacheKey(canonical)];
+  if(!q||!q.fetchedAt)return null;
+  if(Date.now()-new Date(q.fetchedAt).getTime()>QUOTE_CACHE_TTL_MS)return null;
+  if(!Number(q.price))return null;
+  return {price:Number(q.price),source:(q.source||'Cached')+' cache',symbol:q.symbol||canonical,cached:true};
+}
+function saveCachedQuote(canonical,q){
+  if(!q||!Number(q.price))return;
+  const cache=getQuoteCache();
+  cache[quoteCacheKey(canonical)]={price:Number(q.price),source:q.source||'API',symbol:q.symbol||canonical,fetchedAt:new Date().toISOString()};
+  setQuoteCache(cache);
+}
+function fetchJsonWithTimeout(url,ms=12000){
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),ms);
+  return fetch(url,{signal:controller.signal}).then(async r=>{
+    clearTimeout(timeout);
+    const text=await r.text();
+    try{return JSON.parse(text)}catch(e){return {statusCode:r.status,raw:text}}
+  }).catch(e=>{clearTimeout(timeout);throw e});
+}
+
+const EODHD_SYMBOL_CACHE_KEY='cmc_eodhd_symbol_cache_v3';
+function getEodhdSymbolCache(){try{return JSON.parse(localStorage.getItem(EODHD_SYMBOL_CACHE_KEY)||'{}')}catch(e){return {}}}
+function setEodhdSymbolCache(cache){try{localStorage.setItem(EODHD_SYMBOL_CACHE_KEY,JSON.stringify(cache))}catch(e){console.warn('Could not save EODHD symbol cache',e)}}
+function eodhdSymbolCacheKey(canonical){return 'eodhd:'+String(canonical||'').toUpperCase()}
+
+
+function normaliseEodhdSymbol(value){
+  return String(value||'').trim().toUpperCase();
+}
+function getTickerRoot(symbol){
+  return normaliseEodhdSymbol(symbol).split(':')[0].split('.')[0];
+}
+function getSearchStyleSymbol(canonical){
+  const c=(CORP_ACTIONS[canonical]||canonical||'').toUpperCase();
+  const base=c.split(':')[0];
+  if(c.endsWith(':DE'))return base+'.DE';
+  if(c.endsWith(':CA'))return base+'.CA';
+  if(c.endsWith(':SE'))return base+'.SE';
+  if(c.endsWith(':AU'))return base+'.AX';
+  if(c.endsWith(':US'))return base+'.US';
+  return c;
+}
+function eodhdCandidates(canonical){
+  const c=(CORP_ACTIONS[canonical]||canonical||'').toUpperCase();
+  const base=c.split(':')[0];
+  const out=[];const seen=new Set();
+  const add=(sym,why='rule')=>{sym=normaliseEodhdSymbol(sym);if(sym&&!seen.has(sym)){seen.add(sym);out.push({symbol:sym,why})}};
+
+  // Dynamic market-level candidates. No per-ticker hardcoding.
+  // Germany: user confirmed AIXA:DE works as AIXA.XETRA.
+  if(c.endsWith(':DE')){
+    add(base+'.XETRA','Germany Xetra');
+    add(base+'.F','Frankfurt');
+    add(base+'.HM','Hamburg');
+    add(base+'.MU','Munich');
+    add(base+'.BE','Berlin');
+    add(base+'.DU','Dusseldorf');
+    add(base+'.HA','Hanover');
+    add(base+'.DE','generic Germany fallback');
+  }else if(c.endsWith(':CA')){
+    // Canada can be TSX or TSXV/CSE/NEO. Try the common exchange symbols, then search.
+    add(base+'.TO','Toronto TSX');
+    add(base+'.V','TSX Venture');
+    add(base+'.NEO','NEO');
+    add(base+'.CN','CSE');
+    add(base+'.CA','generic Canada fallback');
+  }else if(c.endsWith(':SE')){
+    add(base+'.ST','Nasdaq Stockholm');
+    add(base+'.OMX','OMX');
+    add(base+'.SE','generic Sweden fallback');
+  }else if(c.endsWith(':AU')||!c.includes(':')){
+    add(base+'.AU','ASX');
+    add(base+'.AX','Yahoo-style ASX fallback');
+  }else if(c.endsWith(':US')){
+    add(base+'.US','US');
+    add(base,'US plain');
+  }else{
+    const suffix=c.split(':')[1];
+    if(suffix)add(base+'.'+suffix,'CMC suffix fallback');
+    add(base,'base only');
+  }
+  return out;
+}
+function unwrapQuoteResponse(response){
+  if(!response||typeof response!=='object')return null;
+  if(response.data&&typeof response.data==='object')return response.data;
+  return response;
+}
+function getPriceFromEodhdQuote(response){
+  const data=unwrapQuoteResponse(response);
+  if(!data)return null;
+  const raw=data.close??data.price??data.last??data.previousClose??data.previous_close??data.adjusted_close??data.adjustedClose??null;
+  const n=Number(raw);
+  return Number.isFinite(n)&&n>0?n:null;
+}
+function getEodhdSearchArray(searchResult){
+  if(Array.isArray(searchResult))return searchResult;
+  if(Array.isArray(searchResult?.data))return searchResult.data;
+  if(Array.isArray(searchResult?.results))return searchResult.results;
+  return [];
+}
+function getEodhdProxyUrl(){
+  const el=document.getElementById('eodProxyUrl');
+  return (el&&el.value?el.value.trim().replace(/\/+$/,''):'');
+}
+function eodhdAvailable(key){return Boolean(getEodhdProxyUrl()||key)}
+async function fetchEodhdWorker(path){
+  const proxy=getEodhdProxyUrl();
+  if(!proxy)throw new Error('No EODHD proxy URL');
+  const url=proxy+'/'+String(path||'').replace(/^\/+/, '');
+  return await fetchJsonWithTimeout(url,12000);
+}
+async function fetchEodhdQuoteEndpoint(symbol,key){
+  symbol=normaliseEodhdSymbol(symbol);
+  const proxy=getEodhdProxyUrl();
+  if(proxy)return await fetchEodhdWorker('/quote?symbol='+encodeURIComponent(symbol));
+  if(!key)throw new Error('No EODHD key/proxy');
+  return await fetchJsonWithTimeout(`https://eodhd.com/api/real-time/${encodeURIComponent(symbol)}?api_token=${encodeURIComponent(key)}&fmt=json`,12000);
+}
+async function fetchEodhdEodEndpoint(symbol,key){
+  symbol=normaliseEodhdSymbol(symbol);
+  const proxy=getEodhdProxyUrl();
+  if(proxy)return await fetchEodhdWorker('/eod?symbol='+encodeURIComponent(symbol));
+  if(!key)throw new Error('No EODHD key/proxy');
+  return await fetchJsonWithTimeout(`https://eodhd.com/api/eod/${encodeURIComponent(symbol)}?api_token=${encodeURIComponent(key)}&fmt=json&period=d&order=d&limit=1`,12000);
+}
+async function fetchEodhdSearchEndpoint(query,key){
+  query=normaliseEodhdSymbol(query);
+  const proxy=getEodhdProxyUrl();
+  if(proxy)return await fetchEodhdWorker('/search?q='+encodeURIComponent(query));
+  if(!key)throw new Error('No EODHD key/proxy');
+  return await fetchJsonWithTimeout(`https://eodhd.com/api/search/${encodeURIComponent(query)}?api_token=${encodeURIComponent(key)}&fmt=json`,12000);
+}
+async function fetchEodhdPriceForSymbol(symbol,key){
+  let lastError='';
+  try{
+    const rt=await fetchEodhdQuoteEndpoint(symbol,key);
+    const msg=JSON.stringify(rt||{}).toLowerCase();
+    if(msg.includes('limit'))lastError='rate limit';
+    else if(msg.includes('forbidden')||msg.includes('invalid')||msg.includes('not found')||msg.includes('no data'))lastError=msg.slice(0,140);
+    else{
+      const price=getPriceFromEodhdQuote(rt);
+      if(price)return {price,source:'EODHD real-time',symbol:normaliseEodhdSymbol(symbol)};
+      lastError='no real-time price in response';
     }
+  }catch(e){lastError=e.message||'real-time failed'}
 
-    function clearLog() {
-      document.getElementById("debugLog").textContent = "";
-    }
+  try{
+    const eod=await fetchEodhdEodEndpoint(symbol,key);
+    const row=Array.isArray(eod)?eod[0]:unwrapQuoteResponse(eod);
+    const price=getPriceFromEodhdQuote(row);
+    if(price)return {price,source:'EODHD EOD',symbol:normaliseEodhdSymbol(symbol)};
+    lastError=lastError||'no EOD price in response';
+  }catch(e){lastError=lastError+'; EOD '+(e.message||'failed')}
 
-    function fmtMoney(value) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return "—";
-      return n.toFixed(2);
-    }
+  throw new Error(lastError||'EODHD no quote');
+}
+function getExchangeHints(originalSymbol){
+  const s=normaliseEodhdSymbol(originalSymbol);
+  if(s.endsWith(':DE')||s.endsWith('.DE'))return ['XETRA','F','HM','MU','BE','DU','HA'];
+  if(s.endsWith(':CA')||s.endsWith('.CA'))return ['TO','V','NEO','CN'];
+  if(s.endsWith(':SE')||s.endsWith('.SE'))return ['ST','OMX'];
+  if(s.endsWith(':AU')||s.endsWith('.AX')||s.endsWith('.AU'))return ['AU','ASX','AX'];
+  if(s.endsWith(':US')||s.endsWith('.US'))return ['US'];
+  if(s.endsWith('.L'))return ['LSE'];
+  if(s.endsWith('.PA'))return ['PA'];
+  if(s.endsWith('.AS'))return ['AS'];
+  if(s.endsWith('.SW'))return ['SW'];
+  if(s.endsWith('.TO'))return ['TO','V'];
+  if(s.endsWith('.V'))return ['V','TO'];
+  if(s.endsWith('.T'))return ['TSE','T'];
+  if(s.endsWith('.HK'))return ['HK'];
+  return [];
+}
+function normaliseEodhdSearchItem(item){
+  const code=normaliseEodhdSymbol(item.Code??item.code??item.Symbol??item.symbol??'');
+  const exchange=normaliseEodhdSymbol(item.Exchange??item.exchange??item.ExchangeCode??item.exchangeCode??'');
+  const name=String(item.Name??item.name??item.Description??item.description??'').toUpperCase();
+  const type=String(item.Type??item.type??'').toUpperCase();
+  const country=String(item.Country??item.country??'').toUpperCase();
+  const currency=String(item.Currency??item.currency??'').toUpperCase();
+  const isPrimary=item.isPrimary===true||item.IsPrimary===true||item.primary===true;
+  const eodhdSymbol=code&&exchange?`${code}.${exchange}`:code;
+  return {code,exchange,name,type,country,currency,isPrimary,eodhdSymbol,raw:item};
+}
+function pickBestEodhdSymbol(originalSymbol,searchResult){
+  const original=normaliseEodhdSymbol(originalSymbol);
+  const root=getTickerRoot(original);
+  const hints=getExchangeHints(original);
+  const candidates=getEodhdSearchArray(searchResult).map(normaliseEodhdSearchItem).filter(x=>x.code||x.eodhdSymbol);
+  if(!candidates.length)return null;
 
-    function fmtPrice(value) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return "—";
-      return n.toFixed(4);
-    }
+  // 1. Exact symbol match.
+  let best=candidates.find(x=>x.eodhdSymbol===original);
+  if(best)return best;
 
-    function fmtPercent(value) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return "—";
-      return n.toFixed(2) + "%";
-    }
+  // 2. Same root + expected exchange from country suffix.
+  best=candidates.find(x=>x.code===root&&hints.some(h=>x.exchange===h));
+  if(best)return best;
 
-    function unwrapQuoteResponse(response) {
-      if (!response || typeof response !== "object") return null;
+  // 3. Same root + exchange contains expected hint.
+  best=candidates.find(x=>x.code===root&&hints.some(h=>x.exchange.includes(h)));
+  if(best)return best;
 
-      if (response.data && typeof response.data === "object") {
-        return response.data;
+  // 4. Same root + primary listing.
+  best=candidates.find(x=>x.code===root&&x.isPrimary===true);
+  if(best)return best;
+
+  // 5. Same root + common preferred exchanges.
+  const preferred=['XETRA','TO','V','ST','AU','ASX','US','LSE','TSE','HK','SW','PA','AS','F','NEO','CN','HM','MU','BE'];
+  best=candidates.find(x=>x.code===root&&preferred.includes(x.exchange));
+  if(best)return best;
+
+  // 6. Same root, any exchange.
+  best=candidates.find(x=>x.code===root);
+  if(best)return best;
+
+  // 7. Final fallback.
+  return candidates[0];
+}
+async function resolveEodhdSymbol(rawCode,key){
+  const canonical=(CORP_ACTIONS[rawCode]||rawCode||'').toUpperCase();
+  const symbolCache=getEodhdSymbolCache();
+  const cacheKey=eodhdSymbolCacheKey(canonical);
+  const tried=new Set();
+
+  if(symbolCache[cacheKey]?.symbol){
+    const sym=normaliseEodhdSymbol(symbolCache[cacheKey].symbol);
+    if(sym)return {symbol:sym,source:'EODHD symbol cache'};
+  }
+
+  // Try market-rule candidates first. This handles AIXA:DE -> AIXA.XETRA without any per-ticker hardcode.
+  for(const c of eodhdCandidates(canonical)){
+    const sym=normaliseEodhdSymbol(c.symbol);
+    if(!sym||tried.has(sym))continue;
+    tried.add(sym);
+    try{
+      const q=await fetchEodhdPriceForSymbol(sym,key);
+      if(q?.price){
+        symbolCache[cacheKey]={symbol:sym,why:c.why,updatedAt:new Date().toISOString()};
+        setEodhdSymbolCache(symbolCache);
+        return {symbol:sym,source:c.why};
       }
+    }catch(e){console.warn('EODHD candidate failed',canonical,sym,e.message)}
+  }
 
-      return response;
-    }
-
-    function getPriceFromQuote(response) {
-      const data = unwrapQuoteResponse(response);
-      if (!data) return null;
-
-      const raw =
-        data.close ??
-        data.price ??
-        data.last ??
-        data.previousClose ??
-        data.adjusted_close ??
-        data.adjustedClose ??
-        null;
-
-      const n = Number(raw);
-
-      if (!Number.isFinite(n) || n <= 0) {
-        return null;
-      }
-
-      return n;
-    }
-
-    function getCurrencyFromQuote(response) {
-      if (!response || typeof response !== "object") return "—";
-
-      const data = unwrapQuoteResponse(response);
-
-      return (
-        data?.currency ??
-        data?.Currency ??
-        data?.currencyCode ??
-        data?.CurrencyCode ??
-        response?.currency ??
-        response?.Currency ??
-        response?.currencyCode ??
-        response?.CurrencyCode ??
-        "—"
-      );
-    }
-
-    function isValidQuote(response) {
-      return getPriceFromQuote(response) !== null;
-    }
-
-    /************************************************************
-     * HOLDINGS STORAGE
-     ************************************************************/
-
-    function loadHoldings() {
-      try {
-        return JSON.parse(localStorage.getItem("portfolioHoldings") || "[]");
-      } catch {
-        return [];
+  // Then use the working dynamic method: search by ticker root, choose the best exchange, confirm quote.
+  const searchStyle=getSearchStyleSymbol(canonical);
+  const root=getTickerRoot(searchStyle);
+  const search=await fetchEodhdSearchEndpoint(root,key);
+  const mapped=pickBestEodhdSymbol(searchStyle,search);
+  if(mapped?.eodhdSymbol){
+    const sym=normaliseEodhdSymbol(mapped.eodhdSymbol);
+    if(!tried.has(sym)){
+      const q=await fetchEodhdPriceForSymbol(sym,key);
+      if(q?.price){
+        symbolCache[cacheKey]={symbol:sym,why:'EODHD search',updatedAt:new Date().toISOString()};
+        setEodhdSymbolCache(symbolCache);
+        return {symbol:sym,source:'EODHD search'};
       }
     }
+  }
 
-    function saveHoldings() {
-      localStorage.setItem("portfolioHoldings", JSON.stringify(portfolioHoldings));
-    }
+  return null;
+}
+async function fetchEodhdQuote(rawCode,key){
+  if(!eodhdAvailable(key))return null;
+  const canonical=(CORP_ACTIONS[rawCode]||rawCode||'').toUpperCase();
+  const resolved=await resolveEodhdSymbol(canonical,key);
+  if(!resolved?.symbol)return null;
+  const q=await fetchEodhdPriceForSymbol(resolved.symbol,key);
+  if(!q?.price)return null;
+  return {...q,source:q.source||resolved.source,symbol:resolved.symbol};
+}
 
-    function addHolding() {
-      const symbol = normaliseSymbol(document.getElementById("holdingSymbol").value);
-      const shares = Number(document.getElementById("holdingShares").value);
-      const avgCost = Number(document.getElementById("holdingAvgCost").value);
+async function fetchFinnhubQuote(symbol,key){
+  if(!key)return null;
+  const url=`https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${encodeURIComponent(key)}`;
+  const r=await fetch(url);
+  const j=await r.json();
+  const price=Number(j&&j.c);
+  if(price>0)return {price,source:'Finnhub',symbol};
+  return null;
+}
+async function tryTwelveCandidate(c,tdKey){
+  const params=new URLSearchParams({symbol:c.symbol,apikey:tdKey});
+  if(c.exchange)params.set('exchange',c.exchange);
+  const j=await twelveFetchJson(`https://api.twelvedata.com/quote?${params.toString()}`);
+  if(j&&j.status==='error')throw new Error(j.message||j.code||'Twelve error');
+  const price=Number(j.price||j.close||j.previous_close);
+  if(price>0)return {price,source:'Twelve Data',symbol:c.exchange?`${c.symbol}:${c.exchange}`:c.symbol};
+  throw new Error('No Twelve price');
+}
+async function fetchTwelveQuote(rawCode,tdKey){
+  if(!tdKey)return null;
+  const canonical=(CORP_ACTIONS[rawCode]||rawCode||'').toUpperCase();
+  const cache=getTdCache();
+  const key=tdCacheKey(canonical);
+  const errors=[];
 
-      if (!symbol) {
-        alert("Enter a symbol, e.g. AIXA.DE");
-        return;
-      }
+  // 1) Use the last symbol that actually worked for this CMC code.
+  if(cache[key]){
+    try{
+      const q=await tryTwelveCandidate(cache[key],tdKey);
+      return {...q,symbol:q.symbol+' cached'};
+    }catch(e){errors.push(`cached ${cache[key].label||cache[key].symbol}: ${e.message}`);delete cache[key];setTdCache(cache)}
+  }
 
-      if (!Number.isFinite(shares) || shares <= 0) {
-        alert("Enter valid shares.");
-        return;
-      }
+  // 2) Dynamic discovery: ask Twelve Data what this symbol is on its global symbol list.
+  let candidates=[];
+  try{candidates=await discoverTwelveCandidates(canonical,tdKey)}catch(e){errors.push('symbol_search: '+(e.message||'failed'))}
 
-      if (!Number.isFinite(avgCost) || avgCost < 0) {
-        alert("Enter valid average cost.");
-        return;
-      }
+  // 3) Generic market fallbacks by country suffix, not by individual ticker.
+  candidates=[...candidates,...dynamicTdFallbackCandidates(canonical)];
 
-      const existing = portfolioHoldings.find(
-        h => normaliseSymbol(h.symbol) === symbol
-      );
+  const seen=new Set();
+  for(const c of candidates){
+    const ck=(c.symbol+'|'+(c.exchange||'')).toUpperCase();
+    if(seen.has(ck))continue;
+    seen.add(ck);
+    try{
+      const q=await tryTwelveCandidate(c,tdKey);
+      cache[key]={symbol:c.symbol,exchange:c.exchange||'',label:c.label||q.symbol};
+      setTdCache(cache);
+      return q;
+    }catch(e){errors.push(`${c.label||c.symbol}: ${e.message}`)}
+  }
+  console.warn('Twelve Data failed for',canonical,errors);
+  return null;
+}
+async function refreshLivePrices(){
+  const finnhubKey=document.getElementById('finnhubKey').value.trim();
+  const eodKey=document.getElementById('eodKey').value.trim();
+  const tdKey=document.getElementById('tdKey').value.trim();
+  if(!finnhubKey&&!eodhdAvailable(eodKey)&&!tdKey){showStatus('Add a Finnhub key, an EODHD proxy/API key, or a Twelve Data key first, then refresh live prices.','error');return}
+  saveKeys();
+  const progress=document.getElementById('liveProgress');
+  const fxRates=await getFxRates();
+  let ok=0,fail=0,tdOk=0,fhOk=0,eodOk=0,cacheOk=0;
+  for(let i=0;i<holdingsData.length;i++){
+    const h=holdingsData[i];
+    const needsFallback=/:(DE|CA|SE|AU)$/.test(h.code);
+    progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} (${h.liveSymbol})`;
+    try{
+      let q=null;
 
-      if (existing) {
-        existing.shares = shares;
-        existing.avgCost = avgCost;
+      if(needsFallback){
+        // Foreign holdings: avoid Finnhub/Yahoo-style symbols like AIXA.DE first.
+        // Prefer EODHD market symbols such as AIXA.XETRA, then cache, then Twelve Data, then Finnhub as last resort.
+        q=getFreshCachedQuote(h.code);
+        if(q)cacheOk++;
+
+        if(!q && eodKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via EODHD candidates`;
+          q=await fetchEodhdQuote(h.code,eodKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
+
+        if(!q && tdKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Twelve Data fallback`;
+          q=await fetchTwelveQuote(h.code,tdKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
+
+        if(!q && finnhubKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Finnhub fallback (${h.liveSymbol})`;
+          q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
+        }
       } else {
-        portfolioHoldings.push({ symbol, shares, avgCost });
+        q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
       }
 
-      saveHoldings();
-
-      document.getElementById("holdingSymbol").value = "";
-      document.getElementById("holdingShares").value = "";
-      document.getElementById("holdingAvgCost").value = "";
-
-      refreshPortfolio();
+      if(!q)throw new Error('No live quote');
+      const local=Number(q.price);
+      const aud=convertLocalToAUD(local,h.currency,fxRates,h.lastFx);
+      h.liveLocal=local;
+      h.liveAUD=aud;
+      h.liveValue=aud*h.qty;
+      h.liveError=null;
+      h.liveSource=q.source;
+      h.liveSymbolUsed=q.symbol;
+      h.updatedAt=new Date();
+      ok++;
+      if(q.source==='Finnhub')fhOk++; else if(String(q.source).startsWith('EODHD'))eodOk++; else if(q.source==='Twelve Data')tdOk++;
+    }catch(e){
+      h.liveError=e.message||'quote failed';
+      h.liveSource=null;
+      h.liveSymbolUsed=null;
+      fail++;
     }
-
-    function removeHolding(symbol) {
-      portfolioHoldings = portfolioHoldings.filter(
-        h => normaliseSymbol(h.symbol) !== normaliseSymbol(symbol)
-      );
-
-      saveHoldings();
-      refreshPortfolio();
-    }
-
-    function clearHoldings() {
-      portfolioHoldings = [];
-      saveHoldings();
-      renderRows([]);
-      clearLog();
-      log("Holdings cleared.");
-    }
-
-    /************************************************************
-     * SYMBOL MAPPING CACHE
-     ************************************************************/
-
-    function loadSymbolCache() {
-      try {
-        return JSON.parse(localStorage.getItem("symbolMapCache") || "{}");
-      } catch {
-        return {};
-      }
-    }
-
-    function saveSymbolCache(cache) {
-      localStorage.setItem("symbolMapCache", JSON.stringify(cache));
-    }
-
-    function getCachedSymbolInfo(original) {
-      const cache = loadSymbolCache();
-      const value = cache[normaliseSymbol(original)];
-
-      if (!value) return null;
-
-      // Backwards compatibility if old cache was just a string
-      if (typeof value === "string") {
-        return {
-          resolved: normaliseSymbol(value),
-          currency: "—"
-        };
-      }
-
-      return {
-        resolved: normaliseSymbol(value.resolved),
-        currency: value.currency || "—"
-      };
-    }
-
-    function setCachedSymbolInfo(original, resolved, currency = "—") {
-      const cache = loadSymbolCache();
-
-      cache[normaliseSymbol(original)] = {
-        resolved: normaliseSymbol(resolved),
-        currency: currency || "—"
-      };
-
-      saveSymbolCache(cache);
-    }
-
-    function clearSymbolCache() {
-      localStorage.removeItem("symbolMapCache");
-      clearLog();
-      log("Symbol cache cleared.");
-    }
-
-    /************************************************************
-     * WORKER FETCHERS
-     ************************************************************/
-
-    async function fetchWorker(path) {
-      const url = `${WORKER_BASE}${path}`;
-      log("Fetch: " + url);
-
-      const res = await fetch(url);
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      return await res.json();
-    }
-
-    async function fetchQuote(symbol) {
-      return await fetchWorker(
-        `/quote?symbol=${encodeURIComponent(normaliseSymbol(symbol))}`
-      );
-    }
-
-    async function searchSymbol(query) {
-      return await fetchWorker(
-        `/search?q=${encodeURIComponent(normaliseSymbol(query))}`
-      );
-    }
-
-    /************************************************************
-     * EXCHANGE HINTS
-     ************************************************************/
-
-    function getExchangeHints(originalSymbol) {
-      const s = normaliseSymbol(originalSymbol);
-
-      if (s.endsWith(".DE")) return ["XETRA", "F"];
-      if (s.endsWith(".L")) return ["LSE"];
-      if (s.endsWith(".PA")) return ["PA"];
-      if (s.endsWith(".AS")) return ["AS"];
-      if (s.endsWith(".SW")) return ["SW"];
-      if (s.endsWith(".TO")) return ["TO"];
-      if (s.endsWith(".V")) return ["V"];
-      if (s.endsWith(".T")) return ["TSE", "T"];
-      if (s.endsWith(".HK")) return ["HK"];
-      if (s.endsWith(".AX")) return ["AU", "AX"];
-
-      return [];
-    }
-
-    /************************************************************
-     * SEARCH RESULT HANDLING
-     ************************************************************/
-
-    function getSearchArray(searchResult) {
-      if (Array.isArray(searchResult)) return searchResult;
-      if (Array.isArray(searchResult?.data)) return searchResult.data;
-      if (Array.isArray(searchResult?.results)) return searchResult.results;
-      return [];
-    }
-
-    function normaliseSearchItem(item) {
-      const code = normaliseSymbol(
-        item.Code ??
-        item.code ??
-        item.Symbol ??
-        item.symbol ??
-        ""
-      );
-
-      const exchange = normaliseSymbol(
-        item.Exchange ??
-        item.exchange ??
-        item.ExchangeCode ??
-        item.exchangeCode ??
-        ""
-      );
-
-      const name = String(
-        item.Name ??
-        item.name ??
-        item.Description ??
-        item.description ??
-        ""
-      ).toUpperCase();
-
-      const type = String(
-        item.Type ??
-        item.type ??
-        ""
-      ).toUpperCase();
-
-      const country = String(
-        item.Country ??
-        item.country ??
-        ""
-      ).toUpperCase();
-
-      const currency = String(
-        item.Currency ??
-        item.currency ??
-        ""
-      ).toUpperCase();
-
-      const isPrimary =
-        item.isPrimary === true ||
-        item.IsPrimary === true ||
-        item.primary === true;
-
-      const eodhdSymbol = code && exchange ? `${code}.${exchange}` : code;
-
-      return {
-        code,
-        exchange,
-        name,
-        type,
-        country,
-        currency,
-        isPrimary,
-        eodhdSymbol,
-        raw: item
-      };
-    }
-
-    function pickBestSymbol(originalSymbol, searchResult) {
-      const original = normaliseSymbol(originalSymbol);
-      const root = getTickerRoot(original);
-      const hints = getExchangeHints(original);
-
-      const candidates = getSearchArray(searchResult)
-        .map(normaliseSearchItem)
-        .filter(x => x.code || x.eodhdSymbol);
-
-      log("Search candidates for " + original, candidates);
-
-      if (!candidates.length) return null;
-
-      // 1. Exact match
-      let best = candidates.find(x => x.eodhdSymbol === original);
-      if (best) return best;
-
-      // 2. Same root + expected exchange from original suffix
-      best = candidates.find(x =>
-        x.code === root &&
-        hints.some(h => x.exchange === h)
-      );
-      if (best) return best;
-
-      // 3. Same root + exchange contains hint
-      best = candidates.find(x =>
-        x.code === root &&
-        hints.some(h => x.exchange.includes(h))
-      );
-      if (best) return best;
-
-      // 4. Same root + primary listing
-      best = candidates.find(x =>
-        x.code === root &&
-        x.isPrimary === true
-      );
-      if (best) return best;
-
-      // 5. Same root + common preferred exchanges
-      const preferred = [
-        "XETRA",
-        "LSE",
-        "TSE",
-        "HK",
-        "SW",
-        "PA",
-        "AS",
-        "TO",
-        "AU",
-        "AX",
-        "F"
-      ];
-
-      best = candidates.find(x =>
-        x.code === root &&
-        preferred.includes(x.exchange)
-      );
-      if (best) return best;
-
-      // 6. Same root, any exchange
-      best = candidates.find(x => x.code === root);
-      if (best) return best;
-
-      // 7. Final fallback
-      return candidates[0];
-    }
-
-    /************************************************************
-     * SYMBOL RESOLUTION
-     ************************************************************/
-
-    async function resolveSymbol(originalSymbol) {
-      const original = normaliseSymbol(originalSymbol);
-
-      if (!original) {
-        throw new Error("Empty symbol");
-      }
-
-      // 1. Cache first
-      const cached = getCachedSymbolInfo(original);
-
-      if (cached && cached.resolved) {
-        log(`Using cache: ${original} → ${cached.resolved}`);
-
-        return {
-          original,
-          resolved: cached.resolved,
-          currency: cached.currency || "—",
-          source: "cache"
-        };
-      }
-
-      // 2. Try direct quote first
-      try {
-        const direct = await fetchQuote(original);
-
-        if (isValidQuote(direct)) {
-          const directCurrency = getCurrencyFromQuote(direct);
-
-          setCachedSymbolInfo(original, original, directCurrency);
-
-          log(`Direct worked: ${original}`, direct);
-
-          return {
-            original,
-            resolved: original,
-            currency: directCurrency,
-            source: "direct"
-          };
-        }
-
-        log(`Direct invalid for ${original}`, direct);
-      } catch (err) {
-        log(`Direct failed for ${original}: ${err.message}`);
-      }
-
-      // 3. Search by root
-      const root = getTickerRoot(original);
-      const search = await searchSymbol(root);
-      const mappedInfo = pickBestSymbol(original, search);
-
-      if (!mappedInfo) {
-        log(`No mapping found. Using original: ${original}`);
-
-        return {
-          original,
-          resolved: original,
-          currency: "—",
-          source: "fallback"
-        };
-      }
-
-      // 4. Confirm mapped quote works
-      try {
-        const mappedQuote = await fetchQuote(mappedInfo.eodhdSymbol);
-
-        if (isValidQuote(mappedQuote)) {
-          const quoteCurrency = getCurrencyFromQuote(mappedQuote);
-          const finalCurrency =
-            quoteCurrency !== "—"
-              ? quoteCurrency
-              : mappedInfo.currency || "—";
-
-          setCachedSymbolInfo(original, mappedInfo.eodhdSymbol, finalCurrency);
-
-          log(`Mapped confirmed: ${original} → ${mappedInfo.eodhdSymbol}`, mappedQuote);
-
-          return {
-            original,
-            resolved: mappedInfo.eodhdSymbol,
-            currency: finalCurrency,
-            source: "search"
-          };
-        }
-
-        log(`Mapped invalid: ${mappedInfo.eodhdSymbol}`, mappedQuote);
-      } catch (err) {
-        log(`Mapped failed: ${mappedInfo.eodhdSymbol}: ${err.message}`);
-      }
-
-      return {
-        original,
-        resolved: original,
-        currency: "—",
-        source: "fallback"
-      };
-    }
-
-    async function getSmartQuote(originalSymbol) {
-      const resolvedInfo = await resolveSymbol(originalSymbol);
-      const quote = await fetchQuote(resolvedInfo.resolved);
-
-      const quoteCurrency = getCurrencyFromQuote(quote);
-      const finalCurrency =
-        quoteCurrency !== "—"
-          ? quoteCurrency
-          : resolvedInfo.currency || "—";
-
-      return {
-        originalSymbol: resolvedInfo.original,
-        resolvedSymbol: resolvedInfo.resolved,
-        source: resolvedInfo.source,
-        quote,
-        price: getPriceFromQuote(quote),
-        currency: finalCurrency
-      };
-    }
-
-    /************************************************************
-     * TABLE RENDERING
-     ************************************************************/
-
-    function setMessage(message) {
-      document.getElementById("portfolioBody").innerHTML = `
-        <tr>
-          <td colspan="13" class="small">${message}</td>
-        </tr>
-      `;
-    }
-
-    function renderRows(rows) {
-      const tbody = document.getElementById("portfolioBody");
-
-      if (!rows.length) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="13" class="small">No holdings added yet.</td>
-          </tr>
-        `;
-        return;
-      }
-
-      tbody.innerHTML = rows.map(row => {
-        const pnlClass =
-          row.pnl > 0 ? "ok" :
-          row.pnl < 0 ? "bad" :
-          "";
-
-        const statusClass = row.ok ? "ok" : "bad";
-
-        return `
-          <tr>
-            <td>${row.originalSymbol}</td>
-            <td>${row.resolvedSymbol || "—"}</td>
-            <td>${row.shares ?? "—"}</td>
-            <td>${fmtMoney(row.avgCost)}</td>
-            <td>${fmtPrice(row.price)}</td>
-            <td>${fmtMoney(row.marketValue)}</td>
-            <td>${fmtMoney(row.costValue)}</td>
-            <td class="${pnlClass}">${fmtMoney(row.pnl)}</td>
-            <td class="${pnlClass}">${fmtPercent(row.returnPct)}</td>
-            <td>${row.currency || "—"}</td>
-            <td>${row.source || "—"}</td>
-            <td class="${statusClass}">${row.status}</td>
-            <td>
-              <button class="danger" onclick="removeHolding('${row.originalSymbol}')">
-                Remove
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join("");
-    }
-
-    /************************************************************
-     * MAIN ACTIONS
-     ************************************************************/
-
-    async function refreshPortfolio() {
-      clearLog();
-
-      portfolioHoldings = loadHoldings();
-
-      if (!portfolioHoldings.length) {
-        renderRows([]);
-        log("No holdings found.");
-        return;
-      }
-
-      setMessage("Loading portfolio prices...");
-
-      const rows = [];
-
-      for (const holding of portfolioHoldings) {
-        const symbol = normaliseSymbol(holding.symbol);
-        const shares = Number(holding.shares);
-        const avgCost = Number(holding.avgCost);
-        const costValue = shares * avgCost;
-
-        try {
-          const result = await getSmartQuote(symbol);
-          const price = result.price;
-
-          const marketValue =
-            price !== null ? price * shares : null;
-
-          const pnl =
-            marketValue !== null ? marketValue - costValue : null;
-
-          const returnPct =
-            pnl !== null && costValue > 0 ? (pnl / costValue) * 100 : null;
-
-          rows.push({
-            originalSymbol: result.originalSymbol,
-            resolvedSymbol: result.resolvedSymbol,
-            shares,
-            avgCost,
-            price,
-            marketValue,
-            costValue,
-            pnl,
-            returnPct,
-            currency: result.currency,
-            source: result.source,
-            ok: price !== null,
-            status: price !== null ? "OK" : "No valid price"
-          });
-        } catch (err) {
-          rows.push({
-            originalSymbol: symbol,
-            resolvedSymbol: "—",
-            shares,
-            avgCost,
-            price: null,
-            marketValue: null,
-            costValue,
-            pnl: null,
-            returnPct: null,
-            currency: "—",
-            source: "error",
-            ok: false,
-            status: err.message
-          });
-
-          log(`Error loading ${symbol}: ${err.message}`);
-        }
-
-        renderRows(rows);
-      }
-
-      log("Refresh complete.");
-    }
-
-    async function testSymbol() {
-      clearLog();
-
-      const symbol = normaliseSymbol(document.getElementById("testSymbol").value);
-
-      if (!symbol) {
-        alert("Enter a symbol first.");
-        return;
-      }
-
-      setMessage("Testing " + symbol + "...");
-
-      try {
-        const result = await getSmartQuote(symbol);
-
-        renderRows([
-          {
-            originalSymbol: result.originalSymbol,
-            resolvedSymbol: result.resolvedSymbol,
-            shares: "—",
-            avgCost: null,
-            price: result.price,
-            marketValue: null,
-            costValue: null,
-            pnl: null,
-            returnPct: null,
-            currency: result.currency,
-            source: result.source,
-            ok: result.price !== null,
-            status: result.price !== null ? "OK" : "No valid price"
-          }
-        ]);
-
-        log("Test result", result);
-      } catch (err) {
-        setMessage("Test failed: " + err.message);
-        log("Test failed: " + err.message);
-      }
-    }
-
-    /************************************************************
-     * PAGE LOAD
-     ************************************************************/
-
-    window.addEventListener("load", () => {
-      log("Page loaded.");
-
-      portfolioHoldings = loadHoldings();
-
-      if (portfolioHoldings.length) {
-        refreshPortfolio();
-      } else {
-        renderRows([]);
-      }
-    });
-  </script>
+    renderHoldings();
+    updateSummary();
+    await new Promise(res=>setTimeout(res,250));
+  }
+  holdingsData.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));
+  renderHoldings();
+  updateSummary();
+  progress.textContent=`Live refresh done: ${ok} updated (${fhOk} Finnhub, ${eodOk} EODHD, ${tdOk} Twelve Data, ${cacheOk} cached), ${fail} fallback to last CMC trade price. FX used: manual CMC override first.`;
+  document.getElementById('lastUpdated').textContent='Live refresh · '+new Date().toLocaleString('en-AU');
+}
+function clearQuoteCache(){localStorage.removeItem(QUOTE_CACHE_KEY);localStorage.removeItem(EODHD_SYMBOL_CACHE_KEY);document.getElementById('liveProgress').textContent='Daily quote cache and EODHD symbol cache cleared.'}
+function saveKeys(){
+  localStorage.setItem('cmc_finnhub_key',document.getElementById('finnhubKey').value.trim());
+  localStorage.setItem('cmc_eodhd_key',document.getElementById('eodKey').value.trim());
+  localStorage.setItem('cmc_eodhd_proxy_url',document.getElementById('eodProxyUrl').value.trim());
+  localStorage.setItem('cmc_twelvedata_key',document.getElementById('tdKey').value.trim());
+  localStorage.setItem('cmc_fx_key',document.getElementById('fxKey').value.trim());
+  localStorage.setItem('cmc_fx_usd',document.getElementById('fxUSD').value.trim());
+  localStorage.setItem('cmc_fx_cad',document.getElementById('fxCAD').value.trim());
+  localStorage.setItem('cmc_fx_eur',document.getElementById('fxEUR').value.trim());
+  localStorage.setItem('cmc_fx_sek',document.getElementById('fxSEK').value.trim());
+  document.getElementById('liveProgress').textContent='Keys and CMC FX overrides saved in this browser.';
+}
+function renderHoldings(){const list=document.getElementById('holdingsList');list.innerHTML='';holdingsData.forEach(h=>{const live=h.liveValue!=null,usedPrice=live?h.liveAUD:h.lastPrice,val=live?h.liveValue:h.qty*h.lastPrice,pnl=val-h.totalCost,pct=h.totalCost?pnl/h.totalCost*100:0;const card=document.createElement('div');card.className='hcard';card.innerHTML=`<div class="hcard-top"><div class="hticker"><span class="tbadge">${h.code}</span>${live?'<span class="live-tag">LIVE</span>':h.liveError?'<span class="fail-tag">FALLBACK</span>':''}<span class="corp-tag">${h.liveSymbolUsed||h.liveSymbol}</span>${h.liveSource?`<span class="corp-tag">${h.liveSource}</span>`:''}</div><div class="hval-wrap"><div class="hval">${fmt(val)}</div><div class="hval-sub">${live?'live AUD value':'last CMC trade value'}</div></div></div><div class="hgrid"><div class="hstat"><div class="hl">Shares</div><div class="hv">${h.qty.toFixed(4)}</div></div><div class="hstat"><div class="hl">Avg Cost</div><div class="hv">${fmt(h.avgCost)}</div></div><div class="hstat"><div class="hl">Price AUD</div><div class="hv">${fmt(usedPrice)}</div></div><div class="hstat"><div class="hl">Local Price</div><div class="hv">${live?Number(h.liveLocal).toFixed(4)+' '+h.currency:'—'}</div></div><div class="hstat"><div class="hl">P&L</div><div class="hv ${pnl>=0?'gain':'loss'}">${pnl>=0?'+':''}${fmt(pnl)}</div></div><div class="hstat"><div class="hl">Return</div><div class="hv ${pct>=0?'gain':'loss'}">${pct>=0?'+':''}${pct.toFixed(2)}%</div></div></div>`;list.appendChild(card)})}
+function renderTx(){const list=document.getElementById('txList');list.innerHTML='';const filtered=currentTxFilter==='all'?allTrades:allTrades.filter(t=>t.type===currentTxFilter);[...filtered].reverse().slice(0,100).forEach(t=>{const item=document.createElement('div');item.className='tx-item';const amt=t.type==='BUY'?-(t.consideration+t.brokerage):(t.consideration-t.brokerage);item.innerHTML=`<div class="tx-dot ${t.type.toLowerCase()}"></div><div><div class="tx-ticker">${t.type} · ${t.code}</div><div class="tx-date">${t.date.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}</div></div><div class="tx-right"><div class="tx-amt ${t.type==='BUY'?'loss':'gain'}">${t.type==='BUY'?'-':'+'}${fmt(Math.abs(amt))}</div><div class="tx-qty">${t.qty.toFixed(4)} @ ${fmt(t.priceAUD)}</div></div>`;list.appendChild(item)});if(filtered.length>100){const more=document.createElement('div');more.style.cssText='text-align:center;font-size:10px;color:var(--muted);padding:8px';more.textContent=`Showing 100 of ${filtered.length} transactions`;list.appendChild(more)}}
+function filterTx(type,btn){currentTxFilter=type;document.querySelectorAll('.tx-filter').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTx()}
+function showTab(tab,btn){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('holdingsTab').style.display=tab==='holdings'?'block':'none';document.getElementById('txSection').style.display=tab==='tx'?'block':'none'}
+function makeChart(){const daily={},runQty={},runCost={};for(const t of allTrades){const d=t.date.toISOString().split('T')[0];runQty[t.code]??=0;runCost[t.code]??=0;if(t.type==='BUY'){runQty[t.code]+=t.qty;runCost[t.code]+=t.consideration+t.brokerage}else{const avg=runQty[t.code]>0?runCost[t.code]/runQty[t.code]:0;runQty[t.code]-=t.qty;runCost[t.code]=runQty[t.code]>0?avg*runQty[t.code]:0;if(runQty[t.code]<0.001){runQty[t.code]=0;runCost[t.code]=0}}daily[d]=Object.values(runCost).reduce((s,v)=>s+v,0)}allChartData=Object.keys(daily).sort().map(d=>({date:d,cost:daily[d]}));const ctx=document.getElementById('portfolioChart').getContext('2d');if(chartInstance)chartInstance.destroy();chartInstance=new Chart(ctx,{type:'line',data:{labels:allChartData.map(d=>d.date),datasets:[{label:'Cost Basis AUD',data:allChartData.map(d=>d.cost),borderColor:'#4d9fff',backgroundColor:'rgba(77,159,255,.12)',fill:true,borderWidth:2,pointRadius:0,tension:.25}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7a7a98',font:{family:'DM Mono',size:9}}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)}}},scales:{x:{ticks:{color:'#7a7a98',font:{family:'DM Mono',size:9},maxTicksLimit:6}},y:{ticks:{color:'#7a7a98',font:{family:'DM Mono',size:9},callback:v=>'$'+(v>=1000?(v/1000).toFixed(1)+'k':v)}}}}})}
+function resetApp(){allTrades=[];holdingsData=[];allChartData=[];if(chartInstance){chartInstance.destroy();chartInstance=null}['statsRow','livePanel','chartSection','holdingsSection','resetBtn'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('status').style.display='none';document.getElementById('lastUpdated').textContent='';fileInput.value=''}
+</script>
 </body>
 </html>
