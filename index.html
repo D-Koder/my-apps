@@ -271,36 +271,45 @@
       return n.toFixed(2) + "%";
     }
 
-    function getPriceFromQuote(data) {
-      if (!data || typeof data !== "object") return null;
+   function getPriceFromQuote(response) {
+  if (!response || typeof response !== "object") return null;
 
-      const raw =
-        data.close ??
-        data.price ??
-        data.last ??
-        data.previousClose ??
-        data.adjusted_close ??
-        data.adjustedClose ??
-        null;
+  const data = response.data && typeof response.data === "object"
+    ? response.data
+    : response;
 
-      const n = Number(raw);
+  const raw =
+    data.close ??
+    data.price ??
+    data.last ??
+    data.previousClose ??
+    data.adjusted_close ??
+    data.adjustedClose ??
+    null;
 
-      if (!Number.isFinite(n) || n <= 0) {
-        return null;
-      }
+  const n = Number(raw);
 
-      return n;
-    }
+  if (!Number.isFinite(n) || n <= 0) {
+    return null;
+  }
 
-    function getCurrencyFromQuote(data) {
-      return (
-        data?.currency ??
-        data?.Currency ??
-        data?.currencyCode ??
-        data?.CurrencyCode ??
-        "—"
-      );
-    }
+  return n;
+}
+   function getCurrencyFromQuote(response) {
+  if (!response || typeof response !== "object") return "—";
+
+  const data = response.data && typeof response.data === "object"
+    ? response.data
+    : response;
+
+  return (
+    data?.currency ??
+    data?.Currency ??
+    response?.currency ??
+    response?.Currency ??
+    "—"
+  );
+}
 
     function isValidQuote(data) {
       return getPriceFromQuote(data) !== null;
