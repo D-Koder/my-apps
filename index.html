@@ -11,102 +11,99 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a26; --border: #2a2a3a;
-    --accent: #00e5a0; --accent2: #ff6b35; --accent3: #4d9fff;
-    --text: #e8e8f0; --muted: #6a6a88; --gain: #00e5a0; --loss: #ff4d6d; --warn: #f5c542;
+    --bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--border:#2a2a3a;
+    --accent:#00e5a0;--accent2:#ff6b35;--accent3:#4d9fff;
+    --text:#e8e8f0;--muted:#6a6a88;--gain:#00e5a0;--loss:#ff4d6d;--warn:#f5c542;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
-  body::before {
-    content: ''; position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 0; opacity: 0.4;
-  }
-  .header { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 12px; position: relative; z-index: 1; }
-  .header h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-  .header .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
-  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
-  .header .subtitle { color: var(--muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; margin-left: auto; }
-  .main { padding: 20px; position: relative; z-index: 1; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+  .header{padding:24px 20px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
+  .header h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .subtitle{color:var(--muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-left:auto;}
+  .main{padding:20px;position:relative;z-index:1;}
 
-#dropZone { border: 1.5px dashed var(–border); border-radius: 12px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(–surface); position: relative; overflow: hidden; }
-#dropZone::before { content:’’; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(0,229,160,.05) 0%,transparent 70%); pointer-events:none; }
-#dropZone:hover, #dropZone.drag-over { border-color: var(–accent); background: rgba(0,229,160,0.04); }
-#dropZone .icon { font-size: 32px; margin-bottom: 12px; }
-#dropZone h2 { font-family: ‘Syne’, sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-#dropZone p { color: var(–muted); font-size: 11px; line-height: 1.6; }
-.browse-btn { display: inline-block; margin-top: 16px; padding: 10px 24px; background: transparent; border: 1px solid var(–accent); color: var(–accent); font-family: ‘DM Mono’, monospace; font-size: 12px; border-radius: 6px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
-.browse-btn:hover, .browse-btn:active { background: var(–accent); color: var(–bg); }
-#fileInput { display: none; }
+#dropZone{border:1.5px dashed var(–border);border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(–surface);position:relative;overflow:hidden;}
+#dropZone::before{content:’’;position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(0,229,160,.05) 0%,transparent 70%);pointer-events:none;}
+#dropZone:hover,#dropZone.drag-over{border-color:var(–accent);background:rgba(0,229,160,0.04);}
+#dropZone .icon{font-size:32px;margin-bottom:12px;}
+#dropZone h2{font-family:‘Syne’,sans-serif;font-size:16px;font-weight:600;margin-bottom:6px;}
+#dropZone p{color:var(–muted);font-size:11px;line-height:1.6;}
+.browse-btn{display:inline-block;margin-top:16px;padding:10px 24px;background:transparent;border:1px solid var(–accent);color:var(–accent);font-family:‘DM Mono’,monospace;font-size:12px;border-radius:6px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;}
+.browse-btn:hover,.browse-btn:active{background:var(–accent);color:var(–bg);}
+#fileInput{display:none;}
 
-#status { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 12px; display: none; line-height: 1.5; }
-#status.info  { background: rgba(77,159,255,.1);  border: 1px solid rgba(77,159,255,.3);  color: var(–accent3); }
-#status.success{ background: rgba(0,229,160,.1);  border: 1px solid rgba(0,229,160,.3);   color: var(–accent); }
-#status.error  { background: rgba(255,77,109,.1); border: 1px solid rgba(255,77,109,.3);  color: var(–loss); }
+#status{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:12px;display:none;line-height:1.5;}
+#status.info{background:rgba(77,159,255,.1);border:1px solid rgba(77,159,255,.3);color:var(–accent3);}
+#status.success{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);color:var(–accent);}
+#status.error{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:var(–loss);}
 
-/* Debug log */
-#debugPanel { display: none; margin-top: 12px; }
-#debugToggle { background: none; border: 1px solid var(–border); color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 10px; padding: 4px 10px; border-radius: 4px; cursor: pointer; letter-spacing: 1px; }
-#debugToggle:hover { border-color: var(–accent3); color: var(–accent3); }
-#debugLog { display: none; margin-top: 8px; background: #0d0d14; border: 1px solid var(–border); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-size: 10px; line-height: 1.7; color: var(–muted); }
-#debugLog .log-ok   { color: var(–gain); }
-#debugLog .log-warn { color: var(–warn); }
-#debugLog .log-err  { color: var(–loss); }
-#debugLog .log-info { color: var(–accent3); }
+#debugWrap{display:none;margin-top:12px;}
+#debugLog{background:#0d0d14;border:1px solid var(–border);border-radius:8px;padding:10px 12px;max-height:180px;overflow-y:auto;font-size:10px;line-height:1.8;color:var(–muted);}
+#debugLog .ok{color:var(–gain);}#debugLog .warn{color:var(–warn);}#debugLog .err{color:var(–loss);}#debugLog .info{color:var(–accent3);}
 
-#aiWarning { display: none; margin-top: 12px; padding: 14px 16px; background: rgba(245,197,66,.07); border: 1px solid rgba(245,197,66,.3); border-radius: 8px; font-size: 11px; color: var(–warn); line-height: 1.7; }
-#aiWarning strong { color: #f5d76e; }
-.ai-resolve-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(245,197,66,.1); font-size: 10px; }
-.ai-resolve-item:last-child { border-bottom: none; }
-.ai-badge { background: rgba(245,197,66,.15); border: 1px solid rgba(245,197,66,.3); border-radius: 4px; padding: 2px 6px; font-size: 10px; color: var(–warn); white-space: nowrap; flex-shrink: 0; }
-.ai-note { color: var(–muted); font-size: 10px; margin-top: 1px; }
-#aiResolveList { margin-top: 8px; }
+#corpActions{display:none;margin-top:12px;padding:14px 16px;background:rgba(77,159,255,.07);border:1px solid rgba(77,159,255,.3);border-radius:8px;font-size:11px;color:var(–accent3);line-height:1.7;}
+#corpActions strong{color:var(–text);}
+.ca-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(77,159,255,.15);font-size:10px;}
+.ca-item:last-child{border-bottom:none;}
+.ca-badge{background:rgba(77,159,255,.15);border:1px solid rgba(77,159,255,.3);border-radius:4px;padding:1px 6px;font-size:10px;white-space:nowrap;flex-shrink:0;}
+.ca-note{color:var(–muted);font-size:10px;margin-top:1px;}
 
-#statsRow { display: none; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
-.stat-card { background: var(–surface); border: 1px solid var(–border); border-radius: 10px; padding: 16px; position: relative; overflow: hidden; animation: fadeUp 0.4s ease forwards; opacity: 0; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-.stat-card:nth-child(1){animation-delay:.05s} .stat-card:nth-child(2){animation-delay:.1s} .stat-card:nth-child(3){animation-delay:.15s} .stat-card:nth-child(4){animation-delay:.2s}
-.stat-card .label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(–muted); margin-bottom: 8px; }
-.stat-card .value { font-family: ‘Syne’, sans-serif; font-size: 18px; font-weight: 700; }
-.stat-card .change { font-size: 10px; margin-top: 4px; }
-.stat-card .change.gain { color: var(–gain); } .stat-card .change.loss { color: var(–loss); }
-.stat-card::after { content:’’; position:absolute; top:0;left:0;right:0; height:2px; }
-.stat-card:nth-child(1)::after{background:var(–accent)} .stat-card:nth-child(2)::after{background:var(–accent2)} .stat-card:nth-child(3)::after{background:var(–accent3)} .stat-card:nth-child(4)::after{background:#c77dff}
+#aiWarning{display:none;margin-top:12px;padding:14px 16px;background:rgba(245,197,66,.07);border:1px solid rgba(245,197,66,.3);border-radius:8px;font-size:11px;color:var(–warn);line-height:1.7;}
+#aiWarning strong{color:#f5d76e;}
+.ai-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(245,197,66,.1);font-size:10px;}
+.ai-item:last-child{border-bottom:none;}
+.ai-badge{background:rgba(245,197,66,.15);border:1px solid rgba(245,197,66,.3);border-radius:4px;padding:1px 6px;font-size:10px;color:var(–warn);white-space:nowrap;flex-shrink:0;}
+.ai-note{color:var(–muted);font-size:10px;margin-top:1px;}
+#aiList{margin-top:8px;}
 
-#chartSection { margin-top: 20px; display: none; }
-.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-.chart-header h3 { font-family: ‘Syne’, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-.range-btns { display: flex; gap: 4px; }
-.range-btn { padding: 4px 10px; border-radius: 5px; border: 1px solid var(–border); background: transparent; color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 10px; cursor: pointer; transition: all 0.15s; }
-.range-btn:hover { border-color: var(–accent); color: var(–accent); }
-.range-btn.active { background: var(–accent); border-color: var(–accent); color: var(–bg); }
-.chart-wrap { background: var(–surface); border: 1px solid var(–border); border-radius: 12px; padding: 16px; }
-#portfolioChart { width: 100% !important; height: 240px !important; }
+#statsRow{display:none;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px;}
+.stat-card{background:var(–surface);border:1px solid var(–border);border-radius:10px;padding:14px;position:relative;overflow:hidden;animation:fadeUp 0.4s ease forwards;opacity:0;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.stat-card:nth-child(1){animation-delay:.05s}.stat-card:nth-child(2){animation-delay:.1s}.stat-card:nth-child(3){animation-delay:.15s}.stat-card:nth-child(4){animation-delay:.2s}
+.stat-card .lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(–muted);margin-bottom:6px;}
+.stat-card .val{font-family:‘Syne’,sans-serif;font-size:17px;font-weight:700;}
+.stat-card .chg{font-size:10px;margin-top:3px;}
+.chg.gain{color:var(–gain)}.chg.loss{color:var(–loss)}
+.stat-card::after{content:’’;position:absolute;top:0;left:0;right:0;height:2px;}
+.stat-card:nth-child(1)::after{background:var(–accent)}.stat-card:nth-child(2)::after{background:var(–accent2)}.stat-card:nth-child(3)::after{background:var(–accent3)}.stat-card:nth-child(4)::after{background:#c77dff}
 
-#holdingsSection { margin-top: 20px; display: none; }
-.holdings-header { margin-bottom: 12px; }
-.holdings-header h3 { font-family: ‘Syne’, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-.holding-card { background: var(–surface); border: 1px solid var(–border); border-radius: 10px; padding: 14px; margin-bottom: 8px; }
-.holding-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.holding-ticker { display: flex; align-items: center; gap: 8px; }
-.ticker-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; background: var(–surface2); border: 1px solid var(–border); font-size: 11px; font-weight: 500; }
-.ticker-badge.ai-resolved { border-color: rgba(245,197,66,.5); color: var(–warn); }
-.ai-tag { font-size: 9px; background: rgba(245,197,66,.15); border: 1px solid rgba(245,197,66,.3); color: var(–warn); border-radius: 3px; padding: 1px 4px; }
-.holding-value { font-family: ‘Syne’, sans-serif; font-size: 16px; font-weight: 700; }
-.holding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.holding-stat .hs-label { font-size: 9px; color: var(–muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
-.holding-stat .hs-val { font-size: 11px; }
-.gain-val { color: var(–gain); } .loss-val { color: var(–loss); } .na-val { color: var(–muted); }
+#chartSection{margin-top:20px;display:none;}
+.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.chart-header h3{font-family:‘Syne’,sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;}
+.range-btns{display:flex;gap:4px;}
+.range-btn{padding:4px 10px;border-radius:5px;border:1px solid var(–border);background:transparent;color:var(–muted);font-family:‘DM Mono’,monospace;font-size:10px;cursor:pointer;transition:all 0.15s;}
+.range-btn.active{background:var(–accent);border-color:var(–accent);color:var(–bg);}
+.chart-wrap{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:14px;}
+#portfolioChart{width:100%!important;height:220px!important;}
 
-#progressBar { display: none; margin-top: 10px; height: 3px; background: var(–border); border-radius: 2px; overflow: hidden; }
-#progressFill { height: 100%; background: var(–accent); width: 0%; transition: width 0.3s ease; border-radius: 2px; }
-#resetBtn { display: none; margin-top: 14px; padding: 8px 18px; background: transparent; border: 1px solid var(–border); color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 11px; border-radius: 6px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
-#resetBtn:hover { border-color: var(–loss); color: var(–loss); }
-#instructions { margin-top: 20px; padding: 16px; background: var(–surface); border: 1px solid var(–border); border-radius: 10px; font-size: 11px; line-height: 1.8; color: var(–muted); }
-#instructions strong { color: var(–accent); }
-#instructions h4 { font-family: ‘Syne’, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(–text); margin-bottom: 8px; }
-#instructions ol { padding-left: 16px; }
-#instructions li { margin-bottom: 4px; }
+#holdingsSection{margin-top:20px;display:none;}
+.sec-title{font-family:‘Syne’,sans-serif;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.hcard{background:var(–surface);border:1px solid var(–border);border-radius:10px;padding:14px;margin-bottom:8px;}
+.hcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.hticker{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.tbadge{display:inline-block;padding:3px 8px;border-radius:4px;background:var(–surface2);border:1px solid var(–border);font-size:11px;font-weight:500;}
+.tbadge.corp{border-color:rgba(77,159,255,.5);color:var(–accent3);}
+.tbadge.ai{border-color:rgba(245,197,66,.5);color:var(–warn);}
+.corp-tag{font-size:9px;background:rgba(77,159,255,.15);border:1px solid rgba(77,159,255,.3);color:var(–accent3);border-radius:3px;padding:1px 4px;}
+.ai-tag{font-size:9px;background:rgba(245,197,66,.15);border:1px solid rgba(245,197,66,.3);color:var(–warn);border-radius:3px;padding:1px 4px;}
+.hval{font-family:‘Syne’,sans-serif;font-size:16px;font-weight:700;}
+.hgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.hstat .hl{font-size:9px;color:var(–muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.hstat .hv{font-size:11px;}
+.gv{color:var(–gain)}.lv{color:var(–loss)}.nv{color:var(–muted)}
+
+#progressBar{display:none;margin-top:10px;height:3px;background:var(–border);border-radius:2px;overflow:hidden;}
+#progressFill{height:100%;background:var(–accent);width:0%;transition:width 0.3s ease;border-radius:2px;}
+#resetBtn{display:none;margin-top:14px;padding:8px 18px;background:transparent;border:1px solid var(–border);color:var(–muted);font-family:‘DM Mono’,monospace;font-size:11px;border-radius:6px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;}
+#resetBtn:hover{border-color:var(–loss);color:var(–loss);}
+#instructions{margin-top:20px;padding:16px;background:var(–surface);border:1px solid var(–border);border-radius:10px;font-size:11px;line-height:1.8;color:var(–muted);}
+#instructions strong{color:var(–accent);}
+#instructions h4{font-family:‘Syne’,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(–text);margin-bottom:8px;}
+#instructions ol{padding-left:16px;}
+#instructions li{margin-bottom:4px;}
 </style>
 
 </head>
@@ -121,29 +118,34 @@
     <div class="icon">📂</div>
     <h2>Drop your CMC CSV here</h2>
     <p>CMC Invest → Activity → Confirmation History → Download CSV<br>
-    US · ASX · CA · DE · SE · Crypto · AI fallback ✨</p>
+    US · ASX · CA · DE · SE · Crypto · Merger/rebrand aware ✨</p>
     <button class="browse-btn" onclick="document.getElementById('fileInput').click()">Browse File</button>
     <input type="file" id="fileInput" accept=".csv">
   </div>
 
   <div id="status"></div>
   <div id="progressBar"><div id="progressFill"></div></div>
+  <div id="debugWrap"><div id="debugLog"></div></div>
 
-  <div id="debugPanel">
-    <button id="debugToggle" onclick="toggleDebug()">▶ DEBUG LOG</button>
-    <div id="debugLog"></div>
+  <!-- Corporate actions panel (blue) -->
+
+  <div id="corpActions">
+    <strong>ℹ️ Corporate Actions Applied</strong> — tickers resolved via known mergers/rebrands:
+    <div id="caList"></div>
   </div>
+
+  <!-- AI fallback panel (yellow warning) -->
 
   <div id="aiWarning">
     <strong>⚠️ AI-Assisted Resolution — Verify Before Decisions</strong>
-    <div id="aiResolveList"></div>
+    <div id="aiList"></div>
   </div>
 
   <div id="statsRow">
-    <div class="stat-card"><div class="label">Current Value</div><div class="value" id="statValue">—</div><div class="change" id="statValueChange"></div></div>
-    <div class="stat-card"><div class="label">Total Cost</div><div class="value" id="statCost">—</div></div>
-    <div class="stat-card"><div class="label">Gain / Loss</div><div class="value" id="statGain">—</div><div class="change" id="statGainPct"></div></div>
-    <div class="stat-card"><div class="label">Holdings</div><div class="value" id="statHoldings">—</div><div class="change" id="statLastUpdated"></div></div>
+    <div class="stat-card"><div class="lbl">Current Value</div><div class="val" id="sVal">—</div><div class="chg" id="sValChg"></div></div>
+    <div class="stat-card"><div class="lbl">Total Cost</div><div class="val" id="sCost">—</div></div>
+    <div class="stat-card"><div class="lbl">Gain / Loss</div><div class="val" id="sGain">—</div><div class="chg" id="sGainPct"></div></div>
+    <div class="stat-card"><div class="lbl">Holdings</div><div class="val" id="sCount">—</div><div class="chg" id="sDate"></div></div>
   </div>
 
   <div id="chartSection">
@@ -161,7 +163,7 @@
   </div>
 
   <div id="holdingsSection">
-    <div class="holdings-header"><h3>Current Holdings</h3></div>
+    <div class="sec-title">Current Holdings</div>
     <div id="holdingsList"></div>
   </div>
 
@@ -175,471 +177,494 @@
       <li>Tap <strong>Download CSV</strong> (top right)</li>
       <li>Tap Browse File above and select it</li>
     </ol>
+    <br>
+    <strong>Only fetches current holdings</strong> — fast &amp; iOS-friendly. Known mergers &amp; rebrands auto-resolved.
   </div>
 </div>
 
 <script>
-let allChartData = [], holdingsData = [], aiResolutions = [], currentRange = 365;
-let chartInstance = null;
-const symbolCache = {};
+// ─────────────────────────────────────────────────────────────
+// KNOWN CORPORATE ACTIONS — hardcoded so no AI needed for these
+// Format: 'OLD_CODE': { newYahoo, ratio, note, effectiveDate }
+// ─────────────────────────────────────────────────────────────
+const CORP_ACTIONS = {
+  // BITF (Bitfarms) rebranded to KEEL (Keel Infrastructure) 1:1 on 2026-04-06
+  'BITF:US': { newYahoo: 'KEEL', ratio: 1.0, note: 'Bitfarms rebranded → Keel Infrastructure (KEEL) 1:1, Apr 2026' },
+  // MEIP (MEI Pharma) rebranded to LITS (Lite Strategy) on 2025-09-11
+  'MEIP:US': { newYahoo: 'LITS', ratio: 1.0, note: 'MEI Pharma rebranded → Lite Strategy (LITS), Sep 2025' },
+  // Add more here as needed e.g.:
+  // 'OLDTICKER:US': { newYahoo: 'NEWTICKER', ratio: 0.5, note: 'Merged into XYZ at 0.5x ratio' },
+};
 
-// ── Debug logger ──
+let allChartData=[], holdingsData=[], corpActionLog=[], aiResolutions=[], currentRange=365;
+let chartInstance=null;
+const symCache={};
+
+// ── Logger ──
 function log(msg, type='info') {
-  const el = document.getElementById('debugLog');
-  const line = document.createElement('div');
-  line.className = `log-${type}`;
-  const time = new Date().toLocaleTimeString('en-AU', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  line.textContent = `[${time}] ${msg}`;
+  const wrap=document.getElementById('debugWrap');
+  const el=document.getElementById('debugLog');
+  wrap.style.display='block';
+  const line=document.createElement('div');
+  line.className=type;
+  const t=new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  line.textContent=`[${t}] ${msg}`;
   el.appendChild(line);
-  el.scrollTop = el.scrollHeight;
-  document.getElementById('debugPanel').style.display = 'block';
-}
-function toggleDebug() {
-  const el = document.getElementById('debugLog');
-  const btn = document.getElementById('debugToggle');
-  el.style.display = el.style.display === 'none' ? 'block' : 'none';
-  btn.textContent = el.style.display === 'none' ? '▶ DEBUG LOG' : '▼ DEBUG LOG';
+  el.scrollTop=el.scrollHeight;
 }
 
 // Drop zone
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); });
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) processFile(fileInput.files[0]); });
+const dropZone=document.getElementById('dropZone');
+const fileInput=document.getElementById('fileInput');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0]);});
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])processFile(fileInput.files[0]);});
 
-function showStatus(msg, type='info') {
-  const el = document.getElementById('status');
-  el.textContent = msg; el.className = type; el.style.display = 'block';
-}
-function setProgress(pct) {
-  document.getElementById('progressBar').style.display = 'block';
-  document.getElementById('progressFill').style.width = pct + '%';
-}
+function showStatus(msg,type='info'){const el=document.getElementById('status');el.textContent=msg;el.className=type;el.style.display='block';}
+function setProgress(pct){document.getElementById('progressBar').style.display='block';document.getElementById('progressFill').style.width=pct+'%';}
 
-// ── CORS proxy with multiple fallbacks ──
-// Tries proxies in order until one works
-const PROXIES = [
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-  url => `https://cors-anywhere.herokuapp.com/${url}`,
-];
-
-async function fetchWithProxy(targetUrl) {
-  for (let i = 0; i < PROXIES.length; i++) {
-    const proxyUrl = PROXIES[i](targetUrl);
-    try {
-      log(`Proxy ${i+1}: ${proxyUrl.substring(0,60)}...`, 'info');
-      const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
-      if (!resp.ok) { log(`Proxy ${i+1} HTTP ${resp.status}`, 'warn'); continue; }
-
-      const text = await resp.text();
-
-      // corsproxy.io returns raw content
-      if (i === 0) {
-        try { return JSON.parse(text); } catch(e) { log(`Proxy 1 parse error: ${e.message}`, 'warn'); continue; }
-      }
-      // allorigins wraps in {contents: "..."}
-      if (i === 1) {
-        try {
-          const wrapper = JSON.parse(text);
-          return JSON.parse(wrapper.contents);
-        } catch(e) { log(`Proxy 2 parse error: ${e.message}`, 'warn'); continue; }
-      }
-      // cors-anywhere returns raw
-      if (i === 2) {
-        try { return JSON.parse(text); } catch(e) { log(`Proxy 3 parse error: ${e.message}`, 'warn'); continue; }
-      }
-    } catch(e) {
-      log(`Proxy ${i+1} failed: ${e.message}`, 'warn');
+// ── CORS proxy ──
+async function proxyFetch(url) {
+  // Try corsproxy.io first (better iOS support), fallback to allorigins
+  const proxies = [
+    async () => {
+      const r=await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(12000)});
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    },
+    async () => {
+      const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,{signal:AbortSignal.timeout(12000)});
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      const w=await r.json();
+      return JSON.parse(w.contents);
     }
+  ];
+  for(let i=0;i<proxies.length;i++){
+    try{ return await proxies[i](); }
+    catch(e){ log(`Proxy ${i+1} failed: ${e.message}`,'warn'); }
   }
   throw new Error('All proxies failed');
 }
 
-// ── Parse CMC CSV ──
+// ── Parse CSV ──
 function processFile(file) {
-  log(`Reading file: ${file.name} (${(file.size/1024).toFixed(1)}KB)`, 'info');
-  showStatus('📄 Reading CSV...', 'info');
-  Papa.parse(file, {
-    header: true, skipEmptyLines: true,
-    complete: async (results) => {
+  log(`File: ${file.name} (${(file.size/1024).toFixed(1)}KB)`,'info');
+  showStatus('📄 Reading CSV...','info');
+  Papa.parse(file,{
+    header:true, skipEmptyLines:true,
+    complete: async(results)=>{
       try {
-        log(`CSV parsed: ${results.data.length} rows, columns: ${Object.keys(results.data[0]||{}).join(', ')}`, 'info');
-        const trades = parseCMCTrades(results.data);
-        if (!trades.length) throw new Error('No Buy/Sell trades found — check CSV format');
-        log(`Trades found: ${trades.length}`, 'ok');
-        showStatus(`✓ ${trades.length} transactions found. Fetching prices...`, 'info');
-        await buildPortfolio(trades);
-      } catch(e) {
-        log(`FATAL: ${e.message}`, 'err');
-        showStatus('✗ Error: ' + e.message, 'error');
+        const {trades, currentHoldings}=parseCMC(results.data);
+        const codes=Object.keys(currentHoldings);
+        log(`Trades: ${trades.length} | Current holdings: ${codes.length} → ${codes.join(', ')}`,'ok');
+        showStatus(`✓ ${trades.length} trades · ${codes.length} current holdings. Fetching prices...`,'info');
+        await buildPortfolio(trades, currentHoldings);
+      } catch(e){
+        log(`FATAL: ${e.message}`,'err');
+        showStatus('✗ '+e.message,'error');
       }
     },
-    error: (e) => { log(`CSV parse error: ${e.message}`, 'err'); showStatus('✗ CSV parse error: ' + e.message, 'error'); }
+    error:(e)=>{log(`CSV error: ${e.message}`,'err');showStatus('✗ CSV error: '+e.message,'error');}
   });
 }
 
-function parseCMCTrades(rows) {
-  const trades = [];
-  for (const row of rows) {
-    const orderType = (row['Order Type'] || '').trim().toUpperCase();
-    const isBuy = orderType === 'BUY', isSell = orderType === 'SELL';
-    if (!isBuy && !isSell) continue;
-    const rawCode = (row['AsxCode'] || '').trim().toUpperCase();
-    if (!rawCode) continue;
-    const qty = parseFloat((row['Quantity'] || '0').replace(/[^0-9.-]/g, ''));
-    if (!qty || qty <= 0) continue;
-    const priceAUD = parseFloat((row['Price'] || '0').replace(/[^0-9.-]/g, ''));
-    if (!priceAUD) continue;
-    const brokerage = parseFloat((row['Brokerage'] || '0').replace(/[^0-9.-]/g, '')) || 0;
-    const gst = parseFloat((row['GST'] || '0').replace(/[^0-9.-]/g, '')) || 0;
-    const dateStr = row['Trade Date'] || row['As at Date'] || row['Settlement Date'] || '';
-    const costAUD = isBuy ? qty * priceAUD + brokerage + gst : -(qty * priceAUD - brokerage - gst);
-    trades.push({ date: parseDate(dateStr), rawCode, qty: isSell ? -qty : qty, costAUD });
+function parseCMC(rows) {
+  const qtyMap={}, costMap={}, trades=[];
+  for(const row of rows){
+    const ot=(row['Order Type']||'').trim().toUpperCase();
+    const isBuy=ot==='BUY', isSell=ot==='SELL';
+    if(!isBuy&&!isSell) continue;
+    const code=(row['AsxCode']||'').trim().toUpperCase();
+    if(!code) continue;
+    const qty=parseFloat((row['Quantity']||'0').replace(/[^0-9.-]/g,''));
+    if(!qty||qty<=0) continue;
+    const priceAUD=parseFloat((row['Price']||'0').replace(/[^0-9.-]/g,''));
+    if(!priceAUD) continue;
+    const brok=parseFloat((row['Brokerage']||'0').replace(/[^0-9.-]/g,''))||0;
+    const gst=parseFloat((row['GST']||'0').replace(/[^0-9.-]/g,''))||0;
+    const dateStr=row['Trade Date']||row['As at Date']||row['Settlement Date']||'';
+    const costAUD=isBuy?qty*priceAUD+brok+gst:-(qty*priceAUD-brok-gst);
+    const signedQty=isSell?-qty:qty;
+    if(!qtyMap[code]){qtyMap[code]=0;costMap[code]=0;}
+    qtyMap[code]+=signedQty;
+    costMap[code]+=costAUD;
+    trades.push({date:parseDate(dateStr),code,qty:signedQty,costAUD});
   }
-  trades.sort((a, b) => a.date - b.date);
-  return trades;
+  trades.sort((a,b)=>a.date-b.date);
+  const currentHoldings={};
+  for(const [code,qty] of Object.entries(qtyMap)){
+    if(qty>0.001) currentHoldings[code]={qty,totalCost:costMap[code]};
+  }
+  return {trades,currentHoldings};
 }
 
-function parseDate(str) {
-  if (!str) return new Date();
-  str = str.trim();
-  if (/^\d{4}-\d{2}-\d{2}/.test(str)) return new Date(str + 'T00:00:00');
-  const m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+function parseDate(str){
+  if(!str) return new Date();
+  str=str.trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(str)) return new Date(str+'T00:00:00');
+  const m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if(m) return new Date(+m[3],+m[2]-1,+m[1]);
   return new Date(str);
 }
 
 // ── Symbol mapping ──
-function heuristicSymbol(rawCode) {
-  const colonIdx = rawCode.indexOf(':');
-  const exchange = colonIdx >= 0 ? rawCode.slice(colonIdx + 1) : '';
-  const base = colonIdx >= 0 ? rawCode.slice(0, colonIdx) : rawCode;
-  if (base === 'BTC') return 'BTC-AUD';
-  if (base === 'ETH') return 'ETH-AUD';
-  if (base === 'SOL' && !exchange) return 'SOL-AUD';
-  switch (exchange) {
+function heuristicSym(code){
+  const ci=code.indexOf(':');
+  const ex=ci>=0?code.slice(ci+1):'';
+  const base=ci>=0?code.slice(0,ci):code;
+  if(base==='BTC') return 'BTC-AUD';
+  if(base==='ETH') return 'ETH-AUD';
+  if(base==='SOL'&&!ex) return 'SOL-AUD';
+  switch(ex){
     case 'US': return base;
-    case 'CA': return base + '.TO';
-    case 'SE': return base + '.ST';
-    case 'DE': return base + '.DE';
-    case 'UK': return base + '.L';
-    case 'HK': return base + '.HK';
-    case 'FR': return base + '.PA';
-    default:   return base + '.AX';
+    case 'CA': return base+'.TO';
+    case 'SE': return base+'.ST';
+    case 'DE': return base+'.DE';
+    case 'UK': return base+'.L';
+    case 'HK': return base+'.HK';
+    case 'FR': return base+'.PA';
+    default:   return base+'.AX';
   }
 }
 
-// ── Fetch Yahoo price history ──
-async function fetchYahooHistory(symbol, from, to) {
-  const p1 = Math.floor(from.getTime() / 1000) - 86400;
-  const p2 = Math.floor(to.getTime() / 1000) + 86400;
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${p1}&period2=${p2}&interval=1d`;
-  log(`Fetching ${symbol}`, 'info');
-  const data = await fetchWithProxy(url);
-  const result = data?.chart?.result?.[0];
-  if (!result) { log(`No data for ${symbol}`, 'warn'); return null; }
-  const timestamps = result.timestamp || [];
-  const closes = result.indicators?.quote?.[0]?.close || [];
-  const out = {};
-  for (let i = 0; i < timestamps.length; i++) {
-    if (closes[i] == null) continue;
-    out[new Date(timestamps[i] * 1000).toISOString().split('T')[0]] = closes[i];
+async function fetchHistory(symbol, from, to){
+  const p1=Math.floor(from.getTime()/1000)-86400;
+  const p2=Math.floor(to.getTime()/1000)+86400;
+  const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${p1}&period2=${p2}&interval=1d`;
+  const data=await proxyFetch(url);
+  const result=data?.chart?.result?.[0];
+  if(!result) return null;
+  const ts=result.timestamp||[];
+  const closes=result.indicators?.quote?.[0]?.close||[];
+  const out={};
+  for(let i=0;i<ts.length;i++){
+    if(closes[i]==null) continue;
+    out[new Date(ts[i]*1000).toISOString().split('T')[0]]=closes[i];
   }
-  const count = Object.keys(out).length;
-  if (count > 0) { log(`${symbol}: ${count} price points ✓`, 'ok'); return out; }
-  log(`${symbol}: empty result`, 'warn');
-  return null;
+  return Object.keys(out).length>0?out:null;
 }
 
-// ── Yahoo search ──
-async function searchYahooSymbol(rawCode) {
-  const base = rawCode.includes(':') ? rawCode.split(':')[0] : rawCode;
-  const exchange = rawCode.includes(':') ? rawCode.split(':')[1] : '';
-  const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(base)}&quotesCount=8&newsCount=0`;
-  try {
-    log(`Searching Yahoo for "${base}"`, 'info');
-    const data = await fetchWithProxy(url);
-    const quotes = data?.quotes || [];
-    const exMap = { US:['NMS','NYQ','NGM','NCM','PCX','OTC','PNK','ASE','BTS'], CA:['TOR','CVE'], SE:['STO','NGM'], DE:['GER','FRA','XET'], '':['ASX'] };
-    const expected = exMap[exchange] || [];
-    if (expected.length) {
-      const match = quotes.find(q => q.symbol && expected.includes(q.exchange));
-      if (match) { log(`Search found: ${match.symbol} on ${match.exchange}`, 'ok'); return match.symbol; }
+async function searchYahoo(code){
+  const base=code.includes(':')?code.split(':')[0]:code;
+  const ex=code.includes(':')?code.split(':')[1]:'';
+  const url=`https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(base)}&quotesCount=8&newsCount=0`;
+  try{
+    const data=await proxyFetch(url);
+    const quotes=data?.quotes||[];
+    const exMap={US:['NMS','NYQ','NGM','NCM','PCX','OTC','PNK','ASE'],CA:['TOR','CVE'],SE:['STO'],DE:['GER','FRA','XET'],'':['ASX']};
+    const expected=exMap[ex]||[];
+    if(expected.length){
+      const match=quotes.find(q=>q.symbol&&expected.includes(q.exchange));
+      if(match) return match.symbol;
     }
-    const eq = quotes.find(q => ['EQUITY','ETF','CRYPTOCURRENCY'].includes(q.quoteType));
-    if (eq) { log(`Search fallback: ${eq.symbol}`, 'ok'); return eq.symbol; }
-  } catch(e) { log(`Yahoo search failed: ${e.message}`, 'warn'); }
-  return null;
+    const eq=quotes.find(q=>['EQUITY','ETF','CRYPTOCURRENCY'].includes(q.quoteType));
+    return eq?.symbol||null;
+  }catch(e){return null;}
 }
 
-// ── Claude AI fallback ──
-async function resolveWithClaude(rawCode, attempted) {
-  log(`Asking Claude about ${rawCode}`, 'warn');
-  const prompt = `Stock "${rawCode}" (tried Yahoo symbol "${attempted}") returned no data. May be merged, OTC, delisted, or bankrupt.\n\nRespond ONLY with JSON:\n{"status":"merged"|"otc"|"delisted"|"renamed"|"unknown","yahooSymbol":"SYMBOL_OR_NULL","conversionRatio":1.0,"note":"one line"}\n\nIf worthless: yahooSymbol=null, conversionRatio=0. If unsure: yahooSymbol=null.`;
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: prompt }] })
+async function claudeFallback(code, tried){
+  log(`Asking Claude about ${code}...`,'warn');
+  const prompt=`Stock "${code}" (tried Yahoo: "${tried}") has no price data. May be merged, OTC, delisted, or bankrupt.\nRespond ONLY with JSON (no markdown):\n{"status":"merged"|"otc"|"delisted"|"renamed"|"unknown","yahooSymbol":"SYMBOL_OR_NULL","conversionRatio":1.0,"note":"one line"}\nIf worthless: yahooSymbol=null,conversionRatio=0.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:prompt}]})
     });
-    if (!res.ok) { log(`Claude API error ${res.status}`, 'err'); return null; }
-    const data = await res.json();
-    const text = data.content?.find(b => b.type === 'text')?.text || '';
-    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    log(`Claude says: ${JSON.stringify(parsed)}`, parsed.yahooSymbol ? 'ok' : 'warn');
-    return parsed;
-  } catch(e) { log(`Claude failed: ${e.message}`, 'err'); return null; }
+    if(!res.ok) return null;
+    const d=await res.json();
+    const text=d.content?.find(b=>b.type==='text')?.text||'';
+    return JSON.parse(text.replace(/```json|```/g,'').trim());
+  }catch(e){return null;}
 }
 
-// ── Resolve ticker through all 3 layers ──
-async function resolveSymbol(rawCode, fromDate, toDate) {
-  if (symbolCache[rawCode]) return symbolCache[rawCode];
+// ── Resolve ticker: Corp actions → Heuristic → Search → Claude ──
+async function resolveCode(code, fromDate, toDate){
+  if(symCache[code]) return symCache[code];
 
-  // Layer 1: heuristic
-  const hSym = heuristicSymbol(rawCode);
-  try {
-    const data = await fetchYahooHistory(hSym, fromDate, toDate);
-    if (data) {
-      return symbolCache[rawCode] = { symbol: hSym, data, ratio: 1, aiResolved: false };
-    }
-  } catch(e) { log(`Heuristic fetch failed for ${hSym}: ${e.message}`, 'warn'); }
+  // Layer 0: Known corporate action (hardcoded)
+  if(CORP_ACTIONS[code]){
+    const ca=CORP_ACTIONS[code];
+    log(`Corp action: ${code} → ${ca.newYahoo} (${ca.note})`,'ok');
+    try{
+      const data=await fetchHistory(ca.newYahoo, fromDate, toDate);
+      if(data){
+        corpActionLog.push({original:code, resolved:ca.newYahoo, ratio:ca.ratio, note:ca.note});
+        return symCache[code]={sym:ca.newYahoo,data,ratio:ca.ratio,type:'corp'};
+      }
+    }catch(e){log(`Corp action fetch failed for ${ca.newYahoo}: ${e.message}`,'warn');}
+  }
+
+  // Layer 1: Heuristic
+  const hSym=heuristicSym(code);
+  try{
+    const data=await fetchHistory(hSym, fromDate, toDate);
+    if(data){log(`✓ ${code} → ${hSym}`,'ok');return symCache[code]={sym:hSym,data,ratio:1,type:'ok'};}
+  }catch(e){log(`Heuristic failed ${hSym}: ${e.message}`,'warn');}
 
   // Layer 2: Yahoo search
-  const searched = await searchYahooSymbol(rawCode);
-  if (searched && searched !== hSym) {
-    try {
-      const data = await fetchYahooHistory(searched, fromDate, toDate);
-      if (data) {
-        return symbolCache[rawCode] = { symbol: searched, data, ratio: 1, aiResolved: false, note: `Found as ${searched}` };
-      }
-    } catch(e) { log(`Search result fetch failed: ${e.message}`, 'warn'); }
+  log(`Searching Yahoo for ${code}...`,'info');
+  const found=await searchYahoo(code);
+  if(found&&found!==hSym){
+    try{
+      const data=await fetchHistory(found, fromDate, toDate);
+      if(data){log(`✓ ${code} → ${found} (search)`,'ok');return symCache[code]={sym:found,data,ratio:1,type:'ok',note:`Found as ${found}`};}
+    }catch(e){}
   }
 
-  // Layer 3: Claude
-  const resolution = await resolveWithClaude(rawCode, hSym);
-  if (resolution?.yahooSymbol) {
-    try {
-      const data = await fetchYahooHistory(resolution.yahooSymbol, fromDate, toDate);
-      if (data) {
-        return symbolCache[rawCode] = { symbol: resolution.yahooSymbol, data, ratio: resolution.conversionRatio ?? 1, aiResolved: true, note: resolution.note };
+  // Layer 3: Claude AI
+  const res=await claudeFallback(code, hSym);
+  if(res?.yahooSymbol){
+    try{
+      const data=await fetchHistory(res.yahooSymbol, fromDate, toDate);
+      if(data){
+        log(`✓ ${code} → ${res.yahooSymbol} (AI)`,'ok');
+        aiResolutions.push({original:code,resolved:res.yahooSymbol,ratio:res.conversionRatio??1,note:res.note});
+        return symCache[code]={sym:res.yahooSymbol,data,ratio:res.conversionRatio??1,type:'ai'};
       }
-    } catch(e) {}
+    }catch(e){}
   }
 
-  log(`${rawCode}: completely unresolved — N/A`, 'err');
-  return symbolCache[rawCode] = { symbol: hSym, data: {}, ratio: resolution?.conversionRatio ?? 1, aiResolved: true, note: resolution?.note || 'No price data found', failed: true };
+  log(`✗ ${code}: no data`,'err');
+  aiResolutions.push({original:code,resolved:null,ratio:res?.conversionRatio??1,note:res?.note||'No price data found'});
+  return symCache[code]={sym:hSym,data:{},ratio:1,type:'failed',failed:true};
 }
 
 // ── Build portfolio ──
-async function buildPortfolio(trades) {
-  aiResolutions = [];
-  const rawCodes = [...new Set(trades.map(t => t.rawCode))];
-  log(`Unique tickers: ${rawCodes.join(', ')}`, 'info');
-  const resolved = {};
-  let fetched = 0;
+async function buildPortfolio(trades, currentHoldings){
+  corpActionLog=[]; aiResolutions=[];
+  const codes=Object.keys(currentHoldings);
+  const resolved={};
+  let done=0;
   setProgress(5);
+  const fromDate=trades[0]?.date||new Date(Date.now()-365*24*60*60*1000);
+  const toDate=new Date();
 
-  for (const code of rawCodes) {
-    showStatus(`📡 ${code} (${fetched+1}/${rawCodes.length})...`, 'info');
-    resolved[code] = await resolveSymbol(code, trades[0].date, new Date());
-    if (resolved[code].aiResolved || resolved[code].failed) {
-      aiResolutions.push({ original: code, resolved: resolved[code].failed ? null : resolved[code].symbol, ratio: resolved[code].ratio, note: resolved[code].note || '' });
-    }
-    fetched++;
-    setProgress(5 + 65 * (fetched / rawCodes.length));
+  for(const code of codes){
+    showStatus(`📡 ${code} (${done+1}/${codes.length})...`,'info');
+    resolved[code]=await resolveCode(code, fromDate, toDate);
+    done++;
+    setProgress(5+70*(done/codes.length));
   }
 
-  if (aiResolutions.length > 0) {
-    document.getElementById('aiResolveList').innerHTML = aiResolutions.map(r => `
-      <div class="ai-resolve-item">
+  // Show corp actions panel
+  if(corpActionLog.length>0){
+    document.getElementById('caList').innerHTML=corpActionLog.map(r=>`
+      <div class="ca-item">
+        <span class="ca-badge">${r.original}</span>
+        <span style="color:var(--muted)">→</span>
+        <div>
+          <strong style="color:var(--text)">${r.resolved}</strong>${r.ratio!==1?` ×${r.ratio}`:''}
+          <div class="ca-note">${r.note}</div>
+        </div>
+      </div>`).join('');
+    document.getElementById('corpActions').style.display='block';
+  }
+
+  // Show AI warning panel
+  if(aiResolutions.length>0){
+    document.getElementById('aiList').innerHTML=aiResolutions.map(r=>`
+      <div class="ai-item">
         <span class="ai-badge">${r.original}</span>
         <span style="color:var(--muted)">→</span>
         <div>
-          ${r.resolved ? `<strong style="color:var(--text)">${r.resolved}</strong>${r.ratio!==1?` ×${r.ratio}`:''}` : `<span style="color:var(--loss)">N/A</span>`}
-          <div class="ai-note">${r.note}</div>
+          ${r.resolved?`<strong style="color:var(--text)">${r.resolved}</strong>${r.ratio!==1?` ×${r.ratio}`:''}`:`<span style="color:var(--loss)">N/A</span>`}
+          <div class="ai-note">${r.note||''}</div>
         </div>
       </div>`).join('');
-    document.getElementById('aiWarning').style.display = 'block';
+    document.getElementById('aiWarning').style.display='block';
   }
 
-  setProgress(72);
+  setProgress(78);
 
-  // Build daily timeline
-  const dayMs = 86400000;
-  const days = [];
-  let cursor = new Date(trades[0].date); cursor.setHours(0,0,0,0);
-  const today = new Date(); today.setHours(0,0,0,0);
-  let holdings = {}, tradeIdx = 0;
+  // Build daily timeline using only current holding trades
+  const dayMs=86400000;
+  const days=[];
+  let cursor=new Date(fromDate); cursor.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  // Track running holdings from all trades
+  const runningQty={}, runningCost={};
+  let ti=0;
+  const sortedTrades=[...trades].sort((a,b)=>a.date-b.date);
 
-  while (cursor <= today) {
-    const dStr = cursor.toISOString().split('T')[0];
-    while (tradeIdx < trades.length) {
-      const t = trades[tradeIdx];
-      const tDate = new Date(t.date); tDate.setHours(0,0,0,0);
-      if (tDate > cursor) break;
-      if (!holdings[t.rawCode]) holdings[t.rawCode] = { qty: 0, totalCost: 0 };
-      holdings[t.rawCode].qty += t.qty;
-      holdings[t.rawCode].totalCost += t.costAUD;
-      if (holdings[t.rawCode].qty <= 0.0001) delete holdings[t.rawCode];
-      tradeIdx++;
+  while(cursor<=today){
+    const dStr=cursor.toISOString().split('T')[0];
+    while(ti<sortedTrades.length){
+      const t=sortedTrades[ti];
+      const tDate=new Date(t.date); tDate.setHours(0,0,0,0);
+      if(tDate>cursor) break;
+      if(!runningQty[t.code]){runningQty[t.code]=0;runningCost[t.code]=0;}
+      runningQty[t.code]+=t.qty;
+      runningCost[t.code]+=t.costAUD;
+      if(runningQty[t.code]<=0.0001){delete runningQty[t.code];delete runningCost[t.code];}
+      ti++;
     }
-    if (cursor.getDay() !== 0 && cursor.getDay() !== 6) {
-      let totalValue = 0, hasPrice = false;
-      for (const [code, h] of Object.entries(holdings)) {
-        const r = resolved[code];
-        const p = nearestPrice(r?.data || {}, dStr);
-        if (p !== null) { totalValue += h.qty * p * (r?.ratio ?? 1); hasPrice = true; }
+    // Only price current holdings (others won't have resolved data)
+    if(cursor.getDay()!==0&&cursor.getDay()!==6){
+      let totalValue=0, hasPrice=false;
+      for(const [code,qty] of Object.entries(runningQty)){
+        const r=resolved[code];
+        if(!r) continue; // skip historical-only tickers
+        const p=nearestPrice(r.data||{},dStr);
+        if(p!==null){totalValue+=qty*p*(r.ratio??1);hasPrice=true;}
       }
-      if (hasPrice || !Object.keys(holdings).length) days.push({ date: dStr, value: totalValue });
+      if(hasPrice||Object.keys(runningQty).length===0) days.push({date:dStr,value:totalValue});
     }
-    cursor = new Date(cursor.getTime() + dayMs);
+    cursor=new Date(cursor.getTime()+dayMs);
   }
 
   setProgress(92);
 
-  holdingsData = [];
-  for (const [code, h] of Object.entries(holdings)) {
-    const r = resolved[code];
-    const todayStr = today.toISOString().split('T')[0];
-    const rawPrice = nearestPrice(r?.data || {}, todayStr);
-    const ratio = r?.ratio ?? 1;
-    const effectivePrice = rawPrice !== null ? rawPrice * ratio : null;
-    const marketValue = effectivePrice !== null ? h.qty * effectivePrice : null;
-    holdingsData.push({ code, qty: h.qty, avgCost: h.qty > 0 ? h.totalCost / h.qty : 0, currentPrice: effectivePrice, marketValue, costBasis: h.totalCost, isAiResolved: r?.aiResolved || false });
+  holdingsData=[];
+  for(const [code,h] of Object.entries(currentHoldings)){
+    const r=resolved[code];
+    const todayStr=today.toISOString().split('T')[0];
+    const rawPrice=nearestPrice(r?.data||{},todayStr);
+    const ratio=r?.ratio??1;
+    const effectivePrice=rawPrice!==null?rawPrice*ratio:null;
+    const marketValue=effectivePrice!==null?h.qty*effectivePrice:null;
+    holdingsData.push({
+      code, qty:h.qty,
+      avgCost:h.qty>0?h.totalCost/h.qty:0,
+      currentPrice:effectivePrice, marketValue,
+      costBasis:h.totalCost,
+      resolvedSym:r?.sym||code,
+      type:r?.type||'failed'
+    });
   }
 
-  log(`Portfolio built: ${holdingsData.length} current holdings`, 'ok');
-  allChartData = days;
+  log(`Done! ${codes.length} holdings resolved. Corp actions: ${corpActionLog.length}, AI: ${aiResolutions.length}`,'ok');
+  allChartData=days;
   setProgress(100);
 
   renderChart(days); renderStats(); renderHoldings();
-  ['statsRow','chartSection','holdingsSection','resetBtn'].forEach(id => document.getElementById(id).style.display = id === 'statsRow' ? 'grid' : 'block');
-  document.getElementById('progressBar').style.display = 'none';
-  document.getElementById('instructions').style.display = 'none';
+  document.getElementById('statsRow').style.display='grid';
+  ['chartSection','holdingsSection','resetBtn'].forEach(id=>document.getElementById(id).style.display='block');
+  document.getElementById('progressBar').style.display='none';
+  document.getElementById('instructions').style.display='none';
 
-  const aiNote = aiResolutions.length ? ` · ${aiResolutions.length} AI-resolved ⚠️` : '';
-  showStatus(`✓ ${trades.length} transactions · ${rawCodes.length} tickers${aiNote}`, 'success');
+  const notes=[];
+  if(corpActionLog.length) notes.push(`${corpActionLog.length} corp action(s)`);
+  if(aiResolutions.length) notes.push(`${aiResolutions.length} AI-resolved ⚠️`);
+  showStatus(`✓ ${trades.length} trades · ${codes.length} holdings${notes.length?' · '+notes.join(' · '):''}`, 'success');
 }
 
-function nearestPrice(map, dateStr) {
-  if (!map || !Object.keys(map).length) return null;
-  if (map[dateStr] !== undefined) return map[dateStr];
-  const d = new Date(dateStr);
-  for (let i = 1; i <= 5; i++) {
-    d.setDate(d.getDate() - 1);
-    const s = d.toISOString().split('T')[0];
-    if (map[s] !== undefined) return map[s];
-  }
+function nearestPrice(map,dateStr){
+  if(!map||!Object.keys(map).length) return null;
+  if(map[dateStr]!==undefined) return map[dateStr];
+  const d=new Date(dateStr);
+  for(let i=1;i<=5;i++){d.setDate(d.getDate()-1);const s=d.toISOString().split('T')[0];if(map[s]!==undefined)return map[s];}
   return null;
 }
 
-function setRange(days, event) {
-  currentRange = days;
-  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
-  if (event) event.target.classList.add('active');
-  updateChart(filterByRange(allChartData, days));
+function setRange(days,event){
+  currentRange=days;
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  if(event) event.target.classList.add('active');
+  updateChart(filterByRange(allChartData,days));
 }
-function filterByRange(data, days) {
-  if (!days) return data;
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days);
-  return data.filter(d => new Date(d.date) >= cutoff);
+function filterByRange(data,days){
+  if(!days) return data;
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-days);
+  return data.filter(d=>new Date(d.date)>=cutoff);
 }
-function renderChart(data) {
-  const filtered = filterByRange(data, currentRange);
-  const ctx = document.getElementById('portfolioChart').getContext('2d');
-  if (chartInstance) chartInstance.destroy();
-  const labels = filtered.map(d => d.date);
-  const values = filtered.map(d => d.value);
-  const isGain = values[values.length-1] >= values[0];
-  const lc = isGain ? '#00e5a0' : '#ff4d6d';
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [{ data: values, borderColor: lc, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: lc, fill: true,
-      backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,220); g.addColorStop(0,isGain?'rgba(0,229,160,.15)':'rgba(255,77,109,.15)'); g.addColorStop(1,'rgba(0,0,0,0)'); return g; }, tension: 0.3 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1a26', borderColor: '#2a2a3a', borderWidth: 1, titleColor: '#6a6a88', bodyColor: '#e8e8f0', padding: 10,
-        callbacks: { label: ctx => ' ' + fmt(ctx.raw), title: items => new Date(items[0].label).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) } } },
-      scales: {
-        x: { grid:{color:'rgba(42,42,58,.4)'}, ticks:{color:'#6a6a88',font:{family:'DM Mono',size:9},maxTicksLimit:6, callback:(v,i)=>new Date(labels[i]).toLocaleDateString('en-AU',{day:'numeric',month:'short'})} },
-        y: { grid:{color:'rgba(42,42,58,.4)'}, ticks:{color:'#6a6a88',font:{family:'DM Mono',size:9}, callback:v=>'$'+(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))} }
+function renderChart(data){
+  const filtered=filterByRange(data,currentRange);
+  const ctx=document.getElementById('portfolioChart').getContext('2d');
+  if(chartInstance) chartInstance.destroy();
+  const labels=filtered.map(d=>d.date);
+  const values=filtered.map(d=>d.value);
+  const isGain=values[values.length-1]>=values[0];
+  const lc=isGain?'#00e5a0':'#ff4d6d';
+  chartInstance=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[{data:values,borderColor:lc,borderWidth:2,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:lc,fill:true,
+      backgroundColor:(ctx)=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,isGain?'rgba(0,229,160,.15)':'rgba(255,77,109,.15)');g.addColorStop(1,'rgba(0,0,0,0)');return g;},tension:0.3}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a26',borderColor:'#2a2a3a',borderWidth:1,titleColor:'#6a6a88',bodyColor:'#e8e8f0',padding:10,
+        callbacks:{label:ctx=>' '+fmt(ctx.raw),title:items=>new Date(items[0].label).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}}},
+      scales:{
+        x:{grid:{color:'rgba(42,42,58,.4)'},ticks:{color:'#6a6a88',font:{family:'DM Mono',size:9},maxTicksLimit:6,callback:(v,i)=>new Date(labels[i]).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}},
+        y:{grid:{color:'rgba(42,42,58,.4)'},ticks:{color:'#6a6a88',font:{family:'DM Mono',size:9},callback:v=>'$'+(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))}}
       }
     }
   });
 }
-function updateChart(data) {
-  if (!chartInstance) return;
-  const values = data.map(d => d.value);
-  const isGain = values[values.length-1] >= values[0];
-  chartInstance.data.labels = data.map(d => d.date);
-  chartInstance.data.datasets[0].data = values;
-  chartInstance.data.datasets[0].borderColor = isGain ? '#00e5a0' : '#ff4d6d';
+function updateChart(data){
+  if(!chartInstance) return;
+  const values=data.map(d=>d.value);
+  const isGain=values[values.length-1]>=values[0];
+  chartInstance.data.labels=data.map(d=>d.date);
+  chartInstance.data.datasets[0].data=values;
+  chartInstance.data.datasets[0].borderColor=isGain?'#00e5a0':'#ff4d6d';
   chartInstance.update('active');
 }
 
-function renderStats() {
-  const cd = filterByRange(allChartData, currentRange);
-  const cv = cd.length ? cd[cd.length-1].value : 0, sv = cd.length ? cd[0].value : 0;
-  const totalCost = holdingsData.reduce((s,h)=>s+(h.costBasis||0),0);
-  const totalValue = holdingsData.reduce((s,h)=>s+(h.marketValue||0),0);
-  const gain = totalValue - totalCost, gainPct = totalCost ? gain/totalCost*100 : 0;
-  const pg = cv - sv;
-  document.getElementById('statValue').textContent = fmt(totalValue);
-  document.getElementById('statValueChange').textContent = (pg>=0?'▲ +':'▼ ')+fmt(Math.abs(pg))+' period';
-  document.getElementById('statValueChange').className = 'change '+(pg>=0?'gain':'loss');
-  document.getElementById('statCost').textContent = fmt(totalCost);
-  document.getElementById('statGain').textContent = (gain>=0?'+':'')+fmt(gain);
-  document.getElementById('statGain').style.color = gain>=0?'var(--gain)':'var(--loss)';
-  document.getElementById('statGainPct').textContent = (gainPct>=0?'+':'')+gainPct.toFixed(2)+'%';
-  document.getElementById('statGainPct').className = 'change '+(gain>=0?'gain':'loss');
-  document.getElementById('statHoldings').textContent = holdingsData.length;
-  document.getElementById('statLastUpdated').textContent = 'today';
-  document.getElementById('statLastUpdated').className = 'change';
+function renderStats(){
+  const cd=filterByRange(allChartData,currentRange);
+  const cv=cd.length?cd[cd.length-1].value:0, sv=cd.length?cd[0].value:0;
+  const totalCost=holdingsData.reduce((s,h)=>s+(h.costBasis||0),0);
+  const totalValue=holdingsData.reduce((s,h)=>s+(h.marketValue||0),0);
+  const gain=totalValue-totalCost, gainPct=totalCost?gain/totalCost*100:0;
+  const pg=cv-sv;
+  document.getElementById('sVal').textContent=fmt(totalValue);
+  document.getElementById('sValChg').textContent=(pg>=0?'▲ +':'▼ ')+fmt(Math.abs(pg))+' period';
+  document.getElementById('sValChg').className='chg '+(pg>=0?'gain':'loss');
+  document.getElementById('sCost').textContent=fmt(totalCost);
+  document.getElementById('sGain').textContent=(gain>=0?'+':'')+fmt(gain);
+  document.getElementById('sGain').style.color=gain>=0?'var(--gain)':'var(--loss)';
+  document.getElementById('sGainPct').textContent=(gainPct>=0?'+':'')+gainPct.toFixed(2)+'%';
+  document.getElementById('sGainPct').className='chg '+(gain>=0?'gain':'loss');
+  document.getElementById('sCount').textContent=holdingsData.length;
+  document.getElementById('sDate').textContent='today';
+  document.getElementById('sDate').className='chg';
 }
-function fmt(n) { if(n==null||isNaN(n))return'N/A'; return'$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmt(n){if(n==null||isNaN(n))return'N/A';return'$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});}
 
-function renderHoldings() {
-  const list = document.getElementById('holdingsList');
-  list.innerHTML = '';
-  [...holdingsData].sort((a,b)=>(b.marketValue||0)-(a.marketValue||0)).forEach(h => {
-    const gain = h.marketValue!=null ? h.marketValue-h.costBasis : null;
-    const gainPct = gain!=null&&h.costBasis ? gain/h.costBasis*100 : null;
-    const gc = gain!=null?(gain>=0?'gain-val':'loss-val'):'na-val';
-    const card = document.createElement('div');
-    card.className = 'holding-card';
-    card.innerHTML = `
-      <div class="holding-top">
-        <div class="holding-ticker">
-          <span class="ticker-badge ${h.isAiResolved?'ai-resolved':''}">${h.code}</span>
-          ${h.isAiResolved?'<span class="ai-tag">AI</span>':''}
+function renderHoldings(){
+  const list=document.getElementById('holdingsList');
+  list.innerHTML='';
+  [...holdingsData].sort((a,b)=>(b.marketValue||0)-(a.marketValue||0)).forEach(h=>{
+    const gain=h.marketValue!=null?h.marketValue-h.costBasis:null;
+    const gainPct=gain!=null&&h.costBasis?gain/h.costBasis*100:null;
+    const gc=gain!=null?(gain>=0?'gv':'lv'):'nv';
+    const isCorp=h.type==='corp', isAI=h.type==='ai';
+    const card=document.createElement('div');
+    card.className='hcard';
+    card.innerHTML=`
+      <div class="hcard-top">
+        <div class="hticker">
+          <span class="tbadge ${isCorp?'corp':isAI?'ai':''}">${h.code}</span>
+          ${isCorp?'<span class="corp-tag">MERGED</span>':''}
+          ${isAI?'<span class="ai-tag">AI</span>':''}
+          ${(isCorp||isAI)&&h.resolvedSym!==h.code?`<span style="color:var(--muted);font-size:10px;">→ ${h.resolvedSym}</span>`:''}
         </div>
-        <div class="holding-value">${h.marketValue!=null?fmt(h.marketValue):'<span class="na-val">N/A</span>'}</div>
+        <div class="hval">${h.marketValue!=null?fmt(h.marketValue):'<span class="nv">N/A</span>'}</div>
       </div>
-      <div class="holding-grid">
-        <div class="holding-stat"><div class="hs-label">Shares</div><div class="hs-val">${h.qty.toFixed(4)}</div></div>
-        <div class="holding-stat"><div class="hs-label">Avg Cost</div><div class="hs-val">${fmt(h.avgCost)}</div></div>
-        <div class="holding-stat"><div class="hs-label">Price</div><div class="hs-val">${h.currentPrice!=null?fmt(h.currentPrice):'<span class="na-val">N/A</span>'}</div></div>
-        <div class="holding-stat"><div class="hs-label">Cost</div><div class="hs-val">${fmt(h.costBasis)}</div></div>
-        <div class="holding-stat"><div class="hs-label">P&L</div><div class="hs-val ${gc}">${gain!=null?(gain>=0?'+':'')+fmt(gain):'N/A'}</div></div>
-        <div class="holding-stat"><div class="hs-label">Return</div><div class="hs-val ${gc}">${gainPct!=null?(gainPct>=0?'+':'')+gainPct.toFixed(2)+'%':'N/A'}</div></div>
+      <div class="hgrid">
+        <div class="hstat"><div class="hl">Shares</div><div class="hv">${h.qty.toFixed(4)}</div></div>
+        <div class="hstat"><div class="hl">Avg Cost</div><div class="hv">${fmt(h.avgCost)}</div></div>
+        <div class="hstat"><div class="hl">Price</div><div class="hv">${h.currentPrice!=null?fmt(h.currentPrice):'<span class="nv">N/A</span>'}</div></div>
+        <div class="hstat"><div class="hl">Cost</div><div class="hv">${fmt(h.costBasis)}</div></div>
+        <div class="hstat"><div class="hl">P&amp;L</div><div class="hv ${gc}">${gain!=null?(gain>=0?'+':'')+fmt(gain):'N/A'}</div></div>
+        <div class="hstat"><div class="hl">Return</div><div class="hv ${gc}">${gainPct!=null?(gainPct>=0?'+':'')+gainPct.toFixed(2)+'%':'N/A'}</div></div>
       </div>`;
     list.appendChild(card);
   });
 }
 
-function resetApp() {
-  allChartData=[]; holdingsData=[]; aiResolutions=[];
-  Object.keys(symbolCache).forEach(k=>delete symbolCache[k]);
+function resetApp(){
+  allChartData=[];holdingsData=[];corpActionLog=[];aiResolutions=[];
+  Object.keys(symCache).forEach(k=>delete symCache[k]);
   if(chartInstance){chartInstance.destroy();chartInstance=null;}
-  ['statsRow','chartSection','holdingsSection','resetBtn','aiWarning','debugPanel'].forEach(id=>document.getElementById(id).style.display='none');
+  ['statsRow','chartSection','holdingsSection','resetBtn','aiWarning','corpActions','debugWrap'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('status').style.display='none';
   document.getElementById('progressBar').style.display='none';
   document.getElementById('instructions').style.display='block';
   document.getElementById('holdingsList').innerHTML='';
-  document.getElementById('aiResolveList').innerHTML='';
+  document.getElementById('aiList').innerHTML='';
+  document.getElementById('caList').innerHTML='';
   document.getElementById('debugLog').innerHTML='';
   fileInput.value='';
 }
