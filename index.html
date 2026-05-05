@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CMC Portfolio Tracker · Confirmation Reconcile v10</title>
+<title>CMC Portfolio Tracker · Confirmation Reconcile v11</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
 <body>
 <div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Confirm v10</span></div>
 <div class="main">
-  <div class="info-banner"><strong>Confirmation Reconcile v10</strong> · cost basis rebuilt from Confirmation History only. EODHD now resolves foreign symbols dynamically, tries real-time first, then daily close, and caches successful symbols/quotes locally.</div>
+  <div class="info-banner"><strong>Confirmation Reconcile v11</strong> · cost basis rebuilt from Confirmation History only. EODHD now runs first for foreign holdings, tries real-time first, then daily close, caches successful symbols/quotes locally, and shows the exact symbol/source used.</div>
   <div id="dropZone"><div class="icon">📂</div><h2>Drop your CMC CSV here</h2><p>CMC Invest → Activity → Confirmation History → Download CSV<br>Cost basis in AUD · optional live prices · GitHub Pages friendly</p><button class="btn" onclick="document.getElementById('fileInput').click()">Browse File</button><input type="file" id="fileInput" accept=".csv"></div>
   <div id="status"></div>
   <div id="livePanel">
@@ -137,7 +137,7 @@ async function discoverTwelveCandidates(canonical,tdKey){
   return found;
 }
 function inferCurrency(rawCode){rawCode=(rawCode||'').toUpperCase();for(const [s,cur] of Object.entries(suffixCurrency))if(rawCode.endsWith(s))return cur;if(!rawCode.includes(':'))return 'AUD';return 'USD'}
-function build(rows){const trades=[];for(const row of rows){const ot=String(row['Order Type']||'').trim().toUpperCase();if(ot!=='BUY'&&ot!=='SELL')continue;const rawCode=String(row['AsxCode']||'').trim().toUpperCase();if(!rawCode)continue;const code=CORP_ACTIONS[rawCode]||rawCode;const qty=num(row['Quantity']);const priceAUD=num(row['Price']);if(!qty||!priceAUD)continue;const brok=num(row['Brokerage'])+num(row['GST']);const date=parseDate(row['Trade Date']||row['As at Date']||row['Settlement Date']);if(!date)continue;let adjQty=qty,adjPriceAUD=priceAUD;const split=SPLIT_ACTIONS[rawCode];if(split&&date<new Date(split.before+'T00:00:00')){adjQty=qty*split.ratio;adjPriceAUD=priceAUD/split.ratio}const confNo=num(row['Confirmation Number']);const exch=num(row['Exch Rate']||row['Exchange Rate']||row['ExchangeRate']);trades.push({date,confNo,code,rawCode,type:ot,qty:adjQty,displayQty:qty,priceAUD:adjPriceAUD,consideration:qty*priceAUD,brokerage:brok,fx:exch||1,currency:inferCurrency(rawCode),liveSymbol:mapLiveSymbol(rawCode)})}if(!trades.length)throw new Error('No Buy/Sell trades found in CSV');trades.sort((a,b)=>(a.date-b.date)||((a.confNo||0)-(b.confNo||0)));allTrades=trades;const qtyMap={},costMap={},avgMap={},realisedMap={},lastFxMap={},netQtyMap={};for(const t of trades){qtyMap[t.code]??=0;costMap[t.code]??=0;avgMap[t.code]??=0;realisedMap[t.code]??=0;netQtyMap[t.code]??=0;lastFxMap[t.code]=t.fx||lastFxMap[t.code]||1;if(t.type==='BUY'){netQtyMap[t.code]+=t.qty;qtyMap[t.code]+=t.qty;costMap[t.code]+=t.consideration+t.brokerage;avgMap[t.code]=qtyMap[t.code]>0?costMap[t.code]/qtyMap[t.code]:0}else{netQtyMap[t.code]-=t.qty;const avg=avgMap[t.code]||0;const proceeds=t.consideration-t.brokerage;realisedMap[t.code]+=proceeds-(avg*t.qty);qtyMap[t.code]-=t.qty;costMap[t.code]=qtyMap[t.code]>0?avg*qtyMap[t.code]:0;if(Math.abs(qtyMap[t.code])<=0.0001){qtyMap[t.code]=0;costMap[t.code]=0;avgMap[t.code]=0}if(Math.abs(netQtyMap[t.code])<=0.0001)netQtyMap[t.code]=0}}const holdings=[];for(const [code,netQty] of Object.entries(netQtyMap)){if(netQty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(code)){const last=[...trades].reverse().find(t=>t.code===code);const totalCost=costMap[code]||0;const lastPrice=last?.priceAUD||0;holdings.push({code,rawCode:last?.rawCode||code,qty:netQty,totalCost,avgCost:netQty?totalCost/netQty:0,lastPrice,lastDate:last?.date,currency:last?.currency||'USD',liveSymbol:last?.liveSymbol||mapLiveSymbol(code),lastFx:lastFxMap[code]||1,liveLocal:null,liveAUD:null,liveValue:null,liveError:null,updatedAt:null,realisedPnL:realisedMap[code]||0})}}holdings.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));holdingsData=holdings;const totalBuy=trades.filter(t=>t.type==='BUY').reduce((s,t)=>s+t.consideration+t.brokerage,0);const totalRealised=Object.values(realisedMap).reduce((s,v)=>s+v,0);document.getElementById('sTotalIn').textContent=fmt(totalBuy);document.getElementById('sRealised').textContent=(totalRealised>=0?'+':'')+fmt(totalRealised);document.getElementById('sRealised').className='val '+(totalRealised>=0?'gain':'loss');document.getElementById('sCount').textContent=holdings.length;const lastDate=trades.at(-1)?.date;document.getElementById('sDate').textContent=lastDate?'as of '+lastDate.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'';makeChart();updateSummary();renderHoldings();renderTx();document.getElementById('statsRow').style.display='grid';document.getElementById('livePanel').style.display='block';document.getElementById('chartSection').style.display='block';document.getElementById('holdingsSection').style.display='block';document.getElementById('resetBtn').style.display='inline-block';showStatus(`✓ CONFIRMATION RECONCILE v10 EODHD DYNAMIC · ${trades.length} transactions · ${holdings.length} current holdings loaded. Summary is calculated from the same displayed holdings cards only.`,'success')}
+function build(rows){const trades=[];for(const row of rows){const ot=String(row['Order Type']||'').trim().toUpperCase();if(ot!=='BUY'&&ot!=='SELL')continue;const rawCode=String(row['AsxCode']||'').trim().toUpperCase();if(!rawCode)continue;const code=CORP_ACTIONS[rawCode]||rawCode;const qty=num(row['Quantity']);const priceAUD=num(row['Price']);if(!qty||!priceAUD)continue;const brok=num(row['Brokerage'])+num(row['GST']);const date=parseDate(row['Trade Date']||row['As at Date']||row['Settlement Date']);if(!date)continue;let adjQty=qty,adjPriceAUD=priceAUD;const split=SPLIT_ACTIONS[rawCode];if(split&&date<new Date(split.before+'T00:00:00')){adjQty=qty*split.ratio;adjPriceAUD=priceAUD/split.ratio}const confNo=num(row['Confirmation Number']);const exch=num(row['Exch Rate']||row['Exchange Rate']||row['ExchangeRate']);trades.push({date,confNo,code,rawCode,type:ot,qty:adjQty,displayQty:qty,priceAUD:adjPriceAUD,consideration:qty*priceAUD,brokerage:brok,fx:exch||1,currency:inferCurrency(rawCode),liveSymbol:mapLiveSymbol(rawCode)})}if(!trades.length)throw new Error('No Buy/Sell trades found in CSV');trades.sort((a,b)=>(a.date-b.date)||((a.confNo||0)-(b.confNo||0)));allTrades=trades;const qtyMap={},costMap={},avgMap={},realisedMap={},lastFxMap={},netQtyMap={};for(const t of trades){qtyMap[t.code]??=0;costMap[t.code]??=0;avgMap[t.code]??=0;realisedMap[t.code]??=0;netQtyMap[t.code]??=0;lastFxMap[t.code]=t.fx||lastFxMap[t.code]||1;if(t.type==='BUY'){netQtyMap[t.code]+=t.qty;qtyMap[t.code]+=t.qty;costMap[t.code]+=t.consideration+t.brokerage;avgMap[t.code]=qtyMap[t.code]>0?costMap[t.code]/qtyMap[t.code]:0}else{netQtyMap[t.code]-=t.qty;const avg=avgMap[t.code]||0;const proceeds=t.consideration-t.brokerage;realisedMap[t.code]+=proceeds-(avg*t.qty);qtyMap[t.code]-=t.qty;costMap[t.code]=qtyMap[t.code]>0?avg*qtyMap[t.code]:0;if(Math.abs(qtyMap[t.code])<=0.0001){qtyMap[t.code]=0;costMap[t.code]=0;avgMap[t.code]=0}if(Math.abs(netQtyMap[t.code])<=0.0001)netQtyMap[t.code]=0}}const holdings=[];for(const [code,netQty] of Object.entries(netQtyMap)){if(netQty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(code)){const last=[...trades].reverse().find(t=>t.code===code);const totalCost=costMap[code]||0;const lastPrice=last?.priceAUD||0;holdings.push({code,rawCode:last?.rawCode||code,qty:netQty,totalCost,avgCost:netQty?totalCost/netQty:0,lastPrice,lastDate:last?.date,currency:last?.currency||'USD',liveSymbol:last?.liveSymbol||mapLiveSymbol(code),lastFx:lastFxMap[code]||1,liveLocal:null,liveAUD:null,liveValue:null,liveError:null,updatedAt:null,realisedPnL:realisedMap[code]||0})}}holdings.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));holdingsData=holdings;const totalBuy=trades.filter(t=>t.type==='BUY').reduce((s,t)=>s+t.consideration+t.brokerage,0);const totalRealised=Object.values(realisedMap).reduce((s,v)=>s+v,0);document.getElementById('sTotalIn').textContent=fmt(totalBuy);document.getElementById('sRealised').textContent=(totalRealised>=0?'+':'')+fmt(totalRealised);document.getElementById('sRealised').className='val '+(totalRealised>=0?'gain':'loss');document.getElementById('sCount').textContent=holdings.length;const lastDate=trades.at(-1)?.date;document.getElementById('sDate').textContent=lastDate?'as of '+lastDate.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'';makeChart();updateSummary();renderHoldings();renderTx();document.getElementById('statsRow').style.display='grid';document.getElementById('livePanel').style.display='block';document.getElementById('chartSection').style.display='block';document.getElementById('holdingsSection').style.display='block';document.getElementById('resetBtn').style.display='inline-block';showStatus(`✓ CONFIRMATION RECONCILE v11 EODHD FOREIGN-FIRST · ${trades.length} transactions · ${holdings.length} current holdings loaded. Foreign stocks try EODHD before Finnhub.`,'success')}
 function updateSummary(){const displayedHoldings=holdingsData.filter(h=>h.qty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(h.code));holdingsData=displayedHoldings;const cost=displayedHoldings.reduce((s,h)=>s+h.totalCost,0);const val=displayedHoldings.reduce((s,h)=>s+(h.liveValue??h.qty*h.lastPrice),0);const pnl=val-cost;console.table(displayedHoldings.map(h=>({code:h.code,units:h.qty,cost:+h.totalCost.toFixed(2),value:+((h.liveValue??h.qty*h.lastPrice)).toFixed(2)})));document.getElementById('sHoldingCost').textContent=fmt(cost);document.getElementById('sLiveValue').textContent=fmt(val);document.getElementById('sLiveSub').textContent=holdingsData.some(h=>h.liveValue!=null)?'live/updated where available':'using last CMC trade price';document.getElementById('sUnrealised').textContent=(pnl>=0?'+':'')+fmt(pnl);document.getElementById('sUnrealised').className='val '+(pnl>=0?'gain':'loss');document.getElementById('sUnrealisedPct').textContent=cost?((pnl>=0?'+':'')+(pnl/cost*100).toFixed(2)+'%'):'—'}
 function getManualFxRates(){
   const manual={AUD:1};
@@ -174,7 +174,7 @@ function convertLocalToAUD(local,currency,fxRates,confirmationFx){
   return local;
 }
 
-const QUOTE_CACHE_KEY='cmc_daily_quote_cache_v1';
+const QUOTE_CACHE_KEY='cmc_daily_quote_cache_v2';
 const QUOTE_CACHE_TTL_MS=24*60*60*1000;
 function getQuoteCache(){try{return JSON.parse(localStorage.getItem(QUOTE_CACHE_KEY)||'{}')}catch(e){return {}}}
 function setQuoteCache(cache){try{localStorage.setItem(QUOTE_CACHE_KEY,JSON.stringify(cache))}catch(e){console.warn('Could not save quote cache',e)}}
@@ -203,7 +203,7 @@ function fetchJsonWithTimeout(url,ms=12000){
   }).catch(e=>{clearTimeout(timeout);throw e});
 }
 
-const EODHD_SYMBOL_CACHE_KEY='cmc_eodhd_symbol_cache_v2';
+const EODHD_SYMBOL_CACHE_KEY='cmc_eodhd_symbol_cache_v3';
 function getEodhdSymbolCache(){try{return JSON.parse(localStorage.getItem(EODHD_SYMBOL_CACHE_KEY)||'{}')}catch(e){return {}}}
 function setEodhdSymbolCache(cache){try{localStorage.setItem(EODHD_SYMBOL_CACHE_KEY,JSON.stringify(cache))}catch(e){console.warn('Could not save EODHD symbol cache',e)}}
 function eodhdSymbolCacheKey(canonical){return 'eodhd:'+String(canonical||'').toUpperCase()}
@@ -221,7 +221,7 @@ function eodhdCandidates(canonical){
     add(base+'.XETRA','Germany Xetra');add(base+'.F','Frankfurt');add(base+'.HM','Hamburg');add(base+'.MU','Munich');add(base+'.BE','Berlin');add(base+'.DU','Dusseldorf');add(base+'.HA','Hanover');add(base+'.DE','Yahoo-style fallback');
   } else if(c.endsWith(':CA')){
     // Canada: Venture first because many small/resource names on CMC are TSXV; then TSX/NEO/CSE.
-    add(base+'.V','TSX Venture');add(base+'.TO','Toronto');add(base+'.NEO','NEO');add(base+'.CN','Canadian Securities Exchange');add(base+'.CA','Canada generic');
+    add(base+'.TO','Toronto');add(base+'.V','TSX Venture');add(base+'.NEO','NEO');add(base+'.CN','Canadian Securities Exchange');add(base+'.CA','Canada generic');
   } else if(c.endsWith(':SE')){
     add(base+'.ST','Nasdaq Stockholm');add(base+'.OMX','OMX fallback');add(base+'.SE','Sweden generic');
   } else if(c.endsWith(':AU')||!c.includes(':')){
@@ -417,19 +417,34 @@ async function refreshLivePrices(){
     const needsFallback=/:(DE|CA|SE|AU)$/.test(h.code);
     progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} (${h.liveSymbol})`;
     try{
-      let q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
-      if(!q && needsFallback){
+      let q=null;
+
+      if(needsFallback){
+        // Foreign holdings: avoid Finnhub/Yahoo-style symbols like AIXA.DE first.
+        // Prefer EODHD market symbols such as AIXA.XETRA, then cache, then Twelve Data, then Finnhub as last resort.
         q=getFreshCachedQuote(h.code);
         if(q)cacheOk++;
+
+        if(!q && eodKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via EODHD candidates`;
+          q=await fetchEodhdQuote(h.code,eodKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
+
+        if(!q && tdKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Twelve Data fallback`;
+          q=await fetchTwelveQuote(h.code,tdKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
+
+        if(!q && finnhubKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Finnhub fallback (${h.liveSymbol})`;
+          q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
+        }
+      } else {
+        q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
       }
-      if(!q && needsFallback){
-        q=await fetchEodhdQuote(h.code,eodKey);
-        if(q)saveCachedQuote(h.code,q);
-      }
-      if(!q && needsFallback){
-        q=await fetchTwelveQuote(h.code,tdKey);
-        if(q)saveCachedQuote(h.code,q);
-      }
+
       if(!q)throw new Error('No live quote');
       const local=Number(q.price);
       const aud=convertLocalToAUD(local,h.currency,fxRates,h.lastFx);
