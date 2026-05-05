@@ -22,81 +22,91 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none; z-index: 0; opacity: 0.4;
   }
-  .header { padding: 32px 40px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 16px; position: relative; z-index: 1; }
-  .header h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
-  .header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 12px var(--accent)}50%{opacity:.5;box-shadow:0 0 4px var(--accent)} }
-  .header .subtitle { color: var(--muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-left: auto; }
-  .main { padding: 32px 40px; position: relative; z-index: 1; max-width: 1400px; }
+  .header { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 12px; position: relative; z-index: 1; }
+  .header h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .header .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s ease-in-out infinite; flex-shrink: 0; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+  .header .subtitle { color: var(--muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; margin-left: auto; }
+  .main { padding: 20px; position: relative; z-index: 1; }
 
-#dropZone { border: 1.5px dashed var(–border); border-radius: 12px; padding: 48px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(–surface); position: relative; overflow: hidden; }
+#dropZone { border: 1.5px dashed var(–border); border-radius: 12px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(–surface); position: relative; overflow: hidden; }
 #dropZone::before { content:’’; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(0,229,160,.05) 0%,transparent 70%); pointer-events:none; }
 #dropZone:hover, #dropZone.drag-over { border-color: var(–accent); background: rgba(0,229,160,0.04); }
-#dropZone .icon { font-size: 36px; margin-bottom: 16px; }
-#dropZone h2 { font-family: ‘Syne’, sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-#dropZone p { color: var(–muted); font-size: 12px; line-height: 1.6; }
-.browse-btn { display: inline-block; margin-top: 20px; padding: 10px 24px; background: transparent; border: 1px solid var(–accent); color: var(–accent); font-family: ‘DM Mono’, monospace; font-size: 12px; border-radius: 6px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
-.browse-btn:hover { background: var(–accent); color: var(–bg); }
+#dropZone .icon { font-size: 32px; margin-bottom: 12px; }
+#dropZone h2 { font-family: ‘Syne’, sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+#dropZone p { color: var(–muted); font-size: 11px; line-height: 1.6; }
+.browse-btn { display: inline-block; margin-top: 16px; padding: 10px 24px; background: transparent; border: 1px solid var(–accent); color: var(–accent); font-family: ‘DM Mono’, monospace; font-size: 12px; border-radius: 6px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
+.browse-btn:hover, .browse-btn:active { background: var(–accent); color: var(–bg); }
 #fileInput { display: none; }
 
-#status { margin-top: 20px; padding: 14px 18px; border-radius: 8px; font-size: 12px; display: none; line-height: 1.6; }
+#status { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 12px; display: none; line-height: 1.5; }
 #status.info  { background: rgba(77,159,255,.1);  border: 1px solid rgba(77,159,255,.3);  color: var(–accent3); }
 #status.success{ background: rgba(0,229,160,.1);  border: 1px solid rgba(0,229,160,.3);   color: var(–accent); }
 #status.error  { background: rgba(255,77,109,.1); border: 1px solid rgba(255,77,109,.3);  color: var(–loss); }
 
-#aiWarning { display: none; margin-top: 16px; padding: 16px 18px; background: rgba(245,197,66,.07); border: 1px solid rgba(245,197,66,.3); border-radius: 8px; font-size: 11px; color: var(–warn); line-height: 1.7; }
-#aiWarning strong { color: #f5d76e; }
-.ai-resolve-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(245,197,66,.1); font-size: 11px; }
-.ai-resolve-item:last-child { border-bottom: none; }
-.ai-badge { background: rgba(245,197,66,.15); border: 1px solid rgba(245,197,66,.3); border-radius: 4px; padding: 2px 7px; font-size: 10px; color: var(–warn); white-space: nowrap; flex-shrink: 0; }
-.ai-arrow { color: var(–muted); flex-shrink: 0; margin-top: 2px; }
-.ai-note { color: var(–muted); font-size: 10px; margin-top: 2px; }
-#aiResolveList { margin-top: 10px; }
+/* Debug log */
+#debugPanel { display: none; margin-top: 12px; }
+#debugToggle { background: none; border: 1px solid var(–border); color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 10px; padding: 4px 10px; border-radius: 4px; cursor: pointer; letter-spacing: 1px; }
+#debugToggle:hover { border-color: var(–accent3); color: var(–accent3); }
+#debugLog { display: none; margin-top: 8px; background: #0d0d14; border: 1px solid var(–border); border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-size: 10px; line-height: 1.7; color: var(–muted); }
+#debugLog .log-ok   { color: var(–gain); }
+#debugLog .log-warn { color: var(–warn); }
+#debugLog .log-err  { color: var(–loss); }
+#debugLog .log-info { color: var(–accent3); }
 
-#statsRow { display: none; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 16px; margin-top: 28px; }
-.stat-card { background: var(–surface); border: 1px solid var(–border); border-radius: 10px; padding: 20px; position: relative; overflow: hidden; animation: fadeUp 0.4s ease forwards; opacity: 0; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+#aiWarning { display: none; margin-top: 12px; padding: 14px 16px; background: rgba(245,197,66,.07); border: 1px solid rgba(245,197,66,.3); border-radius: 8px; font-size: 11px; color: var(–warn); line-height: 1.7; }
+#aiWarning strong { color: #f5d76e; }
+.ai-resolve-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(245,197,66,.1); font-size: 10px; }
+.ai-resolve-item:last-child { border-bottom: none; }
+.ai-badge { background: rgba(245,197,66,.15); border: 1px solid rgba(245,197,66,.3); border-radius: 4px; padding: 2px 6px; font-size: 10px; color: var(–warn); white-space: nowrap; flex-shrink: 0; }
+.ai-note { color: var(–muted); font-size: 10px; margin-top: 1px; }
+#aiResolveList { margin-top: 8px; }
+
+#statsRow { display: none; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+.stat-card { background: var(–surface); border: 1px solid var(–border); border-radius: 10px; padding: 16px; position: relative; overflow: hidden; animation: fadeUp 0.4s ease forwards; opacity: 0; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 .stat-card:nth-child(1){animation-delay:.05s} .stat-card:nth-child(2){animation-delay:.1s} .stat-card:nth-child(3){animation-delay:.15s} .stat-card:nth-child(4){animation-delay:.2s}
-.stat-card .label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(–muted); margin-bottom: 10px; }
-.stat-card .value { font-family: ‘Syne’, sans-serif; font-size: 24px; font-weight: 700; }
-.stat-card .change { font-size: 11px; margin-top: 6px; }
+.stat-card .label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(–muted); margin-bottom: 8px; }
+.stat-card .value { font-family: ‘Syne’, sans-serif; font-size: 18px; font-weight: 700; }
+.stat-card .change { font-size: 10px; margin-top: 4px; }
 .stat-card .change.gain { color: var(–gain); } .stat-card .change.loss { color: var(–loss); }
 .stat-card::after { content:’’; position:absolute; top:0;left:0;right:0; height:2px; }
 .stat-card:nth-child(1)::after{background:var(–accent)} .stat-card:nth-child(2)::after{background:var(–accent2)} .stat-card:nth-child(3)::after{background:var(–accent3)} .stat-card:nth-child(4)::after{background:#c77dff}
 
-#chartSection { margin-top: 28px; display: none; }
-.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-.chart-header h3 { font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-.range-btns { display: flex; gap: 6px; }
-.range-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(–border); background: transparent; color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+#chartSection { margin-top: 20px; display: none; }
+.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.chart-header h3 { font-family: ‘Syne’, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.range-btns { display: flex; gap: 4px; }
+.range-btn { padding: 4px 10px; border-radius: 5px; border: 1px solid var(–border); background: transparent; color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 10px; cursor: pointer; transition: all 0.15s; }
 .range-btn:hover { border-color: var(–accent); color: var(–accent); }
 .range-btn.active { background: var(–accent); border-color: var(–accent); color: var(–bg); }
-.chart-wrap { background: var(–surface); border: 1px solid var(–border); border-radius: 12px; padding: 24px; }
-#portfolioChart { width: 100% !important; height: 340px !important; }
+.chart-wrap { background: var(–surface); border: 1px solid var(–border); border-radius: 12px; padding: 16px; }
+#portfolioChart { width: 100% !important; height: 240px !important; }
 
-#holdingsSection { margin-top: 28px; display: none; }
-.holdings-header { margin-bottom: 16px; }
-.holdings-header h3 { font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-table { width: 100%; border-collapse: collapse; background: var(–surface); border-radius: 12px; overflow: hidden; border: 1px solid var(–border); }
-th { text-align: left; padding: 14px 16px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(–muted); border-bottom: 1px solid var(–border); background: var(–surface2); font-weight: 400; }
-td { padding: 14px 16px; font-size: 12px; border-bottom: 1px solid rgba(42,42,58,.5); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,.02); }
+#holdingsSection { margin-top: 20px; display: none; }
+.holdings-header { margin-bottom: 12px; }
+.holdings-header h3 { font-family: ‘Syne’, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.holding-card { background: var(–surface); border: 1px solid var(–border); border-radius: 10px; padding: 14px; margin-bottom: 8px; }
+.holding-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.holding-ticker { display: flex; align-items: center; gap: 8px; }
 .ticker-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; background: var(–surface2); border: 1px solid var(–border); font-size: 11px; font-weight: 500; }
 .ticker-badge.ai-resolved { border-color: rgba(245,197,66,.5); color: var(–warn); }
-.ai-tag { font-size: 9px; background: rgba(245,197,66,.15); border: 1px solid rgba(245,197,66,.3); color: var(–warn); border-radius: 3px; padding: 1px 4px; margin-left: 4px; vertical-align: middle; }
-.gain-cell { color: var(–gain); } .loss-cell { color: var(–loss); } .na-cell { color: var(–muted); }
+.ai-tag { font-size: 9px; background: rgba(245,197,66,.15); border: 1px solid rgba(245,197,66,.3); color: var(–warn); border-radius: 3px; padding: 1px 4px; }
+.holding-value { font-family: ‘Syne’, sans-serif; font-size: 16px; font-weight: 700; }
+.holding-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.holding-stat .hs-label { font-size: 9px; color: var(–muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+.holding-stat .hs-val { font-size: 11px; }
+.gain-val { color: var(–gain); } .loss-val { color: var(–loss); } .na-val { color: var(–muted); }
 
-#progressBar { display: none; margin-top: 12px; height: 3px; background: var(–border); border-radius: 2px; overflow: hidden; }
+#progressBar { display: none; margin-top: 10px; height: 3px; background: var(–border); border-radius: 2px; overflow: hidden; }
 #progressFill { height: 100%; background: var(–accent); width: 0%; transition: width 0.3s ease; border-radius: 2px; }
-#resetBtn { display: none; margin-top: 16px; padding: 8px 18px; background: transparent; border: 1px solid var(–border); color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 11px; border-radius: 6px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
+#resetBtn { display: none; margin-top: 14px; padding: 8px 18px; background: transparent; border: 1px solid var(–border); color: var(–muted); font-family: ‘DM Mono’, monospace; font-size: 11px; border-radius: 6px; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
 #resetBtn:hover { border-color: var(–loss); color: var(–loss); }
-#instructions { margin-top: 24px; padding: 20px; background: var(–surface); border: 1px solid var(–border); border-radius: 10px; font-size: 11px; line-height: 1.8; color: var(–muted); }
+#instructions { margin-top: 20px; padding: 16px; background: var(–surface); border: 1px solid var(–border); border-radius: 10px; font-size: 11px; line-height: 1.8; color: var(–muted); }
 #instructions strong { color: var(–accent); }
-#instructions h4 { font-family: ‘Syne’, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(–text); margin-bottom: 10px; }
+#instructions h4 { font-family: ‘Syne’, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(–text); margin-bottom: 8px; }
 #instructions ol { padding-left: 16px; }
 #instructions li { margin-bottom: 4px; }
-@media (max-width: 600px) { .main, .header { padding: 20px; } .stat-card .value { font-size: 20px; } th:nth-child(n+4), td:nth-child(n+4) { display: none; } }
 </style>
 
 </head>
@@ -104,31 +114,35 @@ tr:hover td { background: rgba(255,255,255,.02); }
 <div class="header">
   <div class="dot"></div>
   <h1>Portfolio Tracker</h1>
-  <span class="subtitle">CMC Invest · AI-Powered</span>
+  <span class="subtitle">CMC · AI</span>
 </div>
 <div class="main">
   <div id="dropZone">
     <div class="icon">📂</div>
     <h2>Drop your CMC CSV here</h2>
-    <p>Export from CMC Invest → Activity → Confirmation History → Download CSV<br>
-    ASX · US · CA · DE · SE · Crypto · Auto symbol lookup + Claude AI fallback ✨</p>
+    <p>CMC Invest → Activity → Confirmation History → Download CSV<br>
+    US · ASX · CA · DE · SE · Crypto · AI fallback ✨</p>
     <button class="browse-btn" onclick="document.getElementById('fileInput').click()">Browse File</button>
     <input type="file" id="fileInput" accept=".csv">
   </div>
+
   <div id="status"></div>
   <div id="progressBar"><div id="progressFill"></div></div>
 
+  <div id="debugPanel">
+    <button id="debugToggle" onclick="toggleDebug()">▶ DEBUG LOG</button>
+    <div id="debugLog"></div>
+  </div>
+
   <div id="aiWarning">
-    <strong>⚠️ AI-Assisted Ticker Resolution — Accuracy Not Guaranteed</strong><br>
-    These tickers couldn't be auto-resolved via Yahoo Finance search. Claude AI has made its best guess —
-    <strong>verify against your broker before making decisions.</strong>
+    <strong>⚠️ AI-Assisted Resolution — Verify Before Decisions</strong>
     <div id="aiResolveList"></div>
   </div>
 
   <div id="statsRow">
     <div class="stat-card"><div class="label">Current Value</div><div class="value" id="statValue">—</div><div class="change" id="statValueChange"></div></div>
     <div class="stat-card"><div class="label">Total Cost</div><div class="value" id="statCost">—</div></div>
-    <div class="stat-card"><div class="label">Total Gain / Loss</div><div class="value" id="statGain">—</div><div class="change" id="statGainPct"></div></div>
+    <div class="stat-card"><div class="label">Gain / Loss</div><div class="value" id="statGain">—</div><div class="change" id="statGainPct"></div></div>
     <div class="stat-card"><div class="label">Holdings</div><div class="value" id="statHoldings">—</div><div class="change" id="statLastUpdated"></div></div>
   </div>
 
@@ -148,10 +162,7 @@ tr:hover td { background: rgba(255,255,255,.02); }
 
   <div id="holdingsSection">
     <div class="holdings-header"><h3>Current Holdings</h3></div>
-    <table>
-      <thead><tr><th>Ticker</th><th>Shares</th><th>Avg Cost (AUD)</th><th>Current Price</th><th>Market Value</th><th>Gain / Loss</th><th>Return</th></tr></thead>
-      <tbody id="holdingsBody"></tbody>
-    </table>
+    <div id="holdingsList"></div>
   </div>
 
 <button id="resetBtn" onclick="resetApp()">↩ Load different file</button>
@@ -160,22 +171,35 @@ tr:hover td { background: rgba(255,255,255,.02); }
     <h4>How to export from CMC Invest</h4>
     <ol>
       <li>Log in to <strong>CMC Invest</strong></li>
-      <li>Go to <strong>Activity</strong> → <strong>Confirmation History</strong></li>
-      <li>Click <strong>Download CSV</strong> (top right)</li>
-      <li>Drop the file onto this page</li>
+      <li>Go to <strong>Activity → Confirmation History</strong></li>
+      <li>Tap <strong>Download CSV</strong> (top right)</li>
+      <li>Tap Browse File above and select it</li>
     </ol>
-    <br>
-    <strong>Supported:</strong> All markets — US, ASX, CA (Toronto), DE, SE and more.
-    Unknown or delisted tickers auto-resolved via Yahoo search + Claude AI fallback.
   </div>
 </div>
 
 <script>
 let allChartData = [], holdingsData = [], aiResolutions = [], currentRange = 365;
 let chartInstance = null;
-
-// ── Symbol cache so we don't re-lookup same ticker ──
 const symbolCache = {};
+
+// ── Debug logger ──
+function log(msg, type='info') {
+  const el = document.getElementById('debugLog');
+  const line = document.createElement('div');
+  line.className = `log-${type}`;
+  const time = new Date().toLocaleTimeString('en-AU', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  line.textContent = `[${time}] ${msg}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+  document.getElementById('debugPanel').style.display = 'block';
+}
+function toggleDebug() {
+  const el = document.getElementById('debugLog');
+  const btn = document.getElementById('debugToggle');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  btn.textContent = el.style.display === 'none' ? '▶ DEBUG LOG' : '▼ DEBUG LOG';
+}
 
 // Drop zone
 const dropZone = document.getElementById('dropZone');
@@ -194,25 +218,70 @@ function setProgress(pct) {
   document.getElementById('progressFill').style.width = pct + '%';
 }
 
+// ── CORS proxy with multiple fallbacks ──
+// Tries proxies in order until one works
+const PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+  url => `https://cors-anywhere.herokuapp.com/${url}`,
+];
+
+async function fetchWithProxy(targetUrl) {
+  for (let i = 0; i < PROXIES.length; i++) {
+    const proxyUrl = PROXIES[i](targetUrl);
+    try {
+      log(`Proxy ${i+1}: ${proxyUrl.substring(0,60)}...`, 'info');
+      const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+      if (!resp.ok) { log(`Proxy ${i+1} HTTP ${resp.status}`, 'warn'); continue; }
+
+      const text = await resp.text();
+
+      // corsproxy.io returns raw content
+      if (i === 0) {
+        try { return JSON.parse(text); } catch(e) { log(`Proxy 1 parse error: ${e.message}`, 'warn'); continue; }
+      }
+      // allorigins wraps in {contents: "..."}
+      if (i === 1) {
+        try {
+          const wrapper = JSON.parse(text);
+          return JSON.parse(wrapper.contents);
+        } catch(e) { log(`Proxy 2 parse error: ${e.message}`, 'warn'); continue; }
+      }
+      // cors-anywhere returns raw
+      if (i === 2) {
+        try { return JSON.parse(text); } catch(e) { log(`Proxy 3 parse error: ${e.message}`, 'warn'); continue; }
+      }
+    } catch(e) {
+      log(`Proxy ${i+1} failed: ${e.message}`, 'warn');
+    }
+  }
+  throw new Error('All proxies failed');
+}
+
 // ── Parse CMC CSV ──
 function processFile(file) {
+  log(`Reading file: ${file.name} (${(file.size/1024).toFixed(1)}KB)`, 'info');
   showStatus('📄 Reading CSV...', 'info');
   Papa.parse(file, {
     header: true, skipEmptyLines: true,
     complete: async (results) => {
       try {
+        log(`CSV parsed: ${results.data.length} rows, columns: ${Object.keys(results.data[0]||{}).join(', ')}`, 'info');
         const trades = parseCMCTrades(results.data);
         if (!trades.length) throw new Error('No Buy/Sell trades found — check CSV format');
-        showStatus(`✓ Found ${trades.length} transactions. Resolving symbols...`, 'info');
+        log(`Trades found: ${trades.length}`, 'ok');
+        showStatus(`✓ ${trades.length} transactions found. Fetching prices...`, 'info');
         await buildPortfolio(trades);
-      } catch(e) { showStatus('✗ Error: ' + e.message, 'error'); console.error(e); }
+      } catch(e) {
+        log(`FATAL: ${e.message}`, 'err');
+        showStatus('✗ Error: ' + e.message, 'error');
+      }
     },
-    error: (e) => showStatus('✗ CSV parse error: ' + e.message, 'error')
+    error: (e) => { log(`CSV parse error: ${e.message}`, 'err'); showStatus('✗ CSV parse error: ' + e.message, 'error'); }
   });
 }
 
 function parseCMCTrades(rows) {
-  if (!rows.length) throw new Error('CSV is empty');
   const trades = [];
   for (const row of rows) {
     const orderType = (row['Order Type'] || '').trim().toUpperCase();
@@ -228,7 +297,7 @@ function parseCMCTrades(rows) {
     const gst = parseFloat((row['GST'] || '0').replace(/[^0-9.-]/g, '')) || 0;
     const dateStr = row['Trade Date'] || row['As at Date'] || row['Settlement Date'] || '';
     const costAUD = isBuy ? qty * priceAUD + brokerage + gst : -(qty * priceAUD - brokerage - gst);
-    trades.push({ date: parseDate(dateStr), rawCode, qty: isSell ? -qty : qty, priceAUD, costAUD });
+    trades.push({ date: parseDate(dateStr), rawCode, qty: isSell ? -qty : qty, costAUD });
   }
   trades.sort((a, b) => a.date - b.date);
   return trades;
@@ -237,112 +306,30 @@ function parseCMCTrades(rows) {
 function parseDate(str) {
   if (!str) return new Date();
   str = str.trim();
-  if (/^\d{4}-\d{2}-\d{2}/.test(str)) return new Date(str);
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) return new Date(str + 'T00:00:00');
   const m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
   if (m) return new Date(+m[3], +m[2]-1, +m[1]);
   return new Date(str);
 }
 
-// ── Step 1: Fast heuristic symbol guess ──
+// ── Symbol mapping ──
 function heuristicSymbol(rawCode) {
-  if (rawCode.includes('.')) return rawCode;
   const colonIdx = rawCode.indexOf(':');
   const exchange = colonIdx >= 0 ? rawCode.slice(colonIdx + 1) : '';
   const base = colonIdx >= 0 ? rawCode.slice(0, colonIdx) : rawCode;
-
-  // Crypto
   if (base === 'BTC') return 'BTC-AUD';
   if (base === 'ETH') return 'ETH-AUD';
   if (base === 'SOL' && !exchange) return 'SOL-AUD';
-
   switch (exchange) {
-    case 'US': return base;           // KEYS, TLN, NVDA etc — Yahoo uses plain ticker for US
-    case 'CA': return base + '.TO';   // Toronto Stock Exchange
-    case 'SE': return base + '.ST';   // Stockholm
-    case 'DE': return base + '.DE';   // Frankfurt/XETRA
-    case 'UK': return base + '.L';    // London
+    case 'US': return base;
+    case 'CA': return base + '.TO';
+    case 'SE': return base + '.ST';
+    case 'DE': return base + '.DE';
+    case 'UK': return base + '.L';
     case 'HK': return base + '.HK';
     case 'FR': return base + '.PA';
-    case 'AU': return base + '.AX';
-    default:   return base + '.AX';   // ASX default (no suffix = ASX stock like GYG, NDQ, IWLD)
+    default:   return base + '.AX';
   }
-}
-
-// ── Step 2: Yahoo Finance search API (finds correct exchange automatically) ──
-async function searchYahooSymbol(rawCode) {
-  const colonIdx = rawCode.indexOf(':');
-  const exchange = colonIdx >= 0 ? rawCode.slice(colonIdx + 1) : '';
-  const base = colonIdx >= 0 ? rawCode.slice(0, colonIdx) : rawCode;
-
-  // Build a smart search query
-  const query = base;
-  const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=5&newsCount=0&listsCount=0`;
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(searchUrl)}`;
-
-  try {
-    const resp = await fetch(proxyUrl);
-    if (!resp.ok) return null;
-    const wrapper = await resp.json();
-    const data = JSON.parse(wrapper.contents);
-    const quotes = data?.quotes || [];
-    if (!quotes.length) return null;
-
-    // Filter to match expected exchange
-    const exchangeMap = {
-      'US': ['NMS', 'NYQ', 'NGM', 'NCM', 'PCX', 'BTS', 'OTC', 'PNK', 'ASE'],
-      'CA': ['TOR', 'CVE', 'VAN'],
-      'SE': ['STO', 'NGM'],
-      'DE': ['GER', 'FRA', 'EBS', 'XET'],
-      'AU': ['ASX'],
-      '':   ['ASX'], // no exchange = ASX
-    };
-
-    const expectedExchanges = exchangeMap[exchange] || [];
-
-    // Try to find exact match for expected exchange first
-    if (expectedExchanges.length) {
-      const match = quotes.find(q =>
-        q.symbol && expectedExchanges.includes(q.exchange) &&
-        (q.symbol.startsWith(base) || q.shortname?.toUpperCase().includes(base))
-      );
-      if (match) return match.symbol;
-    }
-
-    // Fallback: return first equity result
-    const equity = quotes.find(q => q.quoteType === 'EQUITY' || q.quoteType === 'ETF' || q.quoteType === 'CRYPTOCURRENCY');
-    return equity?.symbol || quotes[0]?.symbol || null;
-  } catch(e) {
-    return null;
-  }
-}
-
-// ── Step 3: Claude AI fallback for truly unresolvable tickers ──
-async function resolveWithClaude(rawCode, attemptedSymbol) {
-  const prompt = `Stock ticker "${rawCode}" (Yahoo symbol tried: "${attemptedSymbol}") returned no price data from Yahoo Finance. It may be merged, acquired, moved to OTC, delisted, or bankrupt.
-
-Respond ONLY with a JSON object, no markdown, no explanation:
-{
-  "status": "merged" | "otc" | "delisted" | "renamed" | "unknown",
-  "yahooSymbol": "TICKER_OR_NULL",
-  "conversionRatio": 1.0,
-  "note": "one-line explanation"
-}
-
-If bankrupt/worthless: yahooSymbol=null, conversionRatio=0.
-If unsure: status="unknown", yahooSymbol=null.
-Only provide yahooSymbol if confident it works on Yahoo Finance.`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 300, messages: [{ role: 'user', content: prompt }] })
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const text = data.content?.find(b => b.type === 'text')?.text || '';
-    return JSON.parse(text.replace(/```json|```/g, '').trim());
-  } catch(e) { return null; }
 }
 
 // ── Fetch Yahoo price history ──
@@ -350,13 +337,10 @@ async function fetchYahooHistory(symbol, from, to) {
   const p1 = Math.floor(from.getTime() / 1000) - 86400;
   const p2 = Math.floor(to.getTime() / 1000) + 86400;
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${p1}&period2=${p2}&interval=1d`;
-  const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-  const resp = await fetch(proxy);
-  if (!resp.ok) throw new Error('Network error');
-  const wrapper = await resp.json();
-  const data = JSON.parse(wrapper.contents);
+  log(`Fetching ${symbol}`, 'info');
+  const data = await fetchWithProxy(url);
   const result = data?.chart?.result?.[0];
-  if (!result) return null;
+  if (!result) { log(`No data for ${symbol}`, 'warn'); return null; }
   const timestamps = result.timestamp || [];
   const closes = result.indicators?.quote?.[0]?.close || [];
   const out = {};
@@ -364,115 +348,118 @@ async function fetchYahooHistory(symbol, from, to) {
     if (closes[i] == null) continue;
     out[new Date(timestamps[i] * 1000).toISOString().split('T')[0]] = closes[i];
   }
-  return Object.keys(out).length > 0 ? out : null;
+  const count = Object.keys(out).length;
+  if (count > 0) { log(`${symbol}: ${count} price points ✓`, 'ok'); return out; }
+  log(`${symbol}: empty result`, 'warn');
+  return null;
 }
 
-// ── Resolve a single ticker: heuristic → yahoo search → claude ──
+// ── Yahoo search ──
+async function searchYahooSymbol(rawCode) {
+  const base = rawCode.includes(':') ? rawCode.split(':')[0] : rawCode;
+  const exchange = rawCode.includes(':') ? rawCode.split(':')[1] : '';
+  const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(base)}&quotesCount=8&newsCount=0`;
+  try {
+    log(`Searching Yahoo for "${base}"`, 'info');
+    const data = await fetchWithProxy(url);
+    const quotes = data?.quotes || [];
+    const exMap = { US:['NMS','NYQ','NGM','NCM','PCX','OTC','PNK','ASE','BTS'], CA:['TOR','CVE'], SE:['STO','NGM'], DE:['GER','FRA','XET'], '':['ASX'] };
+    const expected = exMap[exchange] || [];
+    if (expected.length) {
+      const match = quotes.find(q => q.symbol && expected.includes(q.exchange));
+      if (match) { log(`Search found: ${match.symbol} on ${match.exchange}`, 'ok'); return match.symbol; }
+    }
+    const eq = quotes.find(q => ['EQUITY','ETF','CRYPTOCURRENCY'].includes(q.quoteType));
+    if (eq) { log(`Search fallback: ${eq.symbol}`, 'ok'); return eq.symbol; }
+  } catch(e) { log(`Yahoo search failed: ${e.message}`, 'warn'); }
+  return null;
+}
+
+// ── Claude AI fallback ──
+async function resolveWithClaude(rawCode, attempted) {
+  log(`Asking Claude about ${rawCode}`, 'warn');
+  const prompt = `Stock "${rawCode}" (tried Yahoo symbol "${attempted}") returned no data. May be merged, OTC, delisted, or bankrupt.\n\nRespond ONLY with JSON:\n{"status":"merged"|"otc"|"delisted"|"renamed"|"unknown","yahooSymbol":"SYMBOL_OR_NULL","conversionRatio":1.0,"note":"one line"}\n\nIf worthless: yahooSymbol=null, conversionRatio=0. If unsure: yahooSymbol=null.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role: 'user', content: prompt }] })
+    });
+    if (!res.ok) { log(`Claude API error ${res.status}`, 'err'); return null; }
+    const data = await res.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || '';
+    const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    log(`Claude says: ${JSON.stringify(parsed)}`, parsed.yahooSymbol ? 'ok' : 'warn');
+    return parsed;
+  } catch(e) { log(`Claude failed: ${e.message}`, 'err'); return null; }
+}
+
+// ── Resolve ticker through all 3 layers ──
 async function resolveSymbol(rawCode, fromDate, toDate) {
   if (symbolCache[rawCode]) return symbolCache[rawCode];
 
-  const colonIdx = rawCode.indexOf(':');
-  const exchange = colonIdx >= 0 ? rawCode.slice(colonIdx + 1) : '';
-  const base = colonIdx >= 0 ? rawCode.slice(0, colonIdx) : rawCode;
-
-  // Crypto shortcut
-  if (['BTC','ETH','SOL'].includes(base) && !exchange) {
-    const sym = base + '-AUD';
-    const data = await fetchYahooHistory(sym, fromDate, toDate);
-    const result = { symbol: sym, data: data || {}, ratio: 1, aiResolved: false, note: '' };
-    symbolCache[rawCode] = result;
-    return result;
-  }
-
-  // Step 1: Try heuristic symbol
+  // Layer 1: heuristic
   const hSym = heuristicSymbol(rawCode);
   try {
     const data = await fetchYahooHistory(hSym, fromDate, toDate);
     if (data) {
-      const result = { symbol: hSym, data, ratio: 1, aiResolved: false, note: '' };
-      symbolCache[rawCode] = result;
-      return result;
+      return symbolCache[rawCode] = { symbol: hSym, data, ratio: 1, aiResolved: false };
     }
-  } catch(e) {}
+  } catch(e) { log(`Heuristic fetch failed for ${hSym}: ${e.message}`, 'warn'); }
 
-  // Step 2: Try Yahoo search to find the right symbol
-  showStatus(`🔍 Searching Yahoo for ${rawCode}...`, 'info');
-  const searchedSym = await searchYahooSymbol(rawCode);
-  if (searchedSym && searchedSym !== hSym) {
+  // Layer 2: Yahoo search
+  const searched = await searchYahooSymbol(rawCode);
+  if (searched && searched !== hSym) {
     try {
-      const data = await fetchYahooHistory(searchedSym, fromDate, toDate);
+      const data = await fetchYahooHistory(searched, fromDate, toDate);
       if (data) {
-        const result = { symbol: searchedSym, data, ratio: 1, aiResolved: false, note: `Auto-found: ${searchedSym}` };
-        symbolCache[rawCode] = result;
-        return result;
+        return symbolCache[rawCode] = { symbol: searched, data, ratio: 1, aiResolved: false, note: `Found as ${searched}` };
       }
-    } catch(e) {}
+    } catch(e) { log(`Search result fetch failed: ${e.message}`, 'warn'); }
   }
 
-  // Step 3: Claude AI fallback
-  showStatus(`🤖 ${rawCode} unresolved — asking Claude AI...`, 'info');
+  // Layer 3: Claude
   const resolution = await resolveWithClaude(rawCode, hSym);
-
   if (resolution?.yahooSymbol) {
     try {
       const data = await fetchYahooHistory(resolution.yahooSymbol, fromDate, toDate);
       if (data) {
-        const result = { symbol: resolution.yahooSymbol, data, ratio: resolution.conversionRatio ?? 1, aiResolved: true, note: resolution.note || '' };
-        symbolCache[rawCode] = result;
-        return result;
+        return symbolCache[rawCode] = { symbol: resolution.yahooSymbol, data, ratio: resolution.conversionRatio ?? 1, aiResolved: true, note: resolution.note };
       }
     } catch(e) {}
   }
 
-  // Total failure — return empty
-  const result = {
-    symbol: hSym, data: {},
-    ratio: resolution?.conversionRatio ?? 1,
-    aiResolved: true,
-    note: resolution?.note || 'Could not find price data',
-    failed: true
-  };
-  symbolCache[rawCode] = result;
-  return result;
+  log(`${rawCode}: completely unresolved — N/A`, 'err');
+  return symbolCache[rawCode] = { symbol: hSym, data: {}, ratio: resolution?.conversionRatio ?? 1, aiResolved: true, note: resolution?.note || 'No price data found', failed: true };
 }
 
 // ── Build portfolio ──
 async function buildPortfolio(trades) {
   aiResolutions = [];
   const rawCodes = [...new Set(trades.map(t => t.rawCode))];
-  const resolved = {}; // rawCode -> { symbol, data, ratio, aiResolved, note }
-
+  log(`Unique tickers: ${rawCodes.join(', ')}`, 'info');
+  const resolved = {};
   let fetched = 0;
   setProgress(5);
 
   for (const code of rawCodes) {
-    showStatus(`📡 Resolving ${code}... (${fetched+1}/${rawCodes.length})`, 'info');
+    showStatus(`📡 ${code} (${fetched+1}/${rawCodes.length})...`, 'info');
     resolved[code] = await resolveSymbol(code, trades[0].date, new Date());
-
     if (resolved[code].aiResolved || resolved[code].failed) {
-      aiResolutions.push({
-        original: code,
-        resolved: resolved[code].failed ? null : resolved[code].symbol,
-        ratio: resolved[code].ratio,
-        note: resolved[code].note
-      });
+      aiResolutions.push({ original: code, resolved: resolved[code].failed ? null : resolved[code].symbol, ratio: resolved[code].ratio, note: resolved[code].note || '' });
     }
-
     fetched++;
     setProgress(5 + 65 * (fetched / rawCodes.length));
   }
 
-  // Show AI warning if needed
   if (aiResolutions.length > 0) {
     document.getElementById('aiResolveList').innerHTML = aiResolutions.map(r => `
       <div class="ai-resolve-item">
         <span class="ai-badge">${r.original}</span>
-        <span class="ai-arrow">→</span>
+        <span style="color:var(--muted)">→</span>
         <div>
-          ${r.resolved
-            ? `<strong style="color:var(--text)">${r.resolved}</strong>${r.ratio !== 1 ? ` <span style="color:var(--muted)">(×${r.ratio})</span>` : ''}`
-            : `<span style="color:var(--loss)">No data found — shown as N/A</span>`}
-          <div class="ai-note">${r.note || ''}</div>
+          ${r.resolved ? `<strong style="color:var(--text)">${r.resolved}</strong>${r.ratio!==1?` ×${r.ratio}`:''}` : `<span style="color:var(--loss)">N/A</span>`}
+          <div class="ai-note">${r.note}</div>
         </div>
       </div>`).join('');
     document.getElementById('aiWarning').style.display = 'block';
@@ -513,7 +500,6 @@ async function buildPortfolio(trades) {
 
   setProgress(92);
 
-  // Current holdings snapshot
   holdingsData = [];
   for (const [code, h] of Object.entries(holdings)) {
     const r = resolved[code];
@@ -522,23 +508,15 @@ async function buildPortfolio(trades) {
     const ratio = r?.ratio ?? 1;
     const effectivePrice = rawPrice !== null ? rawPrice * ratio : null;
     const marketValue = effectivePrice !== null ? h.qty * effectivePrice : null;
-    holdingsData.push({
-      code, qty: h.qty,
-      avgCost: h.qty > 0 ? h.totalCost / h.qty : 0,
-      currentPrice: effectivePrice, marketValue,
-      costBasis: h.totalCost,
-      isAiResolved: r?.aiResolved || false
-    });
+    holdingsData.push({ code, qty: h.qty, avgCost: h.qty > 0 ? h.totalCost / h.qty : 0, currentPrice: effectivePrice, marketValue, costBasis: h.totalCost, isAiResolved: r?.aiResolved || false });
   }
 
+  log(`Portfolio built: ${holdingsData.length} current holdings`, 'ok');
   allChartData = days;
   setProgress(100);
 
   renderChart(days); renderStats(); renderHoldings();
-  document.getElementById('statsRow').style.display = 'grid';
-  document.getElementById('chartSection').style.display = 'block';
-  document.getElementById('holdingsSection').style.display = 'block';
-  document.getElementById('resetBtn').style.display = 'inline-block';
+  ['statsRow','chartSection','holdingsSection','resetBtn'].forEach(id => document.getElementById(id).style.display = id === 'statsRow' ? 'grid' : 'block');
   document.getElementById('progressBar').style.display = 'none';
   document.getElementById('instructions').style.display = 'none';
 
@@ -579,17 +557,15 @@ function renderChart(data) {
   const lc = isGain ? '#00e5a0' : '#ff4d6d';
   chartInstance = new Chart(ctx, {
     type: 'line',
-    data: { labels, datasets: [{ label: 'Portfolio Value (AUD)', data: values, borderColor: lc, borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: lc, fill: true,
-      backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,300); g.addColorStop(0, isGain?'rgba(0,229,160,.18)':'rgba(255,77,109,.18)'); g.addColorStop(1,'rgba(0,0,0,0)'); return g; }, tension: 0.3 }] },
+    data: { labels, datasets: [{ data: values, borderColor: lc, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: lc, fill: true,
+      backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,220); g.addColorStop(0,isGain?'rgba(0,229,160,.15)':'rgba(255,77,109,.15)'); g.addColorStop(1,'rgba(0,0,0,0)'); return g; }, tension: 0.3 }] },
     options: {
       responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1a26', borderColor: '#2a2a3a', borderWidth: 1, titleColor: '#6a6a88', bodyColor: '#e8e8f0', padding: 12,
-        callbacks: { label: ctx => ' $' + ctx.raw.toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2}) } } },
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1a1a26', borderColor: '#2a2a3a', borderWidth: 1, titleColor: '#6a6a88', bodyColor: '#e8e8f0', padding: 10,
+        callbacks: { label: ctx => ' ' + fmt(ctx.raw), title: items => new Date(items[0].label).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) } } },
       scales: {
-        x: { grid: { color: 'rgba(42,42,58,.5)' }, ticks: { color: '#6a6a88', font: { family: 'DM Mono', size: 10 }, maxTicksLimit: 8,
-          callback: (val, idx) => new Date(labels[idx]).toLocaleDateString('en-AU', {day:'numeric',month:'short'}) } },
-        y: { grid: { color: 'rgba(42,42,58,.5)' }, ticks: { color: '#6a6a88', font: { family: 'DM Mono', size: 10 },
-          callback: val => '$' + (val >= 1000 ? (val/1000).toFixed(1)+'k' : val.toFixed(0)) } }
+        x: { grid:{color:'rgba(42,42,58,.4)'}, ticks:{color:'#6a6a88',font:{family:'DM Mono',size:9},maxTicksLimit:6, callback:(v,i)=>new Date(labels[i]).toLocaleDateString('en-AU',{day:'numeric',month:'short'})} },
+        y: { grid:{color:'rgba(42,42,58,.4)'}, ticks:{color:'#6a6a88',font:{family:'DM Mono',size:9}, callback:v=>'$'+(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0))} }
       }
     }
   });
@@ -607,54 +583,64 @@ function updateChart(data) {
 function renderStats() {
   const cd = filterByRange(allChartData, currentRange);
   const cv = cd.length ? cd[cd.length-1].value : 0, sv = cd.length ? cd[0].value : 0;
-  const totalCost = holdingsData.reduce((s,h) => s+(h.costBasis||0), 0);
-  const totalValue = holdingsData.reduce((s,h) => s+(h.marketValue||0), 0);
+  const totalCost = holdingsData.reduce((s,h)=>s+(h.costBasis||0),0);
+  const totalValue = holdingsData.reduce((s,h)=>s+(h.marketValue||0),0);
   const gain = totalValue - totalCost, gainPct = totalCost ? gain/totalCost*100 : 0;
   const pg = cv - sv;
   document.getElementById('statValue').textContent = fmt(totalValue);
-  document.getElementById('statValueChange').textContent = (pg>=0?'▲ +':'▼ ') + fmt(Math.abs(pg)) + ' this period';
-  document.getElementById('statValueChange').className = 'change ' + (pg>=0?'gain':'loss');
+  document.getElementById('statValueChange').textContent = (pg>=0?'▲ +':'▼ ')+fmt(Math.abs(pg))+' period';
+  document.getElementById('statValueChange').className = 'change '+(pg>=0?'gain':'loss');
   document.getElementById('statCost').textContent = fmt(totalCost);
-  document.getElementById('statGain').textContent = (gain>=0?'+':'') + fmt(gain);
-  document.getElementById('statGain').style.color = gain>=0 ? 'var(--gain)' : 'var(--loss)';
-  document.getElementById('statGainPct').textContent = (gainPct>=0?'+':'') + gainPct.toFixed(2) + '%';
-  document.getElementById('statGainPct').className = 'change ' + (gain>=0?'gain':'loss');
+  document.getElementById('statGain').textContent = (gain>=0?'+':'')+fmt(gain);
+  document.getElementById('statGain').style.color = gain>=0?'var(--gain)':'var(--loss)';
+  document.getElementById('statGainPct').textContent = (gainPct>=0?'+':'')+gainPct.toFixed(2)+'%';
+  document.getElementById('statGainPct').className = 'change '+(gain>=0?'gain':'loss');
   document.getElementById('statHoldings').textContent = holdingsData.length;
-  document.getElementById('statLastUpdated').textContent = 'as of today';
+  document.getElementById('statLastUpdated').textContent = 'today';
   document.getElementById('statLastUpdated').className = 'change';
 }
-function fmt(n) { if (n==null||isNaN(n)) return 'N/A'; return '$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmt(n) { if(n==null||isNaN(n))return'N/A'; return'$'+n.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
 function renderHoldings() {
-  const tbody = document.getElementById('holdingsBody');
-  tbody.innerHTML = '';
-  [...holdingsData].sort((a,b) => (b.marketValue||0)-(a.marketValue||0)).forEach(h => {
+  const list = document.getElementById('holdingsList');
+  list.innerHTML = '';
+  [...holdingsData].sort((a,b)=>(b.marketValue||0)-(a.marketValue||0)).forEach(h => {
     const gain = h.marketValue!=null ? h.marketValue-h.costBasis : null;
     const gainPct = gain!=null&&h.costBasis ? gain/h.costBasis*100 : null;
-    const gc = gain!=null ? (gain>=0?'gain-cell':'loss-cell') : '';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="ticker-badge ${h.isAiResolved?'ai-resolved':''}">${h.code}</span>${h.isAiResolved?'<span class="ai-tag">AI</span>':''}</td>
-      <td>${h.qty.toFixed(4)}</td>
-      <td>${fmt(h.avgCost)}</td>
-      <td>${h.currentPrice!=null?fmt(h.currentPrice):'<span class="na-cell">N/A</span>'}</td>
-      <td>${h.marketValue!=null?fmt(h.marketValue):'<span class="na-cell">N/A</span>'}</td>
-      <td class="${gc}">${gain!=null?(gain>=0?'+':'')+fmt(gain):'<span class="na-cell">N/A</span>'}</td>
-      <td class="${gc}">${gainPct!=null?(gainPct>=0?'+':'')+gainPct.toFixed(2)+'%':'<span class="na-cell">N/A</span>'}</td>`;
-    tbody.appendChild(tr);
+    const gc = gain!=null?(gain>=0?'gain-val':'loss-val'):'na-val';
+    const card = document.createElement('div');
+    card.className = 'holding-card';
+    card.innerHTML = `
+      <div class="holding-top">
+        <div class="holding-ticker">
+          <span class="ticker-badge ${h.isAiResolved?'ai-resolved':''}">${h.code}</span>
+          ${h.isAiResolved?'<span class="ai-tag">AI</span>':''}
+        </div>
+        <div class="holding-value">${h.marketValue!=null?fmt(h.marketValue):'<span class="na-val">N/A</span>'}</div>
+      </div>
+      <div class="holding-grid">
+        <div class="holding-stat"><div class="hs-label">Shares</div><div class="hs-val">${h.qty.toFixed(4)}</div></div>
+        <div class="holding-stat"><div class="hs-label">Avg Cost</div><div class="hs-val">${fmt(h.avgCost)}</div></div>
+        <div class="holding-stat"><div class="hs-label">Price</div><div class="hs-val">${h.currentPrice!=null?fmt(h.currentPrice):'<span class="na-val">N/A</span>'}</div></div>
+        <div class="holding-stat"><div class="hs-label">Cost</div><div class="hs-val">${fmt(h.costBasis)}</div></div>
+        <div class="holding-stat"><div class="hs-label">P&L</div><div class="hs-val ${gc}">${gain!=null?(gain>=0?'+':'')+fmt(gain):'N/A'}</div></div>
+        <div class="holding-stat"><div class="hs-label">Return</div><div class="hs-val ${gc}">${gainPct!=null?(gainPct>=0?'+':'')+gainPct.toFixed(2)+'%':'N/A'}</div></div>
+      </div>`;
+    list.appendChild(card);
   });
 }
 
 function resetApp() {
   allChartData=[]; holdingsData=[]; aiResolutions=[];
-  Object.keys(symbolCache).forEach(k => delete symbolCache[k]);
-  if (chartInstance) { chartInstance.destroy(); chartInstance=null; }
-  ['statsRow','chartSection','holdingsSection','resetBtn','aiWarning'].forEach(id=>document.getElementById(id).style.display='none');
+  Object.keys(symbolCache).forEach(k=>delete symbolCache[k]);
+  if(chartInstance){chartInstance.destroy();chartInstance=null;}
+  ['statsRow','chartSection','holdingsSection','resetBtn','aiWarning','debugPanel'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('status').style.display='none';
   document.getElementById('progressBar').style.display='none';
   document.getElementById('instructions').style.display='block';
-  document.getElementById('holdingsBody').innerHTML='';
+  document.getElementById('holdingsList').innerHTML='';
   document.getElementById('aiResolveList').innerHTML='';
+  document.getElementById('debugLog').innerHTML='';
   fileInput.value='';
 }
 </script>
