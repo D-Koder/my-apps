@@ -16,7 +16,7 @@
     }
 
     h1 {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     h3 {
@@ -25,7 +25,7 @@
 
     .subtitle {
       color: #94a3b8;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .card {
@@ -33,7 +33,7 @@
       border: 1px solid #1e293b;
       border-radius: 12px;
       padding: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .controls {
@@ -49,7 +49,7 @@
       border: 1px solid #334155;
       background: #020617;
       color: #e5e7eb;
-      min-width: 160px;
+      min-width: 150px;
     }
 
     button {
@@ -93,12 +93,12 @@
       width: 100%;
       border-collapse: collapse;
       background: #020617;
-      min-width: 1200px;
+      min-width: 1150px;
     }
 
     th,
     td {
-      padding: 12px;
+      padding: 11px;
       border-bottom: 1px solid #1e293b;
       text-align: left;
       font-size: 14px;
@@ -119,13 +119,13 @@
       font-weight: bold;
     }
 
-    .warn {
-      color: #facc15;
+    .bad {
+      color: #ef4444;
       font-weight: bold;
     }
 
-    .bad {
-      color: #ef4444;
+    .warn {
+      color: #facc15;
       font-weight: bold;
     }
 
@@ -142,7 +142,7 @@
       padding: 12px;
       color: #cbd5e1;
       overflow-x: auto;
-      max-height: 350px;
+      max-height: 320px;
     }
   </style>
 </head>
@@ -151,7 +151,7 @@
   <h1>Portfolio Tracker</h1>
 
   <div class="subtitle">
-    Dynamic holdings + Cloudflare Worker + EODHD foreign stock symbol mapping.
+    Dynamic holdings + Cloudflare Worker + EODHD symbol resolver.
   </div>
 
   <div class="card">
@@ -163,14 +163,13 @@
       <input id="holdingAvgCost" placeholder="Avg cost e.g. 73.70" type="number" step="0.01" />
 
       <button onclick="addHolding()">Add / Update</button>
-      <button class="secondary" onclick="loadDynamicPortfolio()">Refresh Prices</button>
+      <button class="secondary" onclick="refreshPortfolio()">Refresh Prices</button>
       <button class="danger" onclick="clearHoldings()">Clear Holdings</button>
       <button class="secondary" onclick="clearSymbolCache()">Clear Symbol Cache</button>
     </div>
 
     <p class="small">
-      Worker:
-      <span id="workerUrl"></span>
+      Worker: <span id="workerUrl"></span>
     </p>
   </div>
 
@@ -178,8 +177,8 @@
     <h3>Quick Symbol Test</h3>
 
     <div class="controls">
-      <input id="symbolInput" placeholder="Example: AIXA.DE" value="AIXA.DE" />
-      <button onclick="testSingleSymbol()">Test Symbol</button>
+      <input id="testSymbol" placeholder="Example: AIXA.DE" value="AIXA.DE" />
+      <button onclick="testSymbol()">Test Symbol</button>
     </div>
   </div>
 
@@ -187,14 +186,14 @@
     <table>
       <thead>
         <tr>
-          <th>Original Symbol</th>
-          <th>Resolved Symbol</th>
+          <th>Original</th>
+          <th>Resolved</th>
           <th>Shares</th>
           <th>Avg Cost</th>
           <th>Price</th>
           <th>Market Value</th>
           <th>Cost Value</th>
-          <th>P&amp;L</th>
+          <th>P&L</th>
           <th>Return</th>
           <th>Currency</th>
           <th>Source</th>
@@ -223,102 +222,74 @@
 
     document.getElementById("workerUrl").textContent = WORKER_BASE;
 
-    let portfolioHoldings = loadHoldingsFromStorage();
+    let portfolioHoldings = loadHoldings();
 
     /************************************************************
-     * BASIC HELPERS
+     * GENERAL HELPERS
      ************************************************************/
 
-    function logDebug(message, data = null) {
-      const debug = document.getElementById("debugLog");
-      const line = `[${new Date().toLocaleTimeString()}] ${message}`;
-
-      if (data) {
-        debug.textContent += line + "\n" + JSON.stringify(data, null, 2) + "\n\n";
-      } else {
-        debug.textContent += line + "\n";
-      }
-
-      debug.scrollTop = debug.scrollHeight;
-    }
-
-    function clearDebug() {
-      document.getElementById("debugLog").textContent = "";
-    }
-
-    function normaliseSymbol(symbol) {
-      return String(symbol || "").trim().toUpperCase();
+    function normaliseSymbol(value) {
+      return String(value || "").trim().toUpperCase();
     }
 
     function getTickerRoot(symbol) {
       return normaliseSymbol(symbol).split(".")[0];
     }
 
-    function formatMoney(value) {
-      if (value === null || value === undefined || !Number.isFinite(Number(value))) {
-        return "—";
+    function log(message, data = null) {
+      const box = document.getElementById("debugLog");
+      const time = new Date().toLocaleTimeString();
+      box.textContent += `[${time}] ${message}\n`;
+
+      if (data !== null) {
+        box.textContent += JSON.stringify(data, null, 2) + "\n";
       }
 
-      return Number(value).toFixed(2);
+      box.textContent += "\n";
+      box.scrollTop = box.scrollHeight;
     }
 
-    function formatPrice(value) {
-      if (value === null || value === undefined || !Number.isFinite(Number(value))) {
-        return "—";
-      }
-
-      return Number(value).toFixed(4);
+    function clearLog() {
+      document.getElementById("debugLog").textContent = "";
     }
 
-    function formatPercent(value) {
-      if (value === null || value === undefined || !Number.isFinite(Number(value))) {
-        return "—";
-      }
-
-      return `${Number(value).toFixed(2)}%`;
+    function fmtMoney(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return n.toFixed(2);
     }
 
-    function getExchangeHint(symbol) {
-      const s = normaliseSymbol(symbol);
+    function fmtPrice(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return n.toFixed(4);
+    }
 
-      if (s.endsWith(".DE")) return ["XETRA", "F"];
-      if (s.endsWith(".L")) return ["LSE"];
-      if (s.endsWith(".PA")) return ["PA"];
-      if (s.endsWith(".AS")) return ["AS"];
-      if (s.endsWith(".SW")) return ["SW"];
-      if (s.endsWith(".TO")) return ["TO"];
-      if (s.endsWith(".V")) return ["V"];
-      if (s.endsWith(".T")) return ["TSE", "T"];
-      if (s.endsWith(".HK")) return ["HK"];
-      if (s.endsWith(".AX")) return ["AU", "AX"];
-
-      return [];
+    function fmtPercent(value) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return n.toFixed(2) + "%";
     }
 
     function getPriceFromQuote(data) {
       if (!data || typeof data !== "object") return null;
 
-      const value =
+      const raw =
         data.close ??
         data.price ??
+        data.last ??
+        data.previousClose ??
         data.adjusted_close ??
         data.adjustedClose ??
-        data.previousClose ??
-        data.last ??
-        data.value ??
         null;
 
-      const numberValue = Number(value);
+      const n = Number(raw);
 
-      if (!Number.isFinite(numberValue) || numberValue <= 0) {
+      if (!Number.isFinite(n) || n <= 0) {
         return null;
       }
 
-      return numberValue;
-    }
-
-    function looksLikeValidQuote(data) {
-      return getPriceFromQuote(data) !== null;
+      return n;
     }
 
     function getCurrencyFromQuote(data) {
@@ -331,11 +302,15 @@
       );
     }
 
+    function isValidQuote(data) {
+      return getPriceFromQuote(data) !== null;
+    }
+
     /************************************************************
      * HOLDINGS STORAGE
      ************************************************************/
 
-    function loadHoldingsFromStorage() {
+    function loadHoldings() {
       try {
         return JSON.parse(localStorage.getItem("portfolioHoldings") || "[]");
       } catch {
@@ -343,7 +318,7 @@
       }
     }
 
-    function saveHoldingsToStorage() {
+    function saveHoldings() {
       localStorage.setItem("portfolioHoldings", JSON.stringify(portfolioHoldings));
     }
 
@@ -353,7 +328,7 @@
       const avgCost = Number(document.getElementById("holdingAvgCost").value);
 
       if (!symbol) {
-        alert("Enter a symbol.");
+        alert("Enter a symbol, e.g. AIXA.DE");
         return;
       }
 
@@ -375,28 +350,16 @@
         existing.shares = shares;
         existing.avgCost = avgCost;
       } else {
-        portfolioHoldings.push({
-          symbol,
-          shares,
-          avgCost
-        });
+        portfolioHoldings.push({ symbol, shares, avgCost });
       }
 
-      saveHoldingsToStorage();
+      saveHoldings();
 
       document.getElementById("holdingSymbol").value = "";
       document.getElementById("holdingShares").value = "";
       document.getElementById("holdingAvgCost").value = "";
 
-      loadDynamicPortfolio();
-    }
-
-    function clearHoldings() {
-      portfolioHoldings = [];
-      saveHoldingsToStorage();
-      renderRows([]);
-      clearDebug();
-      logDebug("All holdings cleared.");
+      refreshPortfolio();
     }
 
     function removeHolding(symbol) {
@@ -404,15 +367,23 @@
         h => normaliseSymbol(h.symbol) !== normaliseSymbol(symbol)
       );
 
-      saveHoldingsToStorage();
-      loadDynamicPortfolio();
+      saveHoldings();
+      refreshPortfolio();
+    }
+
+    function clearHoldings() {
+      portfolioHoldings = [];
+      saveHoldings();
+      renderRows([]);
+      clearLog();
+      log("Holdings cleared.");
     }
 
     /************************************************************
-     * SYMBOL CACHE
+     * SYMBOL MAPPING CACHE
      ************************************************************/
 
-    function getSymbolCache() {
+    function loadSymbolCache() {
       try {
         return JSON.parse(localStorage.getItem("symbolMapCache") || "{}");
       } catch {
@@ -424,86 +395,85 @@
       localStorage.setItem("symbolMapCache", JSON.stringify(cache));
     }
 
-    function getCachedSymbol(originalSymbol) {
-      const cache = getSymbolCache();
-      return cache[normaliseSymbol(originalSymbol)] || null;
+    function getCachedSymbol(original) {
+      const cache = loadSymbolCache();
+      return cache[normaliseSymbol(original)] || null;
     }
 
-    function setCachedSymbol(originalSymbol, mappedSymbol) {
-      const cache = getSymbolCache();
-      cache[normaliseSymbol(originalSymbol)] = normaliseSymbol(mappedSymbol);
+    function setCachedSymbol(original, resolved) {
+      const cache = loadSymbolCache();
+      cache[normaliseSymbol(original)] = normaliseSymbol(resolved);
       saveSymbolCache(cache);
     }
 
     function clearSymbolCache() {
       localStorage.removeItem("symbolMapCache");
-      clearDebug();
-      logDebug("Symbol mapping cache cleared.");
+      clearLog();
+      log("Symbol cache cleared.");
     }
 
     /************************************************************
-     * WORKER API CALLS
+     * WORKER FETCHERS
      ************************************************************/
 
-    async function fetchWorkerJson(path) {
+    async function fetchWorker(path) {
       const url = `${WORKER_BASE}${path}`;
-
-      logDebug(`Fetching: ${url}`);
+      log("Fetch: " + url);
 
       const res = await fetch(url);
 
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status} from ${url}`);
+        throw new Error(`HTTP ${res.status}`);
       }
 
       return await res.json();
     }
 
     async function fetchQuote(symbol) {
-      const cleanSymbol = normaliseSymbol(symbol);
-
-      return await fetchWorkerJson(
-        `/quote?symbol=${encodeURIComponent(cleanSymbol)}`
-      );
-    }
-
-    async function fetchEod(symbol) {
-      const cleanSymbol = normaliseSymbol(symbol);
-
-      return await fetchWorkerJson(
-        `/eod?symbol=${encodeURIComponent(cleanSymbol)}`
+      return await fetchWorker(
+        `/quote?symbol=${encodeURIComponent(normaliseSymbol(symbol))}`
       );
     }
 
     async function searchSymbol(query) {
-      const cleanQuery = normaliseSymbol(query);
-
-      return await fetchWorkerJson(
-        `/search?q=${encodeURIComponent(cleanQuery)}`
+      return await fetchWorker(
+        `/search?q=${encodeURIComponent(normaliseSymbol(query))}`
       );
     }
 
     /************************************************************
-     * SEARCH RESULT NORMALISATION
+     * EXCHANGE HINTS
      ************************************************************/
 
-    function extractSearchArray(searchResults) {
-      if (Array.isArray(searchResults)) {
-        return searchResults;
-      }
+    function getExchangeHints(originalSymbol) {
+      const s = normaliseSymbol(originalSymbol);
 
-      if (Array.isArray(searchResults?.data)) {
-        return searchResults.data;
-      }
-
-      if (Array.isArray(searchResults?.results)) {
-        return searchResults.results;
-      }
+      if (s.endsWith(".DE")) return ["XETRA", "F"];
+      if (s.endsWith(".L")) return ["LSE"];
+      if (s.endsWith(".PA")) return ["PA"];
+      if (s.endsWith(".AS")) return ["AS"];
+      if (s.endsWith(".SW")) return ["SW"];
+      if (s.endsWith(".TO")) return ["TO"];
+      if (s.endsWith(".V")) return ["V"];
+      if (s.endsWith(".T")) return ["TSE", "T"];
+      if (s.endsWith(".HK")) return ["HK"];
+      if (s.endsWith(".AX")) return ["AU", "AX"];
 
       return [];
     }
 
-    function normaliseSearchResult(item) {
+    /************************************************************
+     * SEARCH RESULT HANDLING
+     ************************************************************/
+
+    function getSearchArray(searchResult) {
+      if (Array.isArray(searchResult)) return searchResult;
+      if (Array.isArray(searchResult?.data)) return searchResult.data;
+      if (Array.isArray(searchResult?.results)) return searchResult.results;
+      return [];
+    }
+
+    function normaliseSearchItem(item) {
       const code = normaliseSymbol(
         item.Code ??
         item.code ??
@@ -520,23 +490,11 @@
         ""
       );
 
-      const ticker = normaliseSymbol(
-        item.Ticker ??
-        item.ticker ??
-        code
-      );
-
       const name = String(
         item.Name ??
         item.name ??
         item.Description ??
         item.description ??
-        ""
-      ).toUpperCase();
-
-      const country = String(
-        item.Country ??
-        item.country ??
         ""
       ).toUpperCase();
 
@@ -546,59 +504,58 @@
         ""
       ).toUpperCase();
 
-      let eodhdSymbol = code;
+      const country = String(
+        item.Country ??
+        item.country ??
+        ""
+      ).toUpperCase();
 
-      if (code && exchange) {
-        eodhdSymbol = `${code}.${exchange}`;
-      }
+      const eodhdSymbol = code && exchange ? `${code}.${exchange}` : code;
 
       return {
-        raw: item,
         code,
         exchange,
-        ticker,
         name,
-        country,
         type,
-        eodhdSymbol
+        country,
+        eodhdSymbol,
+        raw: item
       };
     }
 
-    function pickBestEodhdSymbol(originalSymbol, searchResults) {
+    function pickBestSymbol(originalSymbol, searchResult) {
       const original = normaliseSymbol(originalSymbol);
       const root = getTickerRoot(original);
-      const exchangeHints = getExchangeHint(original);
+      const hints = getExchangeHints(original);
 
-      const results = extractSearchArray(searchResults)
-        .map(normaliseSearchResult)
+      const candidates = getSearchArray(searchResult)
+        .map(normaliseSearchItem)
         .filter(x => x.code || x.eodhdSymbol);
 
-      if (results.length === 0) {
-        return null;
-      }
+      log("Search candidates for " + original, candidates);
 
-      logDebug(`Search candidates for ${original}`, results);
+      if (!candidates.length) return null;
 
-      // 1. Exact EODHD symbol match
-      let best = results.find(x => x.eodhdSymbol === original);
+      // 1. Exact match
+      let best = candidates.find(x => x.eodhdSymbol === original);
       if (best) return best.eodhdSymbol;
 
-      // 2. Same ticker root + expected exchange
-      best = results.find(x =>
+      // 2. Same root + expected exchange
+      best = candidates.find(x =>
         x.code === root &&
-        exchangeHints.some(hint => x.exchange === hint)
+        hints.some(h => x.exchange === h)
       );
       if (best) return best.eodhdSymbol;
 
-      // 3. Same ticker root + exchange contains expected hint
-      best = results.find(x =>
+      // 3. Same root + exchange contains hint
+      best = candidates.find(x =>
         x.code === root &&
-        exchangeHints.some(hint => x.exchange.includes(hint))
+        hints.some(h => x.exchange.includes(h))
       );
       if (best) return best.eodhdSymbol;
 
-      // 4. Same ticker root, prefer common exchanges
-      const preferredExchanges = [
+      // 4. Same root + common good exchanges
+      const preferred = [
         "XETRA",
         "LSE",
         "TSE",
@@ -612,139 +569,114 @@
         "F"
       ];
 
-      best = results.find(x =>
+      best = candidates.find(x =>
         x.code === root &&
-        preferredExchanges.includes(x.exchange)
+        preferred.includes(x.exchange)
       );
       if (best) return best.eodhdSymbol;
 
-      // 5. Same ticker root, any exchange
-      best = results.find(x => x.code === root);
+      // 5. Same root, any exchange
+      best = candidates.find(x => x.code === root);
       if (best) return best.eodhdSymbol;
 
-      // 6. Same ticker field
-      best = results.find(x => x.ticker === root);
-      if (best) return best.eodhdSymbol;
-
-      // 7. Final fallback
-      return results[0]?.eodhdSymbol || null;
+      // 6. Final fallback
+      return candidates[0].eodhdSymbol;
     }
 
     /************************************************************
-     * SMART SYMBOL RESOLVER
+     * SYMBOL RESOLUTION
      ************************************************************/
 
-    async function resolveForeignSymbol(originalSymbol) {
-      const cleanOriginal = normaliseSymbol(originalSymbol);
+    async function resolveSymbol(originalSymbol) {
+      const original = normaliseSymbol(originalSymbol);
 
-      if (!cleanOriginal) {
-        return null;
+      if (!original) {
+        throw new Error("Empty symbol");
       }
 
-      // 1. Use cached mapping first
-      const cached = getCachedSymbol(cleanOriginal);
+      // 1. Cache first
+      const cached = getCachedSymbol(original);
 
       if (cached) {
-        logDebug(`Using cached mapping: ${cleanOriginal} → ${cached}`);
+        log(`Using cache: ${original} → ${cached}`);
 
         return {
-          originalSymbol: cleanOriginal,
-          resolvedSymbol: cached,
+          original,
+          resolved: cached,
           source: "cache"
         };
       }
 
-      // 2. Try original symbol directly
+      // 2. Try direct quote first
       try {
-        const directQuote = await fetchQuote(cleanOriginal);
+        const direct = await fetchQuote(original);
 
-        if (looksLikeValidQuote(directQuote)) {
-          setCachedSymbol(cleanOriginal, cleanOriginal);
-
-          logDebug(`Direct symbol worked: ${cleanOriginal}`, directQuote);
+        if (isValidQuote(direct)) {
+          setCachedSymbol(original, original);
+          log(`Direct worked: ${original}`, direct);
 
           return {
-            originalSymbol: cleanOriginal,
-            resolvedSymbol: cleanOriginal,
+            original,
+            resolved: original,
             source: "direct"
           };
         }
 
-        logDebug(`Direct symbol gave invalid quote: ${cleanOriginal}`, directQuote);
+        log(`Direct invalid for ${original}`, direct);
       } catch (err) {
-        logDebug(`Direct quote failed for ${cleanOriginal}: ${err.message}`);
+        log(`Direct failed for ${original}: ${err.message}`);
       }
 
-      // 3. Search using ticker root
-      const root = getTickerRoot(cleanOriginal);
+      // 3. Search by root
+      const root = getTickerRoot(original);
+      const search = await searchSymbol(root);
+      const mapped = pickBestSymbol(original, search);
 
+      if (!mapped) {
+        log(`No mapping found. Using original: ${original}`);
+
+        return {
+          original,
+          resolved: original,
+          source: "fallback"
+        };
+      }
+
+      // 4. Confirm mapped quote works
       try {
-        const searchResults = await searchSymbol(root);
-        const mappedSymbol = pickBestEodhdSymbol(cleanOriginal, searchResults);
+        const mappedQuote = await fetchQuote(mapped);
 
-        if (!mappedSymbol) {
-          logDebug(`No mapping found for ${cleanOriginal}. Using original.`);
+        if (isValidQuote(mappedQuote)) {
+          setCachedSymbol(original, mapped);
+          log(`Mapped confirmed: ${original} → ${mapped}`, mappedQuote);
 
           return {
-            originalSymbol: cleanOriginal,
-            resolvedSymbol: cleanOriginal,
-            source: "fallback-original"
+            original,
+            resolved: mapped,
+            source: "search"
           };
         }
 
-        // 4. Confirm mapped symbol works
-        const mappedQuote = await fetchQuote(mappedSymbol);
-
-        if (looksLikeValidQuote(mappedQuote)) {
-          setCachedSymbol(cleanOriginal, mappedSymbol);
-
-          logDebug(
-            `Mapped symbol confirmed: ${cleanOriginal} → ${mappedSymbol}`,
-            mappedQuote
-          );
-
-          return {
-            originalSymbol: cleanOriginal,
-            resolvedSymbol: mappedSymbol,
-            source: "search-confirmed"
-          };
-        }
-
-        logDebug(`Mapped symbol did not return valid quote: ${mappedSymbol}`, mappedQuote);
-
-        return {
-          originalSymbol: cleanOriginal,
-          resolvedSymbol: cleanOriginal,
-          source: "fallback-original"
-        };
+        log(`Mapped invalid: ${mapped}`, mappedQuote);
       } catch (err) {
-        logDebug(`Symbol resolve failed for ${cleanOriginal}: ${err.message}`);
-
-        return {
-          originalSymbol: cleanOriginal,
-          resolvedSymbol: cleanOriginal,
-          source: "fallback-error"
-        };
+        log(`Mapped failed: ${mapped}: ${err.message}`);
       }
-    }
-
-    /************************************************************
-     * SMART QUOTE
-     ************************************************************/
-
-    async function getSmartQuote(originalSymbol) {
-      const resolution = await resolveForeignSymbol(originalSymbol);
-
-      if (!resolution?.resolvedSymbol) {
-        throw new Error(`Could not resolve symbol: ${originalSymbol}`);
-      }
-
-      const quote = await fetchQuote(resolution.resolvedSymbol);
 
       return {
-        originalSymbol: resolution.originalSymbol,
-        resolvedSymbol: resolution.resolvedSymbol,
-        source: resolution.source,
+        original,
+        resolved: original,
+        source: "fallback"
+      };
+    }
+
+    async function getSmartQuote(originalSymbol) {
+      const resolvedInfo = await resolveSymbol(originalSymbol);
+      const quote = await fetchQuote(resolvedInfo.resolved);
+
+      return {
+        originalSymbol: resolvedInfo.original,
+        resolvedSymbol: resolvedInfo.resolved,
+        source: resolvedInfo.source,
         quote,
         price: getPriceFromQuote(quote),
         currency: getCurrencyFromQuote(quote)
@@ -755,10 +687,8 @@
      * TABLE RENDERING
      ************************************************************/
 
-    function setLoadingRow(message) {
-      const tbody = document.getElementById("portfolioBody");
-
-      tbody.innerHTML = `
+    function setMessage(message) {
+      document.getElementById("portfolioBody").innerHTML = `
         <tr>
           <td colspan="13" class="small">${message}</td>
         </tr>
@@ -778,24 +708,24 @@
       }
 
       tbody.innerHTML = rows.map(row => {
-        const statusClass = row.ok ? "ok" : "bad";
-
         const pnlClass =
           row.pnl > 0 ? "ok" :
           row.pnl < 0 ? "bad" :
           "";
+
+        const statusClass = row.ok ? "ok" : "bad";
 
         return `
           <tr>
             <td>${row.originalSymbol}</td>
             <td>${row.resolvedSymbol || "—"}</td>
             <td>${row.shares ?? "—"}</td>
-            <td>${formatMoney(row.avgCost)}</td>
-            <td>${formatPrice(row.price)}</td>
-            <td>${formatMoney(row.marketValue)}</td>
-            <td>${formatMoney(row.costValue)}</td>
-            <td class="${pnlClass}">${formatMoney(row.pnl)}</td>
-            <td class="${pnlClass}">${formatPercent(row.returnPct)}</td>
+            <td>${fmtMoney(row.avgCost)}</td>
+            <td>${fmtPrice(row.price)}</td>
+            <td>${fmtMoney(row.marketValue)}</td>
+            <td>${fmtMoney(row.costValue)}</td>
+            <td class="${pnlClass}">${fmtMoney(row.pnl)}</td>
+            <td class="${pnlClass}">${fmtPercent(row.returnPct)}</td>
             <td>${row.currency || "—"}</td>
             <td>${row.source || "—"}</td>
             <td class="${statusClass}">${row.status}</td>
@@ -810,21 +740,95 @@
     }
 
     /************************************************************
-     * UI ACTIONS
+     * MAIN ACTIONS
      ************************************************************/
 
-    async function testSingleSymbol() {
-      clearDebug();
+    async function refreshPortfolio() {
+      clearLog();
 
-      const input = document.getElementById("symbolInput");
-      const symbol = normaliseSymbol(input.value);
+      portfolioHoldings = loadHoldings();
+
+      if (!portfolioHoldings.length) {
+        renderRows([]);
+        log("No holdings found.");
+        return;
+      }
+
+      setMessage("Loading portfolio prices...");
+
+      const rows = [];
+
+      for (const holding of portfolioHoldings) {
+        const symbol = normaliseSymbol(holding.symbol);
+        const shares = Number(holding.shares);
+        const avgCost = Number(holding.avgCost);
+        const costValue = shares * avgCost;
+
+        try {
+          const result = await getSmartQuote(symbol);
+          const price = result.price;
+
+          const marketValue =
+            price !== null ? price * shares : null;
+
+          const pnl =
+            marketValue !== null ? marketValue - costValue : null;
+
+          const returnPct =
+            pnl !== null && costValue > 0 ? (pnl / costValue) * 100 : null;
+
+          rows.push({
+            originalSymbol: result.originalSymbol,
+            resolvedSymbol: result.resolvedSymbol,
+            shares,
+            avgCost,
+            price,
+            marketValue,
+            costValue,
+            pnl,
+            returnPct,
+            currency: result.currency,
+            source: result.source,
+            ok: price !== null,
+            status: price !== null ? "OK" : "No valid price"
+          });
+        } catch (err) {
+          rows.push({
+            originalSymbol: symbol,
+            resolvedSymbol: "—",
+            shares,
+            avgCost,
+            price: null,
+            marketValue: null,
+            costValue,
+            pnl: null,
+            returnPct: null,
+            currency: "—",
+            source: "error",
+            ok: false,
+            status: err.message
+          });
+
+          log(`Error loading ${symbol}: ${err.message}`);
+        }
+
+        renderRows(rows);
+      }
+
+      log("Refresh complete.");
+    }
+
+    async function testSymbol() {
+      clearLog();
+
+      const symbol = normaliseSymbol(document.getElementById("testSymbol").value);
 
       if (!symbol) {
         alert("Enter a symbol first.");
         return;
       }
 
-      setLoadingRow(`Testing ${symbol}...`);
+      setMessage("Testing " + symbol + "...");
 
       try {
         const result = await getSmartQuote(symbol);
@@ -847,127 +851,24 @@
           }
         ]);
 
-        logDebug("Final result", result);
+        log("Test result", result);
       } catch (err) {
-        renderRows([
-          {
-            originalSymbol: symbol,
-            resolvedSymbol: "—",
-            shares: "—",
-            avgCost: null,
-            price: null,
-            marketValue: null,
-            costValue: null,
-            pnl: null,
-            returnPct: null,
-            currency: "—",
-            source: "error",
-            ok: false,
-            status: err.message
-          }
-        ]);
-
-        logDebug(`Error: ${err.message}`);
+        setMessage("Test failed: " + err.message);
+        log("Test failed: " + err.message);
       }
-    }
-
-    async function loadDynamicPortfolio() {
-      clearDebug();
-
-      portfolioHoldings = loadHoldingsFromStorage();
-
-      if (!portfolioHoldings.length) {
-        setLoadingRow("No holdings added yet.");
-        return;
-      }
-
-      setLoadingRow("Loading portfolio prices...");
-
-      const rows = [];
-
-      for (const holding of portfolioHoldings) {
-        try {
-          const result = await getSmartQuote(holding.symbol);
-
-          const price = result.price;
-          const shares = Number(holding.shares);
-          const avgCost = Number(holding.avgCost);
-
-          const marketValue =
-            price !== null
-              ? price * shares
-              : null;
-
-          const costValue =
-            Number.isFinite(avgCost) && Number.isFinite(shares)
-              ? avgCost * shares
-              : null;
-
-          const pnl =
-            marketValue !== null && costValue !== null
-              ? marketValue - costValue
-              : null;
-
-          const returnPct =
-            pnl !== null && costValue > 0
-              ? (pnl / costValue) * 100
-              : null;
-
-          rows.push({
-            originalSymbol: result.originalSymbol,
-            resolvedSymbol: result.resolvedSymbol,
-            shares,
-            avgCost,
-            price,
-            marketValue,
-            costValue,
-            pnl,
-            returnPct,
-            currency: result.currency,
-            source: result.source,
-            ok: price !== null,
-            status: price !== null ? "OK" : "No valid price"
-          });
-        } catch (err) {
-          const shares = Number(holding.shares);
-          const avgCost = Number(holding.avgCost);
-          const costValue = shares * avgCost;
-
-          rows.push({
-            originalSymbol: holding.symbol,
-            resolvedSymbol: "—",
-            shares,
-            avgCost,
-            price: null,
-            marketValue: null,
-            costValue,
-            pnl: null,
-            returnPct: null,
-            currency: "—",
-            source: "error",
-            ok: false,
-            status: err.message
-          });
-        }
-
-        renderRows(rows);
-      }
-
-      logDebug("Dynamic portfolio load finished.");
     }
 
     /************************************************************
-     * AUTO LOAD ON PAGE OPEN
+     * PAGE LOAD
      ************************************************************/
 
     window.addEventListener("load", () => {
-      logDebug("Page loaded.");
-      logDebug("Ready. Add holdings or refresh saved portfolio.");
+      log("Page loaded.");
 
-      portfolioHoldings = loadHoldingsFromStorage();
+      portfolioHoldings = loadHoldings();
 
       if (portfolioHoldings.length) {
-        loadDynamicPortfolio();
+        refreshPortfolio();
       } else {
         renderRows([]);
       }
