@@ -590,7 +590,7 @@ async function refreshLivePrices(){
         q=getFreshCachedQuote(h.code);
         if(q)cacheOk++;
 
-        if(!q && eodKey){
+        if(!q && eodhdAvailable(eodKey)){
           progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via EODHD candidates`;
           q=await fetchEodhdQuote(h.code,eodKey);
           if(q)saveCachedQuote(h.code,q);
