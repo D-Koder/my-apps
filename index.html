@@ -93,7 +93,7 @@ const DEFAULT_FX_API_KEY='9732f4a0ac15202b3c8213a3';
 const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput');
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over')});dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag-over');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0])});fileInput.addEventListener('change',()=>{if(fileInput.files[0])processFile(fileInput.files[0])});
 window.addEventListener('load',()=>{
-  document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'';
+  document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'d7sssbhr01qorsvjt7agd7sssbhr01qorsvjt7b0';
   document.getElementById('eodKey').value=localStorage.getItem('cmc_eodhd_key')||'';
   document.getElementById('eodProxyUrl').value=localStorage.getItem('cmc_eodhd_proxy_url')||DEFAULT_EODHD_PROXY_URL;
   document.getElementById('tdKey').value=localStorage.getItem('cmc_twelvedata_key')||'';
@@ -737,7 +737,7 @@ function importAppDataFromFile(file){
       document.getElementById('importDataInput').value='';
       const progress=document.getElementById('liveProgress');
       if(progress)progress.textContent=`Imported ${count} saved settings/cache entries. Reloading values from storage.`;
-      document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'';
+      document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'d7sssbhr01qorsvjt7agd7sssbhr01qorsvjt7b0';
       document.getElementById('eodKey').value=localStorage.getItem('cmc_eodhd_key')||'';
       document.getElementById('eodProxyUrl').value=localStorage.getItem('cmc_eodhd_proxy_url')||DEFAULT_EODHD_PROXY_URL;
       document.getElementById('tdKey').value=localStorage.getItem('cmc_twelvedata_key')||'';
