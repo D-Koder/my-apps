@@ -206,22 +206,34 @@ async function getFxRates(){
   // Manual inputs are the last emergency fallback only.
   return {...base,...getManualFxRates(),_source:'manual FX fallback'};
 }
-function convertLocalToAUD(local,currency,fxRates,confirmationFx){
-  const localPrice=Number(local);
-  const cur=String(currency||'').toUpperCase();
-  if(!Number.isFinite(localPrice))return local;
-  if(cur==='AUD')return localPrice;
+function convertLocalToAUD(local, currency, fxRates, confirmationFx) {
+  const localPrice = Number(local);
+  const cur = String(currency || '').toUpperCase();
 
-  // Confirmation CSV is the source of truth.
-  // CMC exchange rate is foreign currency per 1 AUD, so AUD = local / rate.
-  const csvFx=Number(confirmationFx);
-  if(Number.isFinite(csvFx)&&csvFx>0)return localPrice/csvFx;
+  if (!Number.isFinite(localPrice)) return local;
+  if (cur === 'AUD') return localPrice;
 
-  // Cached/live ExchangeRate-API fallback. latest/AUD is also foreign currency per 1 AUD.
-  const liveFx=Number(fxRates?.[cur]);
-  if(Number.isFinite(liveFx)&&liveFx>0)return localPrice/liveFx;
+  // 1. Confirmation CSV is source of truth.
+  // CMC Confirmation CSV exchange rate appears to be:
+  // AUD per 1 foreign currency.
+  // Example: USD 665.30 × 1.386 = AUD 922-ish.
+  const csvFx = Number(confirmationFx);
 
-  // Last fallback: leave unconverted.
+  if (Number.isFinite(csvFx) && csvFx > 0) {
+    return localPrice * csvFx;
+  }
+
+  // 2. Live/cached ExchangeRate-API fallback.
+  // latest/AUD returns foreign currency per 1 AUD.
+  // Example: 1 AUD = 0.723 USD.
+  // So AUD = USD / 0.723.
+  const liveFx = Number(fxRates?.[cur]);
+
+  if (Number.isFinite(liveFx) && liveFx > 0) {
+    return localPrice / liveFx;
+  }
+
+  // 3. Final fallback.
   return localPrice;
 }
 
