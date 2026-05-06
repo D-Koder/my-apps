@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CMC Portfolio Tracker · Confirmation Reconcile v17</title>
+<title>CMC Portfolio Tracker · Today Chart v19</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,25 +12,47 @@
 :root{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--border:#2a2a3a;--accent:#00e5a0;--accent2:#ff6b35;--accent3:#4d9fff;--text:#e8e8f0;--muted:#7a7a98;--gain:#00e5a0;--loss:#ff4d6d;--warn:#f5c542}*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;overflow-x:hidden}body:before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0}.header{padding:24px 20px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;position:relative;z-index:1}.header h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 2s ease-in-out infinite;flex-shrink:0}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.subtitle{color:var(--muted);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-left:auto}.main{padding:20px;position:relative;z-index:1}.info-banner{margin-bottom:16px;padding:12px 16px;background:rgba(77,159,255,.07);border:1px solid rgba(77,159,255,.3);border-radius:8px;font-size:11px;color:var(--accent3);line-height:1.7}.info-banner strong{color:var(--text)}#dropZone{border:1.5px dashed var(--border);border-radius:12px;padding:34px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;overflow:hidden}#dropZone:before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(0,229,160,.05) 0%,transparent 70%);pointer-events:none}#dropZone:hover,#dropZone.drag-over{border-color:var(--accent);background:rgba(0,229,160,.04)}#dropZone .icon{font-size:32px;margin-bottom:12px}#dropZone h2{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;margin-bottom:6px}#dropZone p{color:var(--muted);font-size:11px;line-height:1.6}.btn{display:inline-block;margin-top:12px;padding:10px 18px;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'DM Mono',monospace;font-size:11px;border-radius:6px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .2s}.btn:hover,.btn:active{background:var(--accent);color:var(--bg)}.btn.secondary{border-color:var(--border);color:var(--muted)}.btn.secondary:hover{border-color:var(--accent3);color:var(--accent3);background:transparent}.btn.warn{border-color:var(--warn);color:var(--warn)}input[type=file]{display:none}#status{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:12px;display:none;line-height:1.5}#status.info{background:rgba(77,159,255,.1);border:1px solid rgba(77,159,255,.3);color:var(--accent3)}#status.success{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.3);color:var(--accent)}#status.error{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:var(--loss)}#statsRow{display:none;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:20px}.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden;animation:fadeUp .4s ease forwards;opacity:0}@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.stat-card .lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}.stat-card .val{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}.stat-card .sub{font-size:10px;margin-top:3px;color:var(--muted)}.stat-card:after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent3)}.gain{color:var(--gain)}.loss{color:var(--loss)}.muted{color:var(--muted)}#livePanel{display:none;margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}.live-title{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.live-title h3{font-family:'Syne',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:1px}.api-grid{display:grid;grid-template-columns:1fr;gap:8px}.api-row{display:grid;gap:6px}.api-row label{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}.api-row input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:10px;font-family:'DM Mono',monospace;font-size:11px}.api-note{font-size:10px;color:var(--muted);line-height:1.6;margin-top:10px}.live-actions{display:flex;gap:8px;flex-wrap:wrap}.progress{font-size:10px;color:var(--muted);margin-top:8px}.chart-section{display:none;margin-top:20px}.chart-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.chart-header h3{font-family:'Syne',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:1px}.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}#portfolioChart{width:100%!important;height:220px!important}.tabs{display:flex;gap:6px;margin:20px 0 14px;border-bottom:1px solid var(--border)}.tab{padding:8px 16px;font-size:11px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}#holdingsSection{display:none}.hcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}.hcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.hticker{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.tbadge{display:inline-block;padding:3px 8px;border-radius:4px;background:var(--surface2);border:1px solid var(--border);font-size:11px;font-weight:500}.corp-tag{font-size:9px;background:rgba(77,159,255,.15);border:1px solid rgba(77,159,255,.3);color:var(--accent3);border-radius:3px;padding:1px 4px}.live-tag{font-size:9px;background:rgba(0,229,160,.12);border:1px solid rgba(0,229,160,.25);color:var(--accent);border-radius:3px;padding:1px 4px}.fail-tag{font-size:9px;background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.25);color:var(--loss);border-radius:3px;padding:1px 4px}.hval-wrap{text-align:right}.hval{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}.hval-sub{font-size:10px;color:var(--muted);margin-top:2px}.hgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.hstat .hl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}.hstat .hv{font-size:11px}#txSection{display:none}.tx-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}.tx-filter{padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer}.tx-filter.active{background:var(--surface2);border-color:var(--accent3);color:var(--accent3)}.tx-list{display:flex;flex-direction:column;gap:6px}.tx-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.tx-dot{width:8px;height:8px;border-radius:50%}.tx-dot.buy{background:var(--gain)}.tx-dot.sell{background:var(--loss)}.tx-ticker{font-size:11px;font-weight:500}.tx-date,.tx-qty{font-size:10px;color:var(--muted)}.tx-right{text-align:right}.tx-amt{font-size:11px}.last-updated{font-size:10px;color:var(--muted);margin-top:8px;text-align:right}.time-filters{display:flex;gap:6px;flex-wrap:wrap}.range-btn{padding:5px 9px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;margin-top:0;letter-spacing:.5px}.range-btn:hover{border-color:var(--accent3);color:var(--accent3);background:transparent}.range-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,.08)}.chart-point-info{margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.02);color:var(--muted);font-size:11px;line-height:1.6}.chart-point-info strong{color:var(--text)}
 @media(max-width:600px){.main{padding:12px}.header{padding:18px 12px 14px;align-items:flex-start}.header h1{font-size:18px}.subtitle{font-size:8px;margin-left:0}.info-banner{font-size:10px;padding:10px 12px}.live-title{align-items:flex-start;flex-direction:column}.live-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}.live-actions .btn{width:100%;padding:9px 8px;font-size:9px}.chart-header{align-items:flex-start;flex-direction:column;gap:10px}.time-filters{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.range-btn{width:100%;padding:8px 6px;font-size:10px}.chart-wrap{padding:10px}#portfolioChart{height:280px!important}.chart-point-info{font-size:10px;padding:10px}.hgrid{grid-template-columns:repeat(2,1fr)!important}.hcard-top{flex-direction:column}.hval-wrap{text-align:left}.api-grid{grid-template-columns:1fr!important}.api-row input{min-width:0}.stat-card .val{font-size:15px}#statsRow{grid-template-columns:1fr 1fr}.tx-item{grid-template-columns:auto 1fr}.tx-right{text-align:left;grid-column:2}.tabs{overflow-x:auto}.tab{min-width:max-content}}
 @media(min-width:760px){#statsRow{grid-template-columns:repeat(3,1fr)}.api-grid{grid-template-columns:1fr 1fr}.main{max-width:1000px;margin:0 auto}.hgrid{grid-template-columns:repeat(6,1fr)}}
-</style>
+
+/* v18 controls */
+.live-panel-body{display:block}.live-panel-collapsed .live-panel-body{display:none}.live-panel-collapsed{padding-bottom:10px}.privacy-mode .money-mask,.privacy-mode .stat-card .val,.privacy-mode .hval,.privacy-mode .hstat .hv{filter:blur(6px);user-select:none}.privacy-mode .money-mask::selection,.privacy-mode .stat-card .val::selection,.privacy-mode .hval::selection,.privacy-mode .hstat .hv::selection{background:transparent}.utility-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.import-file{display:none!important}.api-warning{font-size:9px;color:var(--warn);line-height:1.5;margin-top:8px}.btn.tiny{padding:7px 10px;font-size:9px;margin-top:0}
+@media(max-width:600px){.utility-actions{display:grid;grid-template-columns:1fr 1fr}.utility-actions .btn{width:100%;padding:9px 8px;font-size:9px}.live-panel-body{width:100%}}</style>
 </head>
 <body>
-<div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Confirm v17</span></div>
+<div class="header"><div class="dot"></div><h1>Portfolio Tracker</h1><span class="subtitle">CMC · Today Chart v19</span></div>
 <div class="main">
-  <div class="info-banner"><strong>Confirmation Reconcile v17</strong> · cost basis rebuilt from Confirmation History only. EODHD uses the smart symbol resolver from your working test app: market candidates first, then EODHD search, then confirmed quote. It now defaults to your Cloudflare Worker proxy so foreign quotes do not hit EODHD directly and avoid CORS.</div>
+  <div class="info-banner"><strong>Today Chart v19</strong> · cost basis rebuilt from Confirmation History only. EODHD uses the smart symbol resolver from your working test app: market candidates first, then EODHD search, then confirmed quote. It now defaults to your Cloudflare Worker proxy so foreign quotes do not hit EODHD directly and avoid CORS.</div>
   <div id="dropZone"><div class="icon">📂</div><h2>Drop your CMC CSV here</h2><p>CMC Invest → Activity → Confirmation History → Download CSV<br>Cost basis in AUD · optional live prices · GitHub Pages friendly</p><button class="btn" onclick="document.getElementById('fileInput').click()">Browse File</button><input type="file" id="fileInput" accept=".csv"></div>
   <div id="status"></div>
   <div id="livePanel">
-    <div class="live-title"><h3>Live Price Mode</h3><div class="live-actions"><button class="btn" onclick="refreshLivePrices()">Refresh live prices</button><button class="btn secondary" onclick="saveKeys()">Save keys</button><button class="btn secondary" onclick="clearQuoteCache()">Clear quote cache</button><button class="btn secondary" onclick="clearFxCache()">Clear FX cache</button></div></div>
-    <div class="api-grid">
-      <div class="api-row"><label>Finnhub API key — US stock quotes</label><input id="finnhubKey" placeholder="paste free Finnhub token here"></div>
-      <div class="api-row"><label>EODHD API key — direct mode only; CORS may block this</label><input id="eodKey" placeholder="optional: direct browser mode"></div>
-      <div class="api-row"><label>EODHD proxy URL — recommended for GitHub Pages / CORS</label><input id="eodProxyUrl" placeholder="https://your-worker.yourname.workers.dev"></div>
-      <div class="api-row"><label>Twelve Data API key — optional backup fallback</label><input id="tdKey" placeholder="optional: paste Twelve Data key here"></div>
-      <div class="api-row"><label>ExchangeRate-API key — live FX backup, cached 12h</label><input id="fxKey" placeholder="saved in browser; used only if CSV FX is missing"></div>
-      <div class="api-row"><label>CMC FX overrides — local currency per 1 AUD</label><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"><input id="fxUSD" placeholder="USD" value="0.722"><input id="fxCAD" placeholder="CAD" value="0.981"><input id="fxEUR" placeholder="EUR" value="0.616"><input id="fxSEK" placeholder="SEK" value="6.702"></div></div>
+    <div class="live-title">
+      <h3>Live Price Mode</h3>
+      <div class="live-actions">
+        <button class="btn" onclick="refreshLivePrices()">Refresh live prices</button>
+        <button class="btn secondary" onclick="toggleLivePanel()" id="toggleLivePanelBtn">Hide API panel</button>
+        <button class="btn secondary" onclick="togglePrivacyMode()" id="privacyBtn">Hide values</button>
+        <button class="btn secondary" onclick="saveKeys()">Save keys</button>
+      </div>
     </div>
-    <div class="api-note">FX priority: Confirmation CSV exchange rate first, cached/live ExchangeRate-API second, manual override last. Live FX rates are saved in this browser for 12 hours. EODHD direct browser calls may be blocked by CORS; use the optional Worker proxy to avoid that. EODHD and Twelve Data fallback quotes are cached for 24 hours so refreshes do not waste limited API calls.</div>
+    <div class="live-panel-body" id="livePanelBody">
+      <div class="api-grid">
+        <div class="api-row"><label>Finnhub API key — US stock quotes</label><input id="finnhubKey" placeholder="paste free Finnhub token here"></div>
+        <div class="api-row"><label>EODHD API key — direct mode only; CORS may block this</label><input id="eodKey" placeholder="optional: direct browser mode"></div>
+        <div class="api-row"><label>EODHD proxy URL — recommended for GitHub Pages / CORS</label><input id="eodProxyUrl" placeholder="https://your-worker.yourname.workers.dev"></div>
+        <div class="api-row"><label>Twelve Data API key — optional backup fallback</label><input id="tdKey" placeholder="optional: paste Twelve Data key here"></div>
+        <div class="api-row"><label>ExchangeRate-API key — live FX backup, cached 12h</label><input id="fxKey" placeholder="saved in browser; used only if CSV FX is missing"></div>
+        <div class="api-row"><label>CMC FX overrides — local currency per 1 AUD</label><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"><input id="fxUSD" placeholder="USD" value="0.722"><input id="fxCAD" placeholder="CAD" value="0.981"><input id="fxEUR" placeholder="EUR" value="0.616"><input id="fxSEK" placeholder="SEK" value="6.702"></div></div>
+      </div>
+      <div class="utility-actions">
+        <button class="btn secondary tiny" onclick="clearQuoteCache()">Clear quote cache</button>
+        <button class="btn secondary tiny" onclick="clearFxCache()">Clear FX cache</button>
+        <button class="btn secondary tiny" onclick="clearPortfolioSnapshots()">Clear snapshots</button>
+        <button class="btn secondary tiny" onclick="exportAppData()">Export data</button>
+        <button class="btn secondary tiny" onclick="document.getElementById('importDataInput').click()">Import data</button>
+        <input type="file" id="importDataInput" class="import-file" accept="application/json,.json" onchange="importAppDataFromFile(this.files[0])">
+      </div>
+      <div class="api-warning">Export includes saved chart snapshots, caches, proxy URL and saved API keys from this browser. Keep the exported JSON private.</div>
+      <div class="api-note">FX priority: Confirmation CSV exchange rate first, cached/live ExchangeRate-API second, manual override last. Live FX rates are saved in this browser for 12 hours. EODHD direct browser calls may be blocked by CORS; use the Worker proxy to avoid that. EODHD and Twelve Data fallback quotes are cached for 24 hours so refreshes do not waste limited API calls.</div>
+    </div>
     <div class="progress" id="liveProgress"></div>
   </div>
   <div id="statsRow">
@@ -80,6 +102,8 @@ window.addEventListener('load',()=>{
   document.getElementById('fxCAD').value=localStorage.getItem('cmc_fx_cad')||'0.981';
   document.getElementById('fxEUR').value=localStorage.getItem('cmc_fx_eur')||'0.616';
   document.getElementById('fxSEK').value=localStorage.getItem('cmc_fx_sek')||'6.702';
+  applyPrivacyMode(localStorage.getItem('cmc_privacy_mode')==='1');
+  applyLivePanelCollapsed(localStorage.getItem('cmc_live_panel_collapsed')==='1');
 });
 function showStatus(msg,type='info'){const el=document.getElementById('status');el.textContent=msg;el.className=type;el.style.display='block'}
 function parseDate(str){if(!str)return null;str=String(str).trim();if(/^\d{4}-\d{2}-\d{2}/.test(str))return new Date(str+'T00:00:00');const m=str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);const d=new Date(str);return isNaN(d)?null:d}
@@ -144,7 +168,7 @@ async function discoverTwelveCandidates(canonical,tdKey){
   return found;
 }
 function inferCurrency(rawCode){rawCode=(rawCode||'').toUpperCase();for(const [s,cur] of Object.entries(suffixCurrency))if(rawCode.endsWith(s))return cur;if(!rawCode.includes(':'))return 'AUD';return 'USD'}
-function build(rows){const trades=[];for(const row of rows){const ot=String(row['Order Type']||'').trim().toUpperCase();if(ot!=='BUY'&&ot!=='SELL')continue;const rawCode=String(row['AsxCode']||'').trim().toUpperCase();if(!rawCode)continue;const code=CORP_ACTIONS[rawCode]||rawCode;const qty=num(row['Quantity']);const priceAUD=num(row['Price']);if(!qty||!priceAUD)continue;const brok=num(row['Brokerage'])+num(row['GST']);const date=parseDate(row['Trade Date']||row['As at Date']||row['Settlement Date']);if(!date)continue;let adjQty=qty,adjPriceAUD=priceAUD;const split=SPLIT_ACTIONS[rawCode];if(split&&date<new Date(split.before+'T00:00:00')){adjQty=qty*split.ratio;adjPriceAUD=priceAUD/split.ratio}const confNo=num(row['Confirmation Number']);const exch=num(row['Exch Rate']||row['Exchange Rate']||row['ExchangeRate']);trades.push({date,confNo,code,rawCode,type:ot,qty:adjQty,displayQty:qty,priceAUD:adjPriceAUD,consideration:qty*priceAUD,brokerage:brok,fx:exch||1,currency:inferCurrency(rawCode),liveSymbol:mapLiveSymbol(rawCode)})}if(!trades.length)throw new Error('No Buy/Sell trades found in CSV');trades.sort((a,b)=>(a.date-b.date)||((a.confNo||0)-(b.confNo||0)));allTrades=trades;const qtyMap={},costMap={},avgMap={},realisedMap={},lastFxMap={},netQtyMap={};for(const t of trades){qtyMap[t.code]??=0;costMap[t.code]??=0;avgMap[t.code]??=0;realisedMap[t.code]??=0;netQtyMap[t.code]??=0;lastFxMap[t.code]=t.fx||lastFxMap[t.code]||1;if(t.type==='BUY'){netQtyMap[t.code]+=t.qty;qtyMap[t.code]+=t.qty;costMap[t.code]+=t.consideration+t.brokerage;avgMap[t.code]=qtyMap[t.code]>0?costMap[t.code]/qtyMap[t.code]:0}else{netQtyMap[t.code]-=t.qty;const avg=avgMap[t.code]||0;const proceeds=t.consideration-t.brokerage;realisedMap[t.code]+=proceeds-(avg*t.qty);qtyMap[t.code]-=t.qty;costMap[t.code]=qtyMap[t.code]>0?avg*qtyMap[t.code]:0;if(Math.abs(qtyMap[t.code])<=0.0001){qtyMap[t.code]=0;costMap[t.code]=0;avgMap[t.code]=0}if(Math.abs(netQtyMap[t.code])<=0.0001)netQtyMap[t.code]=0}}const holdings=[];for(const [code,netQty] of Object.entries(netQtyMap)){if(netQty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(code)){const last=[...trades].reverse().find(t=>t.code===code);const totalCost=costMap[code]||0;const lastPrice=last?.priceAUD||0;holdings.push({code,rawCode:last?.rawCode||code,qty:netQty,totalCost,avgCost:netQty?totalCost/netQty:0,lastPrice,lastDate:last?.date,currency:last?.currency||'USD',liveSymbol:last?.liveSymbol||mapLiveSymbol(code),lastFx:lastFxMap[code]||1,liveLocal:null,liveAUD:null,liveValue:null,liveError:null,updatedAt:null,realisedPnL:realisedMap[code]||0})}}holdings.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));holdingsData=holdings;const totalBuy=trades.filter(t=>t.type==='BUY').reduce((s,t)=>s+t.consideration+t.brokerage,0);const totalRealised=Object.values(realisedMap).reduce((s,v)=>s+v,0);document.getElementById('sTotalIn').textContent=fmt(totalBuy);document.getElementById('sRealised').textContent=(totalRealised>=0?'+':'')+fmt(totalRealised);document.getElementById('sRealised').className='val '+(totalRealised>=0?'gain':'loss');document.getElementById('sCount').textContent=holdings.length;const lastDate=trades.at(-1)?.date;document.getElementById('sDate').textContent=lastDate?'as of '+lastDate.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'';makeChart();updateSummary();renderHoldings();renderTx();document.getElementById('statsRow').style.display='grid';document.getElementById('livePanel').style.display='block';document.getElementById('chartSection').style.display='block';document.getElementById('holdingsSection').style.display='block';document.getElementById('resetBtn').style.display='inline-block';showStatus(`✓ CONFIRMATION RECONCILE v15 SMART EODHD · ${trades.length} transactions · ${holdings.length} current holdings loaded. Foreign stocks use smart EODHD resolver before Finnhub.`,'success')}
+function build(rows){const trades=[];for(const row of rows){const ot=String(row['Order Type']||'').trim().toUpperCase();if(ot!=='BUY'&&ot!=='SELL')continue;const rawCode=String(row['AsxCode']||'').trim().toUpperCase();if(!rawCode)continue;const code=CORP_ACTIONS[rawCode]||rawCode;const qty=num(row['Quantity']);const priceAUD=num(row['Price']);if(!qty||!priceAUD)continue;const brok=num(row['Brokerage'])+num(row['GST']);const date=parseDate(row['Trade Date']||row['As at Date']||row['Settlement Date']);if(!date)continue;let adjQty=qty,adjPriceAUD=priceAUD;const split=SPLIT_ACTIONS[rawCode];if(split&&date<new Date(split.before+'T00:00:00')){adjQty=qty*split.ratio;adjPriceAUD=priceAUD/split.ratio}const confNo=num(row['Confirmation Number']);const exch=num(row['Exch Rate']||row['Exchange Rate']||row['ExchangeRate']);trades.push({date,confNo,code,rawCode,type:ot,qty:adjQty,displayQty:qty,priceAUD:adjPriceAUD,consideration:qty*priceAUD,brokerage:brok,fx:exch||1,currency:inferCurrency(rawCode),liveSymbol:mapLiveSymbol(rawCode)})}if(!trades.length)throw new Error('No Buy/Sell trades found in CSV');trades.sort((a,b)=>(a.date-b.date)||((a.confNo||0)-(b.confNo||0)));allTrades=trades;const qtyMap={},costMap={},avgMap={},realisedMap={},lastFxMap={},netQtyMap={};for(const t of trades){qtyMap[t.code]??=0;costMap[t.code]??=0;avgMap[t.code]??=0;realisedMap[t.code]??=0;netQtyMap[t.code]??=0;lastFxMap[t.code]=t.fx||lastFxMap[t.code]||1;if(t.type==='BUY'){netQtyMap[t.code]+=t.qty;qtyMap[t.code]+=t.qty;costMap[t.code]+=t.consideration+t.brokerage;avgMap[t.code]=qtyMap[t.code]>0?costMap[t.code]/qtyMap[t.code]:0}else{netQtyMap[t.code]-=t.qty;const avg=avgMap[t.code]||0;const proceeds=t.consideration-t.brokerage;realisedMap[t.code]+=proceeds-(avg*t.qty);qtyMap[t.code]-=t.qty;costMap[t.code]=qtyMap[t.code]>0?avg*qtyMap[t.code]:0;if(Math.abs(qtyMap[t.code])<=0.0001){qtyMap[t.code]=0;costMap[t.code]=0;avgMap[t.code]=0}if(Math.abs(netQtyMap[t.code])<=0.0001)netQtyMap[t.code]=0}}const holdings=[];for(const [code,netQty] of Object.entries(netQtyMap)){if(netQty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(code)){const last=[...trades].reverse().find(t=>t.code===code);const totalCost=costMap[code]||0;const lastPrice=last?.priceAUD||0;holdings.push({code,rawCode:last?.rawCode||code,qty:netQty,totalCost,avgCost:netQty?totalCost/netQty:0,lastPrice,lastDate:last?.date,currency:last?.currency||'USD',liveSymbol:last?.liveSymbol||mapLiveSymbol(code),lastFx:lastFxMap[code]||1,liveLocal:null,liveAUD:null,liveValue:null,liveError:null,updatedAt:null,realisedPnL:realisedMap[code]||0})}}holdings.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));holdingsData=holdings;const totalBuy=trades.filter(t=>t.type==='BUY').reduce((s,t)=>s+t.consideration+t.brokerage,0);const totalRealised=Object.values(realisedMap).reduce((s,v)=>s+v,0);document.getElementById('sTotalIn').textContent=fmt(totalBuy);document.getElementById('sRealised').textContent=(totalRealised>=0?'+':'')+fmt(totalRealised);document.getElementById('sRealised').className='val '+(totalRealised>=0?'gain':'loss');document.getElementById('sCount').textContent=holdings.length;const lastDate=trades.at(-1)?.date;document.getElementById('sDate').textContent=lastDate?'as of '+lastDate.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'';makeChart();updateSummary();renderHoldings();renderTx();document.getElementById('statsRow').style.display='grid';document.getElementById('livePanel').style.display='block';document.getElementById('chartSection').style.display='block';document.getElementById('holdingsSection').style.display='block';document.getElementById('resetBtn').style.display='inline-block';showStatus(`✓ TODAY CHART v19 SMART EODHD · ${trades.length} transactions · ${holdings.length} current holdings loaded. Foreign stocks use smart EODHD resolver before Finnhub.`,'success')}
 function updateSummary(){const displayedHoldings=holdingsData.filter(h=>h.qty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(h.code));holdingsData=displayedHoldings;const cost=displayedHoldings.reduce((s,h)=>s+h.totalCost,0);const val=displayedHoldings.reduce((s,h)=>s+(h.liveValue??h.qty*h.lastPrice),0);const pnl=val-cost;console.table(displayedHoldings.map(h=>({code:h.code,units:h.qty,cost:+h.totalCost.toFixed(2),value:+((h.liveValue??h.qty*h.lastPrice)).toFixed(2)})));document.getElementById('sHoldingCost').textContent=fmt(cost);document.getElementById('sLiveValue').textContent=fmt(val);document.getElementById('sLiveSub').textContent=holdingsData.some(h=>h.liveValue!=null)?'live/updated where available':'using last CMC trade price';document.getElementById('sUnrealised').textContent=(pnl>=0?'+':'')+fmt(pnl);document.getElementById('sUnrealised').className='val '+(pnl>=0?'gain':'loss');document.getElementById('sUnrealisedPct').textContent=cost?((pnl>=0?'+':'')+(pnl/cost*100).toFixed(2)+'%'):'—'}
 function getManualFxRates(){
   const manual={AUD:1};
@@ -579,32 +603,52 @@ async function refreshLivePrices(){
   let ok=0,fail=0,tdOk=0,fhOk=0,eodOk=0,cacheOk=0;
   for(let i=0;i<holdingsData.length;i++){
     const h=holdingsData[i];
-    const needsFallback=/:(DE|CA|SE|AU)$/.test(h.code);
-    progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} (${h.liveSymbol})`;
+    const isForeign=/:(DE|CA|SE|AU)$/.test(h.code);
+    const isUS=h.code.endsWith(':US');
+    progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code}`;
     try{
       let q=null;
-
-      if(needsFallback){
-        // Foreign holdings: avoid Finnhub/Yahoo-style symbols like AIXA.DE first.
-        // Prefer EODHD market symbols such as AIXA.XETRA, then cache, then Twelve Data, then Finnhub as last resort.
+      if(isForeign){
         q=getFreshCachedQuote(h.code);
-        if(q)cacheOk++;
-
-        if(!q && eodhdAvailable(eodKey)){
-          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via EODHD candidates`;
+        if(q){cacheOk++;progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} from cache`}
+        if(!q&&eodhdAvailable(eodKey)){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via EODHD Worker`;
           q=await fetchEodhdQuote(h.code,eodKey);
           if(q)saveCachedQuote(h.code,q);
         }
-
-        if(!q && tdKey){
+        if(!q&&tdKey){
           progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Twelve Data fallback`;
           q=await fetchTwelveQuote(h.code,tdKey);
           if(q)saveCachedQuote(h.code,q);
         }
-      } else {
-        q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
+        // Do not use Finnhub for foreign holdings. Finnhub often returns 403 for AIXA.DE, SXGC.V, ATX.V, etc.
+      }else if(isUS){
+        q=getFreshCachedQuote(h.code);
+        if(q){cacheOk++;progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} from cache`}
+        if(!q&&finnhubKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Finnhub (${h.liveSymbol})`;
+          q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
+        if(!q&&eodhdAvailable(eodKey)){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via EODHD backup`;
+          q=await fetchEodhdQuote(h.code,eodKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
+      }else{
+        q=getFreshCachedQuote(h.code);
+        if(q)cacheOk++;
+        if(!q&&eodhdAvailable(eodKey)){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via EODHD`;
+          q=await fetchEodhdQuote(h.code,eodKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
+        if(!q&&finnhubKey){
+          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Finnhub fallback`;
+          q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
+          if(q)saveCachedQuote(h.code,q);
+        }
       }
-
       if(!q)throw new Error('No live quote');
       const local=Number(q.price);
       const aud=convertLocalToAUD(local,h.currency,fxRates,h.lastFx);
@@ -616,7 +660,7 @@ async function refreshLivePrices(){
       h.liveSymbolUsed=q.symbol;
       h.updatedAt=new Date();
       ok++;
-      if(q.source==='Finnhub')fhOk++; else if(String(q.source).startsWith('EODHD'))eodOk++; else if(q.source==='Twelve Data')tdOk++;
+      if(String(q.source||'').startsWith('Finnhub'))fhOk++; else if(String(q.source||'').startsWith('EODHD'))eodOk++; else if(String(q.source||'').startsWith('Twelve'))tdOk++;
     }catch(e){
       h.liveError=e.message||'quote failed';
       h.liveSource=null;
@@ -630,11 +674,86 @@ async function refreshLivePrices(){
   holdingsData.sort((a,b)=>(b.liveValue??b.qty*b.lastPrice)-(a.liveValue??a.qty*a.lastPrice));
   renderHoldings();
   updateSummary();
-  saveTodayPortfolioSnapshot();
+  saveTodayPortfolioSnapshot('live refresh');
   renderPortfolioChart();
-  progress.textContent=`Live refresh done: ${ok} updated (${fhOk} Finnhub, ${eodOk} EODHD, ${tdOk} Twelve Data, ${cacheOk} cached), ${fail} fallback to last CMC trade price. Snapshot saved for chart. FX used: Confirmation CSV first, then ${fxRates._source||'cached/live FX'}, then manual fallback.`;
+  progress.textContent=`Live refresh done: ${ok} updated (${fhOk} Finnhub, ${eodOk} EODHD, ${tdOk} Twelve Data, ${cacheOk} cached), ${fail} fallback to last CMC trade price. Snapshot saved for chart. Today is always shown on chart. FX used: Confirmation CSV first, then ${fxRates._source||'cached/live FX'}, then manual fallback.`;
   document.getElementById('lastUpdated').textContent='Live refresh · '+new Date().toLocaleString('en-AU');
 }
+
+function applyLivePanelCollapsed(collapsed){
+  const panel=document.getElementById('livePanel');
+  const btn=document.getElementById('toggleLivePanelBtn');
+  if(!panel)return;
+  panel.classList.toggle('live-panel-collapsed',Boolean(collapsed));
+  if(btn)btn.textContent=collapsed?'Show API panel':'Hide API panel';
+}
+function toggleLivePanel(){
+  const collapsed=!document.getElementById('livePanel').classList.contains('live-panel-collapsed');
+  localStorage.setItem('cmc_live_panel_collapsed',collapsed?'1':'0');
+  applyLivePanelCollapsed(collapsed);
+}
+function applyPrivacyMode(enabled){
+  document.body.classList.toggle('privacy-mode',Boolean(enabled));
+  const btn=document.getElementById('privacyBtn');
+  if(btn)btn.textContent=enabled?'Show values':'Hide values';
+}
+function togglePrivacyMode(){
+  const enabled=!document.body.classList.contains('privacy-mode');
+  localStorage.setItem('cmc_privacy_mode',enabled?'1':'0');
+  applyPrivacyMode(enabled);
+}
+const EXPORT_STORAGE_KEYS=[
+  'cmc_finnhub_key','cmc_eodhd_key','cmc_eodhd_proxy_url','cmc_twelvedata_key','cmc_fx_key','cmc_fx_usd','cmc_fx_cad','cmc_fx_eur','cmc_fx_sek',
+  'cmc_daily_quote_cache_v2','cmc_eodhd_symbol_cache_v3','cmc_live_fx_rates_cache_v1','cmc_portfolio_snapshots_v1','cmc_td_symbol_cache','cmc_privacy_mode','cmc_live_panel_collapsed'
+];
+function exportAppData(){
+  const data={version:'v18',exportedAt:new Date().toISOString(),localStorage:{}};
+  for(const key of EXPORT_STORAGE_KEYS){
+    const value=localStorage.getItem(key);
+    if(value!==null)data.localStorage[key]=value;
+  }
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='cmc-portfolio-tracker-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href);
+  const progress=document.getElementById('liveProgress');
+  if(progress)progress.textContent='Export created. Keep it private because it may include API keys saved in this browser.';
+}
+function importAppDataFromFile(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      const store=data.localStorage||{};
+      let count=0;
+      for(const [key,value] of Object.entries(store)){
+        if(EXPORT_STORAGE_KEYS.includes(key)){
+          localStorage.setItem(key,String(value));
+          count++;
+        }
+      }
+      document.getElementById('importDataInput').value='';
+      const progress=document.getElementById('liveProgress');
+      if(progress)progress.textContent=`Imported ${count} saved settings/cache entries. Reloading values from storage.`;
+      document.getElementById('finnhubKey').value=localStorage.getItem('cmc_finnhub_key')||'';
+      document.getElementById('eodKey').value=localStorage.getItem('cmc_eodhd_key')||'';
+      document.getElementById('eodProxyUrl').value=localStorage.getItem('cmc_eodhd_proxy_url')||DEFAULT_EODHD_PROXY_URL;
+      document.getElementById('tdKey').value=localStorage.getItem('cmc_twelvedata_key')||'';
+      document.getElementById('fxKey').value=localStorage.getItem('cmc_fx_key')||DEFAULT_FX_API_KEY;
+      document.getElementById('fxUSD').value=localStorage.getItem('cmc_fx_usd')||'0.722';
+      document.getElementById('fxCAD').value=localStorage.getItem('cmc_fx_cad')||'0.981';
+      document.getElementById('fxEUR').value=localStorage.getItem('cmc_fx_eur')||'0.616';
+      document.getElementById('fxSEK').value=localStorage.getItem('cmc_fx_sek')||'6.702';
+      applyPrivacyMode(localStorage.getItem('cmc_privacy_mode')==='1');
+      applyLivePanelCollapsed(localStorage.getItem('cmc_live_panel_collapsed')==='1');
+      renderPortfolioChart();
+    }catch(e){showStatus('Import failed: '+(e.message||e),'error')}
+  };
+  reader.readAsText(file);
+}
+
 function clearQuoteCache(){localStorage.removeItem(QUOTE_CACHE_KEY);localStorage.removeItem(EODHD_SYMBOL_CACHE_KEY);document.getElementById('liveProgress').textContent='Daily quote cache and EODHD symbol cache cleared.'}
 function saveKeys(){
   localStorage.setItem('cmc_finnhub_key',document.getElementById('finnhubKey').value.trim());
@@ -657,23 +776,81 @@ const PORTFOLIO_SNAPSHOT_KEY='cmc_portfolio_snapshots_v1';
 function getPortfolioSnapshots(){try{return JSON.parse(localStorage.getItem(PORTFOLIO_SNAPSHOT_KEY)||'[]')}catch(e){return []}}
 function savePortfolioSnapshots(rows){try{localStorage.setItem(PORTFOLIO_SNAPSHOT_KEY,JSON.stringify(rows))}catch(e){console.warn('Could not save portfolio snapshots',e)}}
 function clearPortfolioSnapshots(){localStorage.removeItem(PORTFOLIO_SNAPSHOT_KEY);makeChart();document.getElementById('liveProgress').textContent='Portfolio value snapshots cleared. Chart is using CSV ledger history until new live snapshots are saved.'}
-function saveTodayPortfolioSnapshot(){
+function saveTodayPortfolioSnapshot(reason='manual/live'){
   const displayedHoldings=holdingsData.filter(h=>h.qty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(h.code));
-  if(!displayedHoldings.length)return;
-  const costBasis=displayedHoldings.reduce((s,h)=>s+h.totalCost,0);
-  const portfolioValue=displayedHoldings.reduce((s,h)=>s+(h.liveValue??h.qty*h.lastPrice),0);
+  const costBasis=displayedHoldings.reduce((sum,h)=>sum+h.totalCost,0);
+  const portfolioValue=displayedHoldings.reduce((sum,h)=>sum+(h.liveValue??h.qty*h.lastPrice),0);
   const today=new Date().toISOString().split('T')[0];
   const snapshots=getPortfolioSnapshots();
-  const row={date:today,cost:costBasis,value:portfolioValue,pnl:portfolioValue-costBasis,source:'live snapshot',updatedAt:new Date().toISOString()};
+  const row={
+    date:today,
+    cost:costBasis,
+    value:portfolioValue,
+    pnl:portfolioValue-costBasis,
+    source:reason,
+    updatedAt:new Date().toISOString(),
+    holdings:displayedHoldings.map(h=>({
+      code:h.code,
+      qty:h.qty,
+      avgCost:h.avgCost,
+      totalCost:h.totalCost,
+      localPrice:h.liveLocal,
+      audPrice:h.liveAUD??h.lastPrice,
+      value:h.liveValue??h.qty*h.lastPrice,
+      currency:h.currency,
+      source:h.liveSource||'CSV last trade',
+      symbol:h.liveSymbolUsed||h.liveSymbol
+    }))
+  };
   const idx=snapshots.findIndex(x=>x.date===today);
   if(idx>=0)snapshots[idx]=row; else snapshots.push(row);
   snapshots.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   savePortfolioSnapshots(snapshots);
 }
+function getTodayChartPoint(){
+  const displayedHoldings=holdingsData.filter(h=>h.qty>0.001&&!CURRENT_HOLDING_EXCLUSIONS.has(h.code));
+  if(!displayedHoldings.length)return null;
+  const today=new Date().toISOString().split('T')[0];
+  const cost=displayedHoldings.reduce((sum,h)=>sum+h.totalCost,0);
+  const value=displayedHoldings.reduce((sum,h)=>sum+(h.liveValue??h.qty*h.lastPrice),0);
+  const hasLive=displayedHoldings.some(h=>h.liveValue!=null);
+  return {
+    date:today,
+    cost,
+    value,
+    pnl:value-cost,
+    source:hasLive?'today live/current':'today last CMC trade',
+    updatedAt:new Date().toISOString(),
+    isToday:true
+  };
+}
 function getChartDataWithSnapshots(){
-  const snapshots=getPortfolioSnapshots().filter(x=>x&&x.date&&Number.isFinite(Number(x.cost))&&Number.isFinite(Number(x.value))).map(x=>({date:x.date,cost:Number(x.cost),value:Number(x.value),source:x.source||'live snapshot',updatedAt:x.updatedAt||''}));
-  if(snapshots.length>=2)return snapshots;
-  return allChartData.map(x=>({...x,source:x.source||'CSV ledger estimate'}));
+  const data=[];
+  const upsert=(row)=>{
+    if(!row||!row.date||!Number.isFinite(Number(row.cost))||!Number.isFinite(Number(row.value)))return;
+    const clean={...row,cost:Number(row.cost),value:Number(row.value),source:row.source||'CSV ledger estimate'};
+    const idx=data.findIndex(x=>x.date===clean.date);
+    if(idx>=0)data[idx]={...data[idx],...clean}; else data.push(clean);
+  };
+
+  // 1. CSV ledger history is the base: steady, auditable, and free.
+  for(const row of allChartData){
+    upsert({...row,source:row.source||'CSV ledger estimate'});
+  }
+
+  // 2. Saved live snapshots overwrite the same date for better accuracy.
+  const snapshots=getPortfolioSnapshots();
+  for(const snap of snapshots){
+    upsert({...snap,source:snap.source||'live snapshot'});
+  }
+
+  // 3. Always show today's point, even before a live refresh.
+  // If live prices were refreshed, this uses live values; otherwise it uses last CMC trade values.
+  const todayPoint=getTodayChartPoint();
+  if(todayPoint)upsert(todayPoint);
+
+  data.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  return data;
 }
 function makeChart(){
   const daily={},runQty={},runCost={},lastKnownPrice={};
@@ -756,8 +933,8 @@ function renderPortfolioChart(){
     data:{
       labels:filtered.map(d=>d.date),
       datasets:[
-        {label:'Cost Basis AUD',data:filtered.map(d=>d.cost),borderColor:'#4d9fff',backgroundColor:'rgba(77,159,255,.10)',fill:false,borderWidth:2,pointRadius:isSmallScreen()?1:2,pointHoverRadius:isSmallScreen()?4:5,tension:.25},
-        {label:'Portfolio Value AUD',data:filtered.map(d=>d.value),borderColor:'#00e5a0',backgroundColor:'rgba(0,229,160,.10)',fill:false,borderWidth:2,pointRadius:isSmallScreen()?1:2,pointHoverRadius:isSmallScreen()?4:5,tension:.25}
+        {label:'Cost Basis AUD',data:filtered.map(d=>d.cost),borderColor:'#4d9fff',backgroundColor:'rgba(77,159,255,.10)',fill:false,borderWidth:2,pointRadius:0,pointHoverRadius:isSmallScreen()?4:5,tension:.25},
+        {label:'Portfolio Value AUD',data:filtered.map(d=>d.value),borderColor:'#00e5a0',backgroundColor:'rgba(0,229,160,.10)',fill:false,borderWidth:2,pointRadius:0,pointHoverRadius:isSmallScreen()?4:5,tension:.25}
       ]
     },
     options:{
