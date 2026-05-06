@@ -601,11 +601,6 @@ async function refreshLivePrices(){
           q=await fetchTwelveQuote(h.code,tdKey);
           if(q)saveCachedQuote(h.code,q);
         }
-
-        if(!q && finnhubKey){
-          progress.textContent=`Fetching ${i+1}/${holdingsData.length}: ${h.code} via Finnhub fallback (${h.liveSymbol})`;
-          q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
-        }
       } else {
         q=await fetchFinnhubQuote(h.liveSymbol,finnhubKey);
       }
